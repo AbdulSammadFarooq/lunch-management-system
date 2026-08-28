@@ -64,18 +64,3 @@ You can have 2, 5, 10, or any number of participants.
 ## Running
 
 Use VS Code Live Server, or any local HTTP server. Do not open `index.html` directly with `file://`, because browsers block the JSON fetch in that mode.
-
-// {
-    //   "date": "2026-08-27",
-    //   "participants": [
-    //     1,
-    //     2,
-    //     3
-    //   ],
-    //   "expenses": [
-    //     {
-    //       "amount": 1200,
-    //       "paidBy": 1
-    //     }
-    //   ]
-    // }
