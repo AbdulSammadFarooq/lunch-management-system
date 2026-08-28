@@ -260,6 +260,8 @@ tr:last-child td {
 }
 .history-row strong {
   color: #172033;
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 .formula-grid {
   display: grid;

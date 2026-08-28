@@ -351,12 +351,24 @@ function renderExpenses(today, people) {
 }
 
 function renderHistory(days) {
+  const names = new Map((data.people || []).map((person) => [person.id, person.name]));
+
   $("history").innerHTML =
     [...days]
       .reverse()
       .map((x) => {
         const splitLabel =
           x.day.splitType === "custom" ? "Custom split" : "Equal split";
+        const participants = x.participantIds
+          .map((personId) => names.get(personId) || "Unknown")
+          .map(escapeHtml)
+          .join(", ");
+        const payers = [...x.paid.entries()]
+          .map(
+            ([personId, amount]) =>
+              `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
+          )
+          .join(", ");
 
         return `
       <article class="history-card">
@@ -366,7 +378,12 @@ function renderHistory(days) {
 
         <div class="history-row">
           <span>Participants</span>
-          <strong>${x.participantIds.length}</strong>
+          <strong>${participants || "None"}</strong>
+        </div>
+
+        <div class="history-row">
+          <span>Paid by</span>
+          <strong>${payers || "None"}</strong>
         </div>
 
         <div class="history-row">
