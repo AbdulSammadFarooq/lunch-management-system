@@ -2,6 +2,35 @@ let data = null;
 
 const $ = (id) => document.getElementById(id);
 
+// Initialize theme on page load
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  if (savedTheme === 'dark') {
+    document.body.classList.add('dark-mode');
+    updateThemeIcon('☀️');
+  } else {
+    updateThemeIcon('🌙');
+  }
+
+  const themeToggle = $('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', toggleTheme);
+  }
+}
+
+function toggleTheme() {
+  const isDarkMode = document.body.classList.toggle('dark-mode');
+  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+  updateThemeIcon(isDarkMode ? '☀️' : '🌙');
+}
+
+function updateThemeIcon(icon) {
+  const themeIcon = document.querySelector('.theme-icon');
+  if (themeIcon) {
+    themeIcon.textContent = icon;
+  }
+}
+
 function money(value, signed = false) {
   const n = Number(value) || 0;
   const prefix = signed && n > 0 ? "+" : n < 0 ? "-" : "";
@@ -176,7 +205,7 @@ function render() {
   };
 
   $("currentDate").textContent = dateLabel(today.day.date);
-
+  $('lunchDateHeading').textContent = dateLabel(today.day.date);
   $("todayExpense").textContent = money(today.total);
 
   $("perHead").textContent = money(today.perHead);
@@ -204,6 +233,7 @@ function render() {
   renderWallets(calc);
   renderExpenses(today, calc.people);
   renderHistory(calc.daily);
+  renderWalletBalanceChart(calc);
 }
 
 function status(balance) {
@@ -417,8 +447,59 @@ function renderHistory(days) {
   `;
 }
 
+// Chart instance
+let walletChart = null;
+
+function renderWalletBalanceChart(calc) {
+  const ctx = $("walletBalanceChart");
+  if (!ctx) return;
+
+  if (walletChart) walletChart.destroy();
+
+  const names = calc.people.map(p => p.name);
+  const balances = calc.people.map(p => calc.balances.get(p.id) || 0);
+
+  const colors = balances.map(b => 
+    b > 0 ? "#10b981" : b < 0 ? "#ef4444" : "#94a3b8"
+  );
+
+  walletChart = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: names,
+      datasets: [{
+        label: "Current Balance",
+        data: balances,
+        backgroundColor: colors,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: function(value) {
+              return `Rs. ${value.toLocaleString()}`;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+
+
 async function init() {
   try {
+    initializeTheme();
+
     const response = await fetch("data.json");
 
     if (!response.ok) {

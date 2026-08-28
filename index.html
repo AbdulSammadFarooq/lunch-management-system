@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#0f172a">
   <title>Lunch Ledger</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app">
@@ -15,7 +16,12 @@
         <h1>🍛 Lunch Ledger</h1>
         <p class="muted">Track participants, expenses and wallet balances from one JSON file.</p>
       </div>
-      <div class="date-chip" id="currentDate">—</div>
+      <div class="header-actions">
+        <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <div class="date-chip" id="currentDate">—</div>
+      </div>
     </header>
 
     <main>
@@ -28,7 +34,7 @@
 
       <section class="panel">
         <div class="panel-head">
-          <div><h2>Today's Lunch</h2><p>Select who ate and see exactly how today's expense affects each wallet.</p></div>
+          <div><h2 id="lunchDateHeading">Today's Lunch</h2><p>Select who ate and see exactly how today's expense affects each wallet.</p></div>
           <span class="badge" id="todayBadge">0 people</span>
         </div>
 
@@ -72,6 +78,13 @@
       <section class="panel">
         <div class="panel-head"><div><h2>Lunch History</h2><p>Daily expense and per-head calculation.</p></div></div>
         <div id="history" class="history"></div>
+      </section>
+
+      <section class="panel analytics-section">
+        <div class="panel-head"><div><h2>Wallet Balance Snapshot</h2><p>Current balance for each person.</p></div></div>
+        <div class="chart-container">
+          <canvas id="walletBalanceChart"></canvas>
+        </div>
       </section>
 
       <section class="panel formula">
