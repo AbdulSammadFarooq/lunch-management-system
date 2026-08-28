@@ -236,6 +236,8 @@ function renderPeople(calc, today) {
 
         return `
       <tr>
+        <td>${escapeHtml(p.id)}</td>
+
         <td class="person">
           ${escapeHtml(p.name)}
         </td>
@@ -286,7 +288,11 @@ function renderPeople(calc, today) {
 
 function renderWallets(calc) {
   $("walletList").innerHTML =
-    calc.people
+    [...calc.people]
+      .sort(
+        (a, b) =>
+          (calc.balances.get(b.id) || 0) - (calc.balances.get(a.id) || 0)
+      )
       .map((p) => {
         const balance = calc.balances.get(p.id) || 0;
 
