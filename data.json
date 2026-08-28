@@ -1,0 +1,47 @@
+{
+  "settings": {
+    "currency": "Rs.",
+    "currencyCode": "PKR"
+  },
+  "people": [
+    {
+      "id": 1,
+      "name": "Abdul Sammad",
+      "initialBalance": -702.43
+    },
+    {
+      "id": 2,
+      "name": "Wajahat Hussain",
+      "initialBalance": 446.97
+    },
+    {
+      "id": 3,
+      "name": "Umair Zafar",
+      "initialBalance": -1344.98
+    },
+    {
+      "id": 4,
+      "name": "Rizwan Khan",
+      "initialBalance": -1421.15
+    },
+    {
+      "id": 5,
+      "name": "Muhammad Junaid",
+      "initialBalance": 2535.73
+    },
+    {
+      "id": 6,
+      "name": "Arslan",
+      "initialBalance": 295.69
+    },
+    {
+      "id": 7,
+      "name": "Adeel Ahmed",
+      "initialBalance": 190.17
+    }
+  ],
+  "days": [
+    
+  ]
+}
+
