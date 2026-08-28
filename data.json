@@ -52,7 +52,7 @@
       "participants": [
         {
           "personId": 1,
-          "share": 881.875
+          "share": 882.37
         },
         {
           "personId": 2,
@@ -65,15 +65,11 @@
         {
           "personId": 5,
           "share": 881.875
-        },
-        {
-          "personId": 8,
-          "share": 705.5
         }
       ],
       "expenses": [
         {
-          "amount": 4233,
+          "amount": 3528,
           "paidBy": 1
         }
       ]
