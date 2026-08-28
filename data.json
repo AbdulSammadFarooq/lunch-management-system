@@ -38,7 +38,45 @@
       "id": 7,
       "name": "Adeel Ahmed",
       "initialBalance": 190.17
+    },
+    {
+      "id": 8,
+      "name": "Kashif",
+      "initialBalance": 0
     }
   ],
-  "days": []
+  "days": [
+    {
+      "date": "2026-08-28",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 881.875
+        },
+        {
+          "personId": 2,
+          "share": 881.875
+        },
+        {
+          "personId": 3,
+          "share": 881.875
+        },
+        {
+          "personId": 5,
+          "share": 881.875
+        },
+        {
+          "personId": 8,
+          "share": 705.5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 4233,
+          "paidBy": 1
+        }
+      ]
+    }
+  ]
 }
