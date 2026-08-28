@@ -467,7 +467,151 @@ body.dark-mode .error {
   padding: 10px 0;
 }
 
-@media (max-width: 900px) {
+/* --- Monthly Expenses --- */
+
+.monthly-expenses {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 16px;
+}
+
+.monthly-card {
+  background: #fff;
+  border: 1px solid #e7ebf2;
+  border-radius: 14px;
+  padding: 16px;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .monthly-card {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+.monthly-card:hover {
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+body.dark-mode .monthly-card:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+}
+
+.monthly-month {
+  font-weight: 800;
+  font-size: 14px;
+  color: #3159a6;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+body.dark-mode .monthly-month {
+  color: #60a5fa;
+}
+
+.monthly-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.monthly-table thead th {
+  background: transparent;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: left;
+  padding: 8px 0;
+  border-bottom: 1px solid #e7ebf2;
+}
+
+body.dark-mode .monthly-table thead th {
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+
+.monthly-table td {
+  padding: 10px 0;
+  border-bottom: 1px solid #edf0f4;
+}
+
+body.dark-mode .monthly-table td {
+  border-bottom-color: #334155;
+}
+
+.monthly-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.monthly-table td.person {
+  font-weight: 750;
+  color: #172033;
+}
+
+body.dark-mode .monthly-table td.person {
+.monthly-table td.person {
+  font-weight: 750;
+  color: #172033;
+}
+
+body.dark-mode .monthly-table td.person {
+  color: #e2e8f0;
+}
+
+/* --- Monthly Totals --- */
+
+.monthly-totals {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.monthly-total-card {
+  background: linear-gradient(135deg, #e8eefc 0%, #f0f4fc 100%);
+  border: 1px solid #d0dff5;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+body.dark-mode .monthly-total-card {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-color: #334155;
+}
+
+.monthly-total-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(49, 89, 166, 0.15);
+}
+
+body.dark-mode .monthly-total-card:hover {
+  box-shadow: 0 8px 24px rgba(96, 165, 250, 0.15);
+}
+
+.monthly-total-month {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+
+body.dark-mode .monthly-total-month {
+  color: #94a3b8;
+}
+
+.monthly-total-amount {
+  font-size: 24px;
+  font-weight: 850;
+  color: #3159a6;
+  letter-spacing: -0.02em;
+}
+
+body.dark-mode .monthly-total-amount {
+  color: #60a5fa;
+}
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -518,10 +662,19 @@ body.dark-mode .error {
   .today-summary div:last-child {
     border-bottom: 0;
   }
+  .monthly-expenses {
+    grid-template-columns: 1fr;
+  }
+  .monthly-totals {
+    grid-template-columns: repeat(2, 1fr);
+  }
   .history {
     grid-template-columns: 1fr;
   }
   .formula-grid {
+    grid-template-columns: 1fr;
+  }
+  .monthly-totals {
     grid-template-columns: 1fr;
   }
   .panel-head {

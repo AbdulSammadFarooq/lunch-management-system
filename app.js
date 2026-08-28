@@ -232,6 +232,8 @@ function render() {
   renderPeople(calc, today);
   renderWallets(calc);
   renderExpenses(today, calc.people);
+  renderMonthlyExpenses(calc);
+  renderMonthlyTotals(calc);
   renderHistory(calc.daily);
   renderWalletBalanceChart(calc);
 }
@@ -386,11 +388,114 @@ function renderExpenses(today, people) {
   `;
 }
 
+function renderMonthlyExpenses(calc) {
+  const names = new Map((data.people || []).map((person) => [person.id, person.name]));
+  
+  // Group expenses by month and person
+  const monthlyData = {};
+  
+  for (const day of calc.daily) {
+    const date = new Date(`${day.day.date}T00:00:00`);
+    const monthKey = date.toLocaleDateString("en-PK", { year: "numeric", month: "long" });
+    
+    if (!monthlyData[monthKey]) {
+      monthlyData[monthKey] = {};
+      for (const person of calc.people) {
+        monthlyData[monthKey][person.id] = 0;
+      }
+    }
+    
+    // Add paid amounts for each person
+    for (const [personId, amount] of day.paid) {
+      monthlyData[monthKey][personId] = (monthlyData[monthKey][personId] || 0) + amount;
+    }
+  }
+
+  const monthlyHtml = Object.entries(monthlyData)
+    .reverse()
+    .map(([month, personExpenses]) => {
+      const rows = calc.people
+        .map(person => {
+          const amount = personExpenses[person.id] || 0;
+          return `
+        <tr>
+          <td class="person">${escapeHtml(person.name)}</td>
+          <td class="${amount > 0 ? "positive" : "zero"}">
+            ${money(amount)}
+          </td>
+        </tr>
+      `;
+        })
+        .join("");
+
+      return `
+      <div class="monthly-card">
+        <div class="monthly-month">${month}</div>
+        <table class="monthly-table">
+          <thead>
+            <tr>
+              <th>Person</th>
+              <th>Total Paid</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows}
+          </tbody>
+        </table>
+      </div>
+    `;
+    })
+    .join("");
+
+  $("monthlyExpenses").innerHTML = monthlyHtml || `
+    <div class="empty">
+      No expense data available.
+    </div>
+  `;
+}
+
+function renderMonthlyTotals(calc) {
+  // Group expenses by month
+  const monthlyTotals = {};
+  
+  for (const day of calc.daily) {
+    const date = new Date(`${day.day.date}T00:00:00`);
+    const monthKey = date.toLocaleDateString("en-PK", { year: "numeric", month: "long" });
+    
+    if (!monthlyTotals[monthKey]) {
+      monthlyTotals[monthKey] = 0;
+    }
+    
+    monthlyTotals[monthKey] += day.total;
+  }
+
+  const monthlyHtml = Object.entries(monthlyTotals)
+    .reverse()
+    .map(([month, total]) => {
+      return `
+      <div class="monthly-total-card">
+        <div class="monthly-total-month">${month}</div>
+        <div class="monthly-total-amount">${money(total)}</div>
+      </div>
+    `;
+    })
+    .join("");
+
+  $("monthlyTotals").innerHTML = monthlyHtml || `
+    <div class="empty">
+      No expense data available.
+    </div>
+  `;
+}
+
 function renderHistory(days) {
   const names = new Map((data.people || []).map((person) => [person.id, person.name]));
 
+  // Show only last 10 days
+  const lastTenDays = [...days].reverse().slice(0, 10).reverse();
+
   $("history").innerHTML =
-    [...days]
+    [...lastTenDays]
       .reverse()
       .map((x) => {
         const splitLabel =
