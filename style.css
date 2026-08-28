@@ -486,6 +486,7 @@ body.dark-mode .error {
 body.dark-mode .monthly-card {
   background: #1e293b;
   border-color: #334155;
+  color: #e2e8f0;
 }
 
 .monthly-card:hover {
@@ -515,6 +516,10 @@ body.dark-mode .monthly-month {
   font-size: 12px;
 }
 
+body.dark-mode .monthly-table {
+  background: transparent;
+}
+
 .monthly-table thead th {
   background: transparent;
   color: #64748b;
@@ -528,6 +533,7 @@ body.dark-mode .monthly-month {
 body.dark-mode .monthly-table thead th {
   color: #94a3b8;
   border-bottom-color: #334155;
+  background: transparent;
 }
 
 .monthly-table td {
@@ -549,13 +555,24 @@ body.dark-mode .monthly-table td {
 }
 
 body.dark-mode .monthly-table td.person {
-.monthly-table td.person {
-  font-weight: 750;
+  color: #e2e8f0;
+}
+
+.monthly-table td {
   color: #172033;
 }
 
-body.dark-mode .monthly-table td.person {
+body.dark-mode .monthly-table td {
   color: #e2e8f0;
+}
+
+.monthly-table td.positive {
+  color: #16824a;
+  font-weight: 800;
+}
+
+body.dark-mode .monthly-table td.positive {
+  color: #86efac;
 }
 
 /* --- Monthly Totals --- */
