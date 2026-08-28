@@ -121,7 +121,7 @@ function calculate() {
     people.map((p) => [p.id, Number(p.initialBalance) || 0])
   );
 
-  const daily = [];
+  const dailyByDate = new Map();
 
   for (const day of days) {
     const participants = Array.isArray(day.participants)
@@ -166,7 +166,7 @@ function calculate() {
       balances.set(p.id, (balances.get(p.id) || 0) + change);
     }
 
-    daily.push({
+    const transaction = {
       day,
       participants,
       participantIds,
@@ -176,8 +176,42 @@ function calculate() {
       paid,
       shares,
       changes
-    });
+    };
+
+    const grouped = dailyByDate.get(day.date) || {
+      day: { date: day.date },
+      participants: [],
+      participantIds: [],
+      expenses: [],
+      total: 0,
+      participantSlots: 0,
+      paid: new Map(),
+      shares: new Map(),
+      changes: new Map(),
+      transactions: []
+    };
+
+    grouped.transactions.push(transaction);
+    grouped.total += total;
+    grouped.participantSlots += participantIds.length;
+    grouped.participantIds = [...new Set([...grouped.participantIds, ...participantIds])];
+    grouped.participants = grouped.participantIds;
+    grouped.expenses.push(...expenses);
+
+    for (const [personId, amount] of paid) {
+      grouped.paid.set(personId, (grouped.paid.get(personId) || 0) + amount);
+    }
+    for (const [personId, share] of shares) {
+      grouped.shares.set(personId, (grouped.shares.get(personId) || 0) + share);
+    }
+    for (const [personId, change] of changes) {
+      grouped.changes.set(personId, (grouped.changes.get(personId) || 0) + change);
+    }
+    grouped.perHead = grouped.participantSlots ? grouped.total / grouped.participantSlots : 0;
+    dailyByDate.set(day.date, grouped);
   }
+
+  const daily = [...dailyByDate.values()].sort((a, b) => a.day.date.localeCompare(b.day.date));
 
   return {
     people,
@@ -201,7 +235,8 @@ function render() {
     perHead: 0,
     paid: new Map(),
     shares: new Map(),
-    changes: new Map()
+    changes: new Map(),
+    transactions: []
   };
 
   $("currentDate").textContent = dateLabel(today.day.date);
@@ -235,7 +270,6 @@ function render() {
   renderMonthlyExpenses(calc);
   renderMonthlyTotals(calc);
   renderHistory(calc.daily);
-  renderWalletBalanceChart(calc);
 }
 
 function status(balance) {
@@ -268,39 +302,39 @@ function renderPeople(calc, today) {
 
         return `
       <tr>
-        <td>${escapeHtml(p.id)}</td>
+        <td data-label="Id">${escapeHtml(p.id)}</td>
 
-        <td class="person">
+        <td class="person" data-label="Person">
           ${escapeHtml(p.name)}
         </td>
 
-        <td>
+        <td data-label="Participated">
           <span class="pill ${ate ? "yes" : "no"}">
             ${ate ? "✓ Yes" : "— No"}
           </span>
         </td>
 
-        <td>
+        <td data-label="Paid Today">
           ${paid ? money(paid) : "—"}
         </td>
 
-        <td>
+        <td data-label="Share">
           ${share ? money(share) : "—"}
         </td>
 
-        <td class="${
+        <td data-label="Today's Change" class="${
           change > 0 ? "positive" : change < 0 ? "negative" : "zero"
         }">
           ${money(change, true)}
         </td>
 
-        <td class="${
+        <td data-label="Current Wallet" class="${
           current > 0 ? "positive" : current < 0 ? "negative" : "zero"
         }">
           ${money(current, true)}
         </td>
 
-        <td>
+        <td data-label="Status">
           <span class="pill ${cls}">
             ${label}
           </span>
@@ -360,23 +394,23 @@ function renderExpenses(today, people) {
   const names = new Map(people.map((p) => [p.id, p.name]));
 
   $("expenseList").innerHTML =
-    today.expenses
+    today.transactions
       .map(
-        (e) => `
-    <div class="expense-item">
-      <div>
-        <span class="expense-name">
-          ${escapeHtml(names.get(e.paidBy) || "Unknown")}
-        </span>
-
-        <span class="expense-sub">
-          Paid toward today's lunch
-        </span>
+        (transaction, index) => `
+    <div class="transaction-item">
+      <div class="transaction-heading">
+        <span class="expense-name">${escapeHtml(transaction.day.label || transaction.day.type || `Transaction ${index + 1}`)}</span>
+        <span class="expense-amount">${money(transaction.total)}</span>
       </div>
-
-      <span class="expense-amount">
-        ${money(e.amount)}
-      </span>
+      ${transaction.expenses.map((expense) => `
+        <div class="expense-item">
+          <div>
+            <span class="expense-name">${escapeHtml(names.get(expense.paidBy) || "Unknown")}</span>
+            <span class="expense-sub">Paid for this transaction</span>
+          </div>
+          <span class="expense-amount">${money(expense.amount)}</span>
+        </div>
+      `).join("")}
     </div>
   `
       )
@@ -551,55 +585,6 @@ function renderHistory(days) {
     </div>
   `;
 }
-
-// Chart instance
-let walletChart = null;
-
-function renderWalletBalanceChart(calc) {
-  const ctx = $("walletBalanceChart");
-  if (!ctx) return;
-
-  if (walletChart) walletChart.destroy();
-
-  const names = calc.people.map(p => p.name);
-  const balances = calc.people.map(p => calc.balances.get(p.id) || 0);
-
-  const colors = balances.map(b => 
-    b > 0 ? "#10b981" : b < 0 ? "#ef4444" : "#94a3b8"
-  );
-
-  walletChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: names,
-      datasets: [{
-        label: "Current Balance",
-        data: balances,
-        backgroundColor: colors,
-        borderRadius: 6,
-        borderSkipped: false
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false }
-      },
-      scales: {
-        y: {
-          ticks: {
-            callback: function(value) {
-              return `Rs. ${value.toLocaleString()}`;
-            }
-          }
-        }
-      }
-    }
-  });
-}
-
-
 
 async function init() {
   try {

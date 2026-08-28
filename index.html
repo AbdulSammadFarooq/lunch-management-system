@@ -6,7 +6,6 @@
   <meta name="theme-color" content="#0f172a">
   <title>Lunch Ledger</title>
   <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="app">
@@ -27,21 +26,21 @@
     <main>
       <section class="stats">
         <article class="stat"><span>Today's Expense</span><strong id="todayExpense">Rs. 0</strong><small id="todayParticipants">0 participants</small></article>
-        <article class="stat"><span>Per Head</span><strong id="perHead">Rs. 0</strong><small>Today's lunch cost</small></article>
+        <article class="stat"><span>Average Share</span><strong id="perHead">Rs. 0</strong><small>Across today's transactions</small></article>
         <article class="stat"><span>People Ate</span><strong id="peopleAte">0</strong><small id="peoplePaid">0 people paid</small></article>
         <article class="stat"><span>Net Wallet</span><strong id="netWallet">Rs. 0</strong><small>All current balances</small></article>
       </section>
 
       <section class="panel">
         <div class="panel-head">
-          <div><h2 id="lunchDateHeading">Today's Lunch</h2><p>Select who ate and see exactly how today's expense affects each wallet.</p></div>
+          <div><h2 id="lunchDateHeading">Today's Transactions</h2><p>Each transaction keeps its own participants and share calculation.</p></div>
           <span class="badge" id="todayBadge">0 people</span>
         </div>
 
         <div class="today-summary">
           <div><span>Total Expense</span><strong id="summaryExpense">Rs. 0</strong></div>
           <div><span>Participants</span><strong id="summaryParticipants">0</strong></div>
-          <div><span>Per Head</span><strong id="summaryPerHead">Rs. 0</strong></div>
+          <div><span>Average Share</span><strong id="summaryPerHead">Rs. 0</strong></div>
         </div>
 
         <div class="table-wrap">
@@ -50,7 +49,7 @@
               <tr>
                 <th>Id</th>
                 <th>Person</th>
-                <th>Ate Lunch</th>
+                <th>Participated</th>
                 <th>Paid Today</th>
                 <th>Share</th>
                 <th>Today's Change</th>
@@ -70,7 +69,7 @@
         </div>
 
         <div class="panel">
-          <div class="panel-head"><div><h2>Today's Expenses</h2><p>Every person who contributed to today's lunch.</p></div></div>
+          <div class="panel-head"><div><h2>Today's Transactions</h2><p>Payments grouped by lunch, snacks, or any other transaction.</p></div></div>
           <div id="expenseList" class="expense-list"></div>
         </div>
       </section>
@@ -88,13 +87,6 @@
       <section class="panel">
         <div class="panel-head"><div><h2>Lunch History (Last 10 Days)</h2><p>Daily expense and per-head calculation.</p></div></div>
         <div id="history" class="history"></div>
-      </section>
-
-      <section class="panel analytics-section">
-        <div class="panel-head"><div><h2>Wallet Balance Snapshot</h2><p>Current balance for each person.</p></div></div>
-        <div class="chart-container">
-          <canvas id="walletBalanceChart"></canvas>
-        </div>
       </section>
 
       <section class="panel formula">

@@ -16,6 +16,9 @@ Each person has an `initialBalance`.
 Each day has:
 - `participants`: IDs of people who ate lunch
 - `expenses`: one or more payments, each with `amount` and `paidBy`
+- optional `label`: a name such as `Lunch`, `Snacks`, or `Dinner`
+
+Multiple entries may use the same `date`. Each entry is calculated with its own participants and split, then the dashboard combines them into one date while keeping the transactions separate and labeled.
 
 ## Formula
 
@@ -58,6 +61,8 @@ Add another object to `days` in `data.json`:
   ]
 }
 ```
+
+For another transaction on the same date, add a second object with the same `date` and a different `label`. Its participants and expense will be calculated independently.
 
 You can have 2, 5, 10, or any number of participants.
 

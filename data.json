@@ -48,6 +48,7 @@
   "days": [
     {
       "date": "2026-08-28",
+      "label": "Lunch",
       "splitType": "custom",
       "participants": [
         {
@@ -71,6 +72,27 @@
         {
           "amount": 3528,
           "paidBy": 1
+        }
+      ]
+    },
+     {
+      "date": "2026-08-28",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 700,
+          "paidBy": 3
         }
       ]
     }

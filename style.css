@@ -315,6 +315,28 @@ tr:last-child td {
 .expense-item:last-child {
   border-bottom: 0;
 }
+.transaction-item {
+  border: 1px solid #e7ebf2;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+.transaction-item:last-child {
+  margin-bottom: 0;
+}
+.transaction-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #edf0f4;
+}
+body.dark-mode .transaction-item {
+  border-color: #334155;
+}
+body.dark-mode .transaction-heading {
+  border-bottom-color: #334155;
+}
 .wallet-name,
 .expense-name {
   font-weight: 750;
@@ -452,19 +474,6 @@ body.dark-mode .error {
 
 .highlight {
   font-weight: 850;
-}
-
-/* --- Charts & Analytics --- */
-
-.analytics-section {
-  margin-bottom: 18px;
-}
-
-.chart-container {
-  position: relative;
-  width: 100%;
-  height: 300px;
-  padding: 10px 0;
 }
 
 /* --- Monthly Expenses --- */
@@ -648,12 +657,18 @@ body.dark-mode .monthly-total-amount {
   }
   .topbar {
     flex-direction: column;
+    gap: 14px;
   }
   .topbar h1 {
     font-size: 27px;
   }
   .date-chip {
     align-self: flex-start;
+  }
+  .header-actions {
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
   }
   .stats {
     grid-template-columns: 1fr 1fr;
@@ -699,6 +714,64 @@ body.dark-mode .monthly-total-amount {
   }
   .badge {
     align-self: flex-start;
+  }
+  .table-wrap {
+    overflow: visible;
+  }
+  table,
+  thead,
+  tbody,
+  tr,
+  td {
+    display: block;
+  }
+  table {
+    min-width: 0;
+  }
+  thead {
+    display: none;
+  }
+  tbody tr {
+    padding: 10px 0;
+    border-bottom: 1px solid #edf0f4;
+  }
+  body.dark-mode tbody tr {
+    border-bottom-color: #334155;
+  }
+  tbody tr:last-child {
+    border-bottom: 0;
+  }
+  td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 0;
+    border-bottom: 0;
+    text-align: right;
+  }
+  td::before {
+    content: attr(data-label);
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: left;
+  }
+  body.dark-mode td::before {
+    color: #94a3b8;
+  }
+  td.person {
+    display: block;
+    padding-top: 4px;
+    padding-bottom: 9px;
+    text-align: left;
+    font-size: 16px;
+  }
+  td.person::before {
+    display: none;
+  }
+  .pill {
+    flex: 0 0 auto;
   }
 }
 
