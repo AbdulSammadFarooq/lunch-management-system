@@ -453,8 +453,8 @@ function renderMonthlyExpenses(calc) {
           const amount = personExpenses[person.id] || 0;
           return `
         <tr>
-          <td class="person">${escapeHtml(person.name)}</td>
-          <td class="${amount > 0 ? "positive" : "zero"}">
+          <td class="person" data-label="Person">${escapeHtml(person.name)}</td>
+          <td class="${amount > 0 ? "positive" : "zero"}" data-label="Total Paid">
             ${money(amount)}
           </td>
         </tr>
