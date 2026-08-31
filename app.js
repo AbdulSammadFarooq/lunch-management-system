@@ -287,9 +287,8 @@ function status(balance) {
 function renderPeople(calc, today) {
   $("peopleTable").innerHTML =
     calc.people
+      .filter((p) => today.participantIds.includes(p.id))
       .map((p) => {
-        const ate = today.participantIds.includes(p.id);
-
         const paid = today.paid.get(p.id) || 0;
 
         const share = today.shares.get(p.id) || 0;
@@ -306,12 +305,6 @@ function renderPeople(calc, today) {
 
         <td class="person" data-label="Person">
           ${escapeHtml(p.name)}
-        </td>
-
-        <td data-label="Participated">
-          <span class="pill ${ate ? "yes" : "no"}">
-            ${ate ? "✓ Yes" : "— No"}
-          </span>
         </td>
 
         <td data-label="Paid Today">
@@ -345,8 +338,8 @@ function renderPeople(calc, today) {
       .join("") ||
     `
     <tr>
-      <td colspan="7" class="empty">
-        No people configured.
+      <td colspan="6" class="empty">
+        No people participated today.
       </td>
     </tr>
   `;
