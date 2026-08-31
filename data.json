@@ -75,7 +75,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-08-28",
       "label": "Snacks",
       "participants": [
@@ -117,7 +117,7 @@
           "personId": 5,
           "share": 95
         },
-         {
+        {
           "personId": 4,
           "share": 95
         }
@@ -126,6 +126,39 @@
         {
           "amount": 430,
           "paidBy": 4
+        }
+      ]
+    },
+    {
+      "date": "2026-08-31",
+      "label": "Snacks",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":50
+        },
+        {
+          "personId": 2,
+          "share":50
+        },
+        {
+          "personId": 3,
+          "share":50
+        },
+        {
+          "personId": 6,
+          "share":50
+        },
+        {
+          "personId": 5,
+          "share":0
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 200,
+          "paidBy": 5
         }
       ]
     }
