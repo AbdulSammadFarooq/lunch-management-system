@@ -161,6 +161,58 @@
           "paidBy": 5
         }
       ]
+    },
+    {
+      "date": "2026-08-31",
+      "label": "Exchange",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":0
+        },
+         {
+          "personId": 6,
+          "share":195.69
+        }
+        
+      ],
+      "expenses": [
+        {
+          "amount": 195.69,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-01",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":273.33
+        },
+         {
+          "personId": 2,
+          "share":273.33
+        },
+        {
+          "personId": 3,
+          "share":50
+        },
+        {
+          "personId": 5,
+          "share":273.33
+        }
+        
+      ],
+      "expenses": [
+        {
+          "amount": 870,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
