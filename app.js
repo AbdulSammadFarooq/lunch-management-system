@@ -389,9 +389,10 @@ function renderWallets(calc) {
         const balance = calc.balances.get(p.id) || 0;
 
         const isPositiveWallet = balance > 0;
+        const isNegativeWallet = balance < 0;
 
         return `
-      <div class="wallet-item ${isPositiveWallet ? "positive-wallet" : ""}">
+      <div class="wallet-item ${isPositiveWallet ? "positive-wallet" : isNegativeWallet ? "negative-wallet" : ""}">
         <div>
           <span class="wallet-name">
             ${escapeHtml(p.name)}
@@ -400,6 +401,9 @@ function renderWallets(calc) {
               <span class="confetti" aria-hidden="true">
                 <i></i><i></i><i></i><i></i><i></i><i></i>
               </span>
+            ` : ""}
+            ${isNegativeWallet ? `
+              <span class="negative-mark" role="img" aria-label="Negative balance">⚠️</span>
             ` : ""}
           </span>
 

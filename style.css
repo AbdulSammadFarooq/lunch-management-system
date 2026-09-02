@@ -372,6 +372,48 @@ body.dark-mode .positive-wallet {
 .positive-wallet .confetti {
   left: 0;
 }
+.negative-wallet {
+  position: relative;
+  padding: 12px 10px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(254, 226, 226, 0.82), rgba(255, 255, 255, 0));
+}
+
+body.dark-mode .negative-wallet {
+  background: linear-gradient(90deg, rgba(127, 29, 29, 0.38), rgba(30, 41, 59, 0));
+}
+
+.negative-wallet .wallet-name {
+  position: relative;
+  padding-left: 14px;
+}
+
+.negative-wallet .wallet-name::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 24px;
+  border-radius: 999px;
+  background: #ef4444;
+  transform: translateY(-50%);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.48);
+}
+
+.negative-mark {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 17px;
+  line-height: 1;
+  vertical-align: middle;
+  animation: warningPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes warningPulse {
+  0%, 100% { transform: rotate(-8deg) scale(1); }
+  50% { transform: rotate(8deg) scale(1.18); }
+}
 .pill {
   display: inline-flex;
   align-items: center;
@@ -596,11 +638,13 @@ body.dark-mode .error {
 
 .monthly-expenses {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
   gap: 16px;
 }
 
 .monthly-card {
+  min-width: 0;
+  overflow: hidden;
   background: #fff;
   border: 1px solid #e7ebf2;
   border-radius: 14px;
@@ -637,6 +681,8 @@ body.dark-mode .monthly-month {
 
 .monthly-table {
   width: 100%;
+  max-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: 12px;
 }
@@ -663,6 +709,7 @@ body.dark-mode .monthly-table thead th {
 
 .monthly-table td {
   padding: 10px 0;
+  overflow-wrap: anywhere;
   border-bottom: 1px solid #edf0f4;
 }
 
@@ -921,11 +968,17 @@ body.dark-mode .monthly-total-amount {
   }
   .monthly-table {
     min-width: 0;
+    width: 100%;
   }
   .monthly-table thead {
     display: none;
   }
   .monthly-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
     padding: 10px 0;
     border-bottom: 1px solid #edf0f4;
   }
@@ -936,33 +989,24 @@ body.dark-mode .monthly-total-amount {
     border-bottom: 0;
   }
   .monthly-table td {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 7px 0;
+    display: block;
+    min-width: 0;
+    padding: 0;
     border-bottom: 0;
-    text-align: right;
-  }
-  .monthly-table td::before {
-    content: attr(data-label);
-    color: #64748b;
-    font-size: 11px;
-    font-weight: 700;
     text-align: left;
   }
-  body.dark-mode .monthly-table td::before {
-    color: #94a3b8;
+  .monthly-table td::before {
+    display: none;
+  }
+  .monthly-table td:last-child {
+    text-align: right;
+    white-space: nowrap;
   }
   .monthly-table td.person {
     display: block;
-    padding-top: 4px;
-    padding-bottom: 9px;
-    text-align: left;
-    font-size: 16px;
-  }
-  .monthly-table td.person::before {
-    display: none;
+    padding: 0;
+    overflow-wrap: anywhere;
+    font-size: 14px;
   }
 }
 
