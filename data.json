@@ -235,6 +235,32 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-02",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":500
+        },
+         {
+          "personId": 2,
+          "share":0
+        },
+        {
+          "personId": 3,
+          "share":0
+        }
+        
+      ],
+      "expenses": [
+        {
+          "amount": 500,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }

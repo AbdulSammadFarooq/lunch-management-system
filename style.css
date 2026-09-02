@@ -256,6 +256,122 @@ tr:last-child td {
 .person {
   font-weight: 750;
 }
+.positive-user {
+  position: relative;
+  background: linear-gradient(90deg, rgba(220, 252, 231, 0.78), rgba(255, 255, 255, 0));
+}
+
+body.dark-mode .positive-user {
+  background: linear-gradient(90deg, rgba(20, 83, 45, 0.38), rgba(30, 41, 59, 0));
+}
+
+.positive-user .person {
+  position: relative;
+  padding-left: 18px;
+}
+
+.positive-user .person::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 5px;
+  height: 28px;
+  border-radius: 999px;
+  background: #22c55e;
+  transform: translateY(-50%);
+  box-shadow: 0 0 16px rgba(34, 197, 94, 0.55);
+}
+
+.positive-mark {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 3px 7px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+body.dark-mode .positive-mark {
+  border-color: #166534;
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+.confetti {
+  position: absolute;
+  left: 2px;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
+.confetti i {
+  position: absolute;
+  display: block;
+  width: 5px;
+  height: 9px;
+  border-radius: 2px;
+  background: #f97316;
+  animation: confettiBurst 1.8s ease-out infinite;
+}
+
+.confetti i:nth-child(1) { --x: -18px; --y: -18px; --r: -28deg; background: #f43f5e; }
+.confetti i:nth-child(2) { --x: -8px; --y: -27px; --r: 22deg; background: #eab308; animation-delay: 180ms; }
+.confetti i:nth-child(3) { --x: 5px; --y: -22px; --r: 52deg; background: #3b82f6; animation-delay: 320ms; }
+.confetti i:nth-child(4) { --x: 17px; --y: -12px; --r: -48deg; background: #a855f7; animation-delay: 100ms; }
+.confetti i:nth-child(5) { --x: -16px; --y: 10px; --r: 48deg; background: #14b8a6; animation-delay: 420ms; }
+.confetti i:nth-child(6) { --x: 12px; --y: 14px; --r: -18deg; background: #f97316; animation-delay: 260ms; }
+
+@keyframes confettiBurst {
+  0%, 100% { opacity: 0; transform: translate(0, 0) rotate(0); }
+  18% { opacity: 1; }
+  72% { opacity: 1; }
+  100% { opacity: 0; transform: translate(var(--x), var(--y)) rotate(var(--r)); }
+}
+
+body.dark-mode .positive-user td {
+  border-bottom-color: rgba(74, 222, 128, 0.18);
+}
+.positive-wallet {
+  position: relative;
+  padding: 12px 10px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, rgba(220, 252, 231, 0.78), rgba(255, 255, 255, 0));
+}
+
+body.dark-mode .positive-wallet {
+  background: linear-gradient(90deg, rgba(20, 83, 45, 0.38), rgba(30, 41, 59, 0));
+}
+
+.positive-wallet .wallet-name {
+  position: relative;
+  padding-left: 14px;
+}
+
+.positive-wallet .wallet-name::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 4px;
+  height: 24px;
+  border-radius: 999px;
+  background: #22c55e;
+  transform: translateY(-50%);
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.55);
+}
+
+.positive-wallet .confetti {
+  left: 0;
+}
 .pill {
   display: inline-flex;
   align-items: center;
@@ -993,11 +1109,16 @@ table tbody tr:nth-child(3) { animation-delay: 320ms; }
   .expense-item,
   .history-card,
   table tbody tr,
-  #netWallet {
+  #netWallet,
+  .confetti i {
     animation: none !important;
     transition: none !important;
     transform: none !important;
     opacity: 1 !important;
+  }
+
+  .confetti i {
+    display: none;
   }
 }
 

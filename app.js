@@ -324,12 +324,20 @@ function renderPeople(calc, today) {
 
         const [label, cls] = status(current);
 
+        const isPositiveUser = current > 0;
+
         return `
-      <tr>
+      <tr class="${isPositiveUser ? "positive-user" : ""}">
         <td data-label="Id">${escapeHtml(p.id)}</td>
 
         <td class="person" data-label="Person">
           ${escapeHtml(p.name)}
+          ${isPositiveUser ? `
+            <span class="positive-mark" aria-hidden="true">In the green</span>
+            <span class="confetti" aria-hidden="true">
+              <i></i><i></i><i></i><i></i><i></i><i></i>
+            </span>
+          ` : ""}
         </td>
 
         <td data-label="Paid Today">
@@ -380,11 +388,19 @@ function renderWallets(calc) {
       .map((p) => {
         const balance = calc.balances.get(p.id) || 0;
 
+        const isPositiveWallet = balance > 0;
+
         return `
-      <div class="wallet-item">
+      <div class="wallet-item ${isPositiveWallet ? "positive-wallet" : ""}">
         <div>
           <span class="wallet-name">
             ${escapeHtml(p.name)}
+            ${isPositiveWallet ? `
+              <span class="positive-mark" aria-hidden="true">In the green</span>
+              <span class="confetti" aria-hidden="true">
+                <i></i><i></i><i></i><i></i><i></i><i></i>
+              </span>
+            ` : ""}
           </span>
 
           <span class="wallet-sub">
