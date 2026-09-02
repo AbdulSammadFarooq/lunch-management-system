@@ -221,6 +221,22 @@ function calculate() {
   };
 }
 
+function getMonthKey(dateValue) {
+  const date = new Date(`${dateValue}T00:00:00`);
+
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function getCurrentMonthTotal(daily) {
+  const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
+
+  return daily.reduce((sum, day) => {
+    const dayKey = getMonthKey(day.day.date);
+
+    return dayKey === currentMonthKey ? sum + (Number(day.total) || 0) : sum;
+  }, 0);
+}
+
 function render() {
   const calc = calculate();
 
@@ -251,6 +267,15 @@ function render() {
 
   $("todayParticipants").textContent =
     `${today.participantIds.length} participants`;
+
+  const currentMonthTotal = getCurrentMonthTotal(calc.daily);
+  const currentMonthLabel = new Date().toLocaleDateString("en-PK", {
+    month: "long",
+    year: "numeric"
+  });
+
+  $("thisMonthExpense").textContent = money(currentMonthTotal);
+  $("thisMonthLabel").textContent = currentMonthLabel;
 
   $("todayBadge").textContent = `${today.participantIds.length} people`;
 
@@ -441,18 +466,26 @@ function renderMonthlyExpenses(calc) {
   const monthlyHtml = Object.entries(monthlyData)
     .reverse()
     .map(([month, personExpenses]) => {
-      const rows = calc.people
+      const rows = [...calc.people]
         .map(person => {
           const amount = personExpenses[person.id] || 0;
-          return `
+          return { person, amount };
+        })
+        .sort((a, b) => {
+          if (b.amount !== a.amount) {
+            return b.amount - a.amount;
+          }
+
+          return (a.person.name || "").localeCompare(b.person.name || "");
+        })
+        .map(({ person, amount }) => `
         <tr>
           <td class="person" data-label="Person">${escapeHtml(person.name)}</td>
           <td class="${amount > 0 ? "positive" : "zero"}" data-label="Total Paid">
             ${money(amount)}
           </td>
         </tr>
-      `;
-        })
+      `)
         .join("");
 
       return `
