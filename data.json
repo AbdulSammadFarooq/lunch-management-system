@@ -77,7 +77,7 @@
     },
     {
       "date": "2026-08-28",
-      "label": "Snacks",
+      "label": "French Fries (PWD)",
       "participants": [
         {
           "personId": 1
@@ -132,27 +132,27 @@
     {
       "date": "2026-08-31",
       "label": "Snacks",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":50
+          "share": 50
         },
         {
           "personId": 2,
-          "share":50
+          "share": 50
         },
         {
           "personId": 3,
-          "share":50
+          "share": 50
         },
         {
           "personId": 6,
-          "share":50
+          "share": 50
         },
         {
           "personId": 5,
-          "share":0
+          "share": 0
         }
       ],
       "expenses": [
@@ -165,17 +165,16 @@
     {
       "date": "2026-08-31",
       "label": "Exchange",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":0
+          "share": 0
         },
-         {
+        {
           "personId": 6,
-          "share":195.69
+          "share": 195.69
         }
-        
       ],
       "expenses": [
         {
@@ -187,25 +186,24 @@
     {
       "date": "2026-09-01",
       "label": "Lunch",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":273.33
+          "share": 273.33
         },
-         {
+        {
           "personId": 2,
-          "share":273.33
+          "share": 273.33
         },
         {
           "personId": 3,
-          "share":50
+          "share": 50
         },
         {
           "personId": 5,
-          "share":273.33
+          "share": 273.33
         }
-        
       ],
       "expenses": [
         {
@@ -221,13 +219,12 @@
         {
           "personId": 1
         },
-         {
+        {
           "personId": 3
         },
         {
           "personId": 5
         }
-        
       ],
       "expenses": [
         {
@@ -239,25 +236,48 @@
     {
       "date": "2026-09-02",
       "label": "Lunch",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":500
+          "share": 500
         },
-         {
+        {
           "personId": 2,
-          "share":0
+          "share": 0
         },
         {
           "personId": 3,
-          "share":0
+          "share": 0
         }
-        
       ],
       "expenses": [
         {
           "amount": 500,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-03",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 300,
           "paidBy": 1
         }
       ]

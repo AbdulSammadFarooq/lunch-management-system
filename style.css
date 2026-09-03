@@ -163,6 +163,31 @@ body.dark-mode .panel {
   align-items: flex-start;
   margin-bottom: 18px;
 }
+.recent-activity > summary {
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.recent-activity > summary::-webkit-details-marker {
+  display: none;
+}
+.recent-activity > summary::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  margin: 4px 4px 0 0;
+  border-right: 2px solid #3159a6;
+  border-bottom: 2px solid #3159a6;
+  transform: rotate(45deg);
+  transition: transform 180ms ease;
+}
+.recent-activity[open] > summary::after {
+  transform: rotate(225deg);
+}
+.recent-activity:not([open]) > summary {
+  margin-bottom: 0;
+}
 .panel h2 {
   margin: 0;
   font-size: 18px;
@@ -524,6 +549,19 @@ body.dark-mode .expense-item {
 .wallet-value {
   font-weight: 850;
 }
+.wallet-current {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+.wallet-current-label {
+  color: #64748b;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
 .expense-amount {
   font-weight: 800;
 }
@@ -543,8 +581,30 @@ body.dark-mode .history-card {
   background: #1e293b;
 }
 
+.history-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 11px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #edf0f4;
+}
+.history-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 850;
+}
 .history-date {
-  font-weight: 800;
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 11px;
+}
+.history-total {
+  color: #0b4f9c;
+  font-size: 16px;
+  white-space: nowrap;
 }
 
 .history-row {
@@ -554,6 +614,14 @@ body.dark-mode .history-card {
   margin-top: 10px;
   color: #64748b;
   font-size: 12px;
+}
+
+body.dark-mode .history-heading {
+  border-bottom-color: #334155;
+}
+
+body.dark-mode .history-date {
+  color: #94a3b8;
 }
 
 body.dark-mode .history-row {

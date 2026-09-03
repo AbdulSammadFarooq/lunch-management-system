@@ -120,6 +120,7 @@ function calculate() {
   const balances = new Map(
     people.map((p) => [p.id, Number(p.initialBalance) || 0])
   );
+  const activity = new Map(people.map((p) => [p.id, 0]));
 
   const dailyByDate = new Map();
 
@@ -164,6 +165,7 @@ function calculate() {
       changes.set(p.id, change);
 
       balances.set(p.id, (balances.get(p.id) || 0) + change);
+      activity.set(p.id, (activity.get(p.id) || 0) + change);
     }
 
     const transaction = {
@@ -217,7 +219,8 @@ function calculate() {
     people,
     days,
     daily,
-    balances
+    balances,
+    activity
   };
 }
 
@@ -294,7 +297,7 @@ function render() {
   renderExpenses(today, calc.people);
   renderMonthlyExpenses(calc);
   renderMonthlyTotals(calc);
-  renderHistory(calc.daily);
+  renderHistory(calc);
 }
 
 function status(balance) {
@@ -387,6 +390,8 @@ function renderWallets(calc) {
       )
       .map((p) => {
         const balance = calc.balances.get(p.id) || 0;
+        const startingBalance = Number(p.initialBalance) || 0;
+        const walletActivity = calc.activity.get(p.id) || 0;
 
         const isPositiveWallet = balance > 0;
         const isNegativeWallet = balance < 0;
@@ -408,14 +413,19 @@ function renderWallets(calc) {
           </span>
 
           <span class="wallet-sub">
-            Initial: ${money(p.initialBalance || 0, true)}
+            Starting ${money(startingBalance, true)}
+            <span class="wallet-separator">·</span>
+            Activity ${money(walletActivity, true)}
           </span>
         </div>
 
-        <span class="wallet-value ${
-          balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"
-        }">
-          ${money(balance, true)}
+        <span class="wallet-current">
+          <span class="wallet-current-label">Current</span>
+          <span class="wallet-value ${
+            balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"
+          }">
+            ${money(balance, true)}
+          </span>
         </span>
       </div>
     `;
@@ -568,23 +578,25 @@ function renderMonthlyTotals(calc) {
   `;
 }
 
-function renderHistory(days) {
+function renderHistory(calc) {
   const names = new Map((data.people || []).map((person) => [person.id, person.name]));
+  const transactions = calc.daily
+    .flatMap((day) => day.transactions)
+    .sort((a, b) => b.day.date.localeCompare(a.day.date));
 
-  // Show only last 10 days
-  const lastTenDays = [...days].reverse().slice(0, 10).reverse();
+  // Show the ten most recent transactions while preserving their labels.
+  const recentTransactions = transactions.slice(0, 10);
 
   $("history").innerHTML =
-    [...lastTenDays]
-      .reverse()
-      .map((x) => {
+    recentTransactions
+      .map((transaction) => {
         const splitLabel =
-          x.day.splitType === "custom" ? "Custom split" : "Equal split";
-        const participants = x.participantIds
+          transaction.day.splitType === "custom" ? "Custom split" : "Equal split";
+        const participants = transaction.participantIds
           .map((personId) => names.get(personId) || "Unknown")
           .map(escapeHtml)
           .join(", ");
-        const payers = [...x.paid.entries()]
+        const payers = [...transaction.paid.entries()]
           .map(
             ([personId, amount]) =>
               `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
@@ -593,12 +605,16 @@ function renderHistory(days) {
 
         return `
       <article class="history-card">
-        <div class="history-date">
-          ${dateLabel(x.day.date)}
+        <div class="history-heading">
+          <div>
+            <span class="history-label">${escapeHtml(transaction.day.label || transaction.day.type || "Other")}</span>
+            <span class="history-date">${dateLabel(transaction.day.date)}</span>
+          </div>
+          <strong class="history-total">${money(transaction.total)}</strong>
         </div>
 
         <div class="history-row">
-          <span>Participants</span>
+          <span>Who joined (${transaction.participantIds.length})</span>
           <strong>${participants || "None"}</strong>
         </div>
 
@@ -608,18 +624,13 @@ function renderHistory(days) {
         </div>
 
         <div class="history-row">
-          <span>Total expense</span>
-          <strong>${money(x.total)}</strong>
-        </div>
-
-        <div class="history-row">
           <span>Split</span>
           <strong>${splitLabel}</strong>
         </div>
 
         <div class="history-row">
-          <span>Per head</span>
-          <strong>${money(x.perHead)}</strong>
+          <span>Average share</span>
+          <strong>${money(transaction.perHead)}</strong>
         </div>
       </article>
     `;

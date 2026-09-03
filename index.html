@@ -64,7 +64,7 @@
 
       <section class="grid-2">
         <div class="panel">
-          <div class="panel-head"><div><h2>Wallet Overview</h2><p>Calculated from initial balance + every daily transaction.</p></div></div>
+          <div class="panel-head"><div><h2>Wallet Overview</h2><p>Current balance = starting balance + recorded activity.</p></div></div>
           <div id="walletList" class="wallet-list"></div>
         </div>
 
@@ -84,10 +84,12 @@
         <div id="monthlyTotals" class="monthly-totals"></div>
       </section>
 
-      <section class="panel">
-        <div class="panel-head"><div><h2>Lunch History (Last 10 Days)</h2><p>Daily expense and per-head calculation.</p></div></div>
+      <details class="panel recent-activity" open>
+        <summary class="panel-head">
+          <div><h2>Recent Lunch Activity</h2><p>Every lunch, snack, and other transaction is shown separately.</p></div>
+        </summary>
         <div id="history" class="history"></div>
-      </section>
+      </details>
     </main>
 
     <!-- <footer>Data source: <code>data.json</code> · Edit the JSON, refresh the page.</footer> -->
