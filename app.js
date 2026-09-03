@@ -583,9 +583,12 @@ function renderHistory(calc) {
   const transactions = calc.daily
     .flatMap((day) => day.transactions)
     .sort((a, b) => b.day.date.localeCompare(a.day.date));
+  const recentDates = [...new Set(transactions.map((transaction) => transaction.day.date))].slice(0, 30);
 
-  // Show the ten most recent transactions while preserving their labels.
-  const recentTransactions = transactions.slice(0, 10);
+  // Show every labeled transaction from the thirty most recent calendar days.
+  const recentTransactions = transactions.filter((transaction) =>
+    recentDates.includes(transaction.day.date)
+  );
 
   $("history").innerHTML =
     recentTransactions
