@@ -281,6 +281,54 @@
           "paidBy": 1
         }
       ]
+    },
+     {
+      "date": "2026-09-04",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 500,
+          "paidBy": 1
+        }
+      ]
+    },
+     {
+      "date": "2026-09-04",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 3
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 500,
+          "paidBy": 3
+        }
+      ]
+    },
+     {
+      "date": "2026-09-04",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1260,
+          "paidBy": 5
+        }
+      ]
     }
   ]
 }
