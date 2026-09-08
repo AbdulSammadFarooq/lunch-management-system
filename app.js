@@ -630,11 +630,6 @@ function renderHistory(calc) {
           <span>Split</span>
           <strong>${splitLabel}</strong>
         </div>
-
-        <div class="history-row">
-          <span>Average share</span>
-          <strong>${money(transaction.perHead)}</strong>
-        </div>
       </article>
     `;
       })

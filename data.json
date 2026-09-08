@@ -282,7 +282,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-04",
       "label": "Lunch",
       "participants": [
@@ -297,7 +297,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-04",
       "label": "Lunch",
       "participants": [
@@ -312,7 +312,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-04",
       "label": "Lunch",
       "participants": [
@@ -330,7 +330,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-07",
       "label": "Lunch",
       "splitType": "custom",
@@ -360,6 +360,27 @@
         {
           "amount": 520,
           "paidBy": 1
+        }
+      ]
+    },
+     {
+      "date": "2026-09-08",
+      "label": "Exchange",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 7200
+        },
+        {
+          "personId": 3,
+          "share": 0
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 7200,
+          "paidBy": 3
         }
       ]
     }
