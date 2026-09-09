@@ -370,7 +370,7 @@
       "participants": [
         {
           "personId": 1,
-          "share": 10700
+          "share": 15700
         },
         {
           "personId": 3,
@@ -378,6 +378,10 @@
         },
         {
           "personId": 5,
+          "share": 0
+        },
+        {
+          "personId": 2,
           "share": 0
         }
       ],
@@ -389,6 +393,10 @@
         {
           "amount": 3500,
           "paidBy": 5
+        },
+        {
+          "amount": 5000,
+          "paidBy": 2
         }
       ]
     },
@@ -436,6 +444,33 @@
       "expenses": [
         {
           "amount": 150,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-09",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 720,
           "paidBy": 1
         }
       ]
