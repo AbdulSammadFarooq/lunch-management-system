@@ -859,6 +859,36 @@ body.dark-mode .monthly-total-month {
   color: #94a3b8;
 }
 
+.monthly-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  font-size: 14px;
+}
+
+.monthly-total-row span {
+  color: #475569;
+}
+
+.monthly-total-row strong {
+  font-size: 16px;
+  font-weight: 850;
+  color: #3159a6;
+  letter-spacing: -0.02em;
+}
+
+body.dark-mode .monthly-total-row span {
+  color: #cbd5e1;
+}
+
+body.dark-mode .monthly-total-row strong {
+  color: #60a5fa;
+}
+
 .monthly-total-amount {
   font-size: 24px;
   font-weight: 850;

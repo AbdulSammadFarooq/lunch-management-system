@@ -383,6 +383,10 @@
         {
           "personId": 2,
           "share": 0
+        },
+        {
+          "personId": 4,
+          "share": 0
         }
       ],
       "expenses": [
@@ -397,6 +401,10 @@
         {
           "amount": 5000,
           "paidBy": 2
+        },
+        {
+          "amount": 7000,
+          "paidBy": 4
         }
       ]
     },

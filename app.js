@@ -471,25 +471,39 @@ function renderExpenses(today, people) {
 }
 
 function renderMonthlyExpenses(calc) {
-  const names = new Map((data.people || []).map((person) => [person.id, person.name]));
-  
-  // Group expenses by month and person
   const monthlyData = {};
-  
-  for (const day of calc.daily) {
-    const date = new Date(`${day.day.date}T00:00:00`);
-    const monthKey = date.toLocaleDateString("en-PK", { year: "numeric", month: "long" });
-    
+
+  for (const day of calc.days) {
+    const label = String(day.label || "").trim();
+
+    if (label.toLowerCase() === "exchange") {
+      continue;
+    }
+
+    const date = new Date(`${day.date}T00:00:00`);
+    const monthKey = date.toLocaleDateString("en-PK", {
+      year: "numeric",
+      month: "long"
+    });
+
     if (!monthlyData[monthKey]) {
       monthlyData[monthKey] = {};
       for (const person of calc.people) {
         monthlyData[monthKey][person.id] = 0;
       }
     }
-    
-    // Add paid amounts for each person
-    for (const [personId, amount] of day.paid) {
-      monthlyData[monthKey][personId] = (monthlyData[monthKey][personId] || 0) + amount;
+
+    const total = (Array.isArray(day.expenses) ? day.expenses : []).reduce(
+      (sum, expense) => sum + (Number(expense.amount) || 0),
+      0
+    );
+
+    for (const person of calc.people) {
+      if (!getParticipantIds(day.participants || []).includes(person.id)) {
+        continue;
+      }
+
+      monthlyData[monthKey][person.id] += getParticipantShare(day, person.id, total);
     }
   }
 
@@ -497,7 +511,7 @@ function renderMonthlyExpenses(calc) {
     .reverse()
     .map(([month, personExpenses]) => {
       const rows = [...calc.people]
-        .map(person => {
+        .map((person) => {
           const amount = personExpenses[person.id] || 0;
           return { person, amount };
         })
@@ -511,7 +525,7 @@ function renderMonthlyExpenses(calc) {
         .map(({ person, amount }) => `
         <tr>
           <td class="person" data-label="Person">${escapeHtml(person.name)}</td>
-          <td class="${amount > 0 ? "positive" : "zero"}" data-label="Total Paid">
+          <td class="${amount > 0 ? "positive" : "zero"}" data-label="Amount Ate">
             ${money(amount)}
           </td>
         </tr>
@@ -525,7 +539,7 @@ function renderMonthlyExpenses(calc) {
           <thead>
             <tr>
               <th>Person</th>
-              <th>Total Paid</th>
+              <th>Amount Ate</th>
             </tr>
           </thead>
           <tbody>
@@ -545,27 +559,46 @@ function renderMonthlyExpenses(calc) {
 }
 
 function renderMonthlyTotals(calc) {
-  // Group expenses by month
   const monthlyTotals = {};
-  
-  for (const day of calc.daily) {
-    const date = new Date(`${day.day.date}T00:00:00`);
+
+  for (const day of calc.days) {
+    const label = String(day.label || "").trim();
+    const date = new Date(`${day.date}T00:00:00`);
     const monthKey = date.toLocaleDateString("en-PK", { year: "numeric", month: "long" });
-    
+
     if (!monthlyTotals[monthKey]) {
-      monthlyTotals[monthKey] = 0;
+      monthlyTotals[monthKey] = {
+        collection: 0,
+        consume: 0
+      };
     }
-    
-    monthlyTotals[monthKey] += day.total;
+
+    const total = (Array.isArray(day.expenses) ? day.expenses : []).reduce(
+      (sum, expense) => sum + (Number(expense.amount) || 0),
+      0
+    );
+
+    if (label.toLowerCase() === "exchange") {
+      monthlyTotals[monthKey].collection += total;
+    } else {
+      monthlyTotals[monthKey].consume += total;
+    }
   }
 
   const monthlyHtml = Object.entries(monthlyTotals)
     .reverse()
-    .map(([month, total]) => {
+    .map(([month, totals]) => {
       return `
       <div class="monthly-total-card">
         <div class="monthly-total-month">${month}</div>
-        <div class="monthly-total-amount">${money(total)}</div>
+        <div class="monthly-total-row">
+          <span>Total Collection</span>
+          <strong>${money(totals.collection)}</strong>
+        </div>
+        <div class="monthly-total-row">
+          <span>Total Consume</span>
+          <strong>${money(totals.consume)}</strong>
+        </div>
       </div>
     `;
     })
