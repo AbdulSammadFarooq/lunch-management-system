@@ -495,6 +495,33 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-09",
+      "label": "PWD BURGERS",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        },
+        {
+          "personId": 7
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1560,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
