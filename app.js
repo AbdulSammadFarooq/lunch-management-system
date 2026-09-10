@@ -605,6 +605,24 @@ function renderHistory(calc) {
               `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
           )
           .join(", ");
+        const perHeadDetails =
+          transaction.day.splitType === "custom"
+            ? transaction.participants
+                .map((participant) => {
+                  const personId =
+                    typeof participant === "object" && participant !== null
+                      ? participant.personId
+                      : participant;
+
+                  const share =
+                    typeof participant === "object" && participant !== null
+                      ? Number(participant.share) || 0
+                      : 0;
+
+                  return `${escapeHtml(names.get(personId) || "Unknown")} (${money(share)})`;
+                })
+                .join(", ")
+            : money(transaction.perHead || 0);
 
         return `
       <article class="history-card">
@@ -629,6 +647,11 @@ function renderHistory(calc) {
         <div class="history-row">
           <span>Split</span>
           <strong>${splitLabel}</strong>
+        </div>
+
+        <div class="history-row">
+          <span>Per head</span>
+          <strong>${perHeadDetails || "None"}</strong>
         </div>
       </article>
     `;
