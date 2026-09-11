@@ -534,27 +534,27 @@
     {
       "date": "2026-09-10",
       "label": "Lunch",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":0
+          "share": 0
         },
         {
           "personId": 2,
-          "share":203.33
+          "share": 203.33
         },
         {
           "personId": 3,
-          "share":60
+          "share": 60
         },
         {
           "personId": 4,
-          "share":203.33
+          "share": 203.33
         },
         {
           "personId": 5,
-          "share":203.33
+          "share": 203.33
         }
       ],
       "expenses": [
@@ -584,6 +584,56 @@
       "expenses": [
         {
           "amount": 200,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "label": "Breakfast",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 0
+        },
+        {
+          "personId": 3,
+          "share": 120
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 120,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-11",
+      "label": "Lunch",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 550
+        },
+        {
+          "personId": 2,
+          "share": 540
+        },
+        {
+          "personId": 3,
+          "share": 540
+        },
+        {
+          "personId": 5,
+          "share": 540
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 2170,
           "paidBy": 1
         }
       ]
