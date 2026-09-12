@@ -637,6 +637,27 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-11",
+      "label": "Sweet Ice-cream I8",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 3
+        },
+         {
+          "personId": 4
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 548,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
