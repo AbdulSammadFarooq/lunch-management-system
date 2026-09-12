@@ -281,33 +281,6 @@ tr:last-child td {
 .person {
   font-weight: 750;
 }
-.positive-user {
-  position: relative;
-  background: linear-gradient(90deg, rgba(220, 252, 231, 0.78), rgba(255, 255, 255, 0));
-}
-
-body.dark-mode .positive-user {
-  background: linear-gradient(90deg, rgba(20, 83, 45, 0.38), rgba(30, 41, 59, 0));
-}
-
-.positive-user .person {
-  position: relative;
-  padding-left: 18px;
-}
-
-.positive-user .person::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 5px;
-  height: 28px;
-  border-radius: 999px;
-  background: #22c55e;
-  transform: translateY(-50%);
-  box-shadow: 0 0 16px rgba(34, 197, 94, 0.55);
-}
-
 .positive-mark {
   display: inline-block;
   margin-left: 8px;

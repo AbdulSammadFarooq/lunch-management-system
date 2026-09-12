@@ -327,20 +327,12 @@ function renderPeople(calc, today) {
 
         const [label, cls] = status(current);
 
-        const isPositiveUser = current > 0;
-
         return `
-      <tr class="${isPositiveUser ? "positive-user" : ""}">
+      <tr>
         <td data-label="Id">${escapeHtml(p.id)}</td>
 
         <td class="person" data-label="Person">
           ${escapeHtml(p.name)}
-          ${isPositiveUser ? `
-            <span class="positive-mark" aria-hidden="true">In the green</span>
-            <span class="confetti" aria-hidden="true">
-              <i></i><i></i><i></i><i></i><i></i><i></i>
-            </span>
-          ` : ""}
         </td>
 
         <td data-label="Paid Today">
