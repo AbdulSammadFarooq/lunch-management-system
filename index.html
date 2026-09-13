@@ -93,6 +93,40 @@
 
     <!-- <footer>Data source: <code>data.json</code> · Edit the JSON, refresh the page.</footer> -->
   </div>
+
+  <div class="modal-backdrop hidden" id="personModal" aria-hidden="true">
+    <div class="person-modal" role="dialog" aria-modal="true" aria-labelledby="personModalTitle">
+      <button class="person-modal-close" id="personModalClose" type="button" aria-label="Close details">×</button>
+      <div class="person-modal-header">
+        <div>
+          <p class="eyebrow">Wallet detail</p>
+          <h3 id="personModalTitle">Person</h3>
+        </div>
+        <div class="person-modal-metrics" id="personModalMetrics"></div>
+      </div>
+
+      <div class="person-modal-body">
+        <div class="person-modal-summary" id="personModalSummary"></div>
+
+        <div class="table-wrap person-modal-table-wrap">
+          <table class="person-modal-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Transaction</th>
+                <th>Paid</th>
+                <th>Share</th>
+                <th>Change</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="personModalTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

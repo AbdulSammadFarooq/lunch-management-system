@@ -381,6 +381,7 @@ function render() {
 
   renderPeople(calc, today);
   renderWallets(calc);
+  bindWalletDetailButtons(calc);
   renderExpenses(today, calc.people);
   renderMonthlyExpenses(calc);
   renderMonthlyTotals(calc);
@@ -460,6 +461,124 @@ function renderPeople(calc, today) {
   `;
 }
 
+function bindWalletDetailButtons(calc) {
+  document.querySelectorAll(".wallet-detail-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      const personId = Number(button.dataset.personId);
+      openPersonHistoryModal(calc, personId);
+    });
+  });
+}
+
+function openPersonHistoryModal(calc, personId) {
+  const person = (calc.people || []).find((entry) => entry.id === personId);
+
+  if (!person) {
+    return;
+  }
+
+  const modal = $("personModal");
+  const title = $("personModalTitle");
+  const metrics = $("personModalMetrics");
+  const summary = $("personModalSummary");
+  const tableBody = $("personModalTableBody");
+
+  const balance = calc.balances.get(person.id) || 0;
+  const avgMonthlyExpense = getAverageMonthlyExpenseByPerson(calc).get(person.id) || 0;
+
+  title.textContent = `${person.name}`;
+  metrics.innerHTML = `
+    <span class="modal-pill ${balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"}">
+      Current ${money(balance, true)}
+    </span>
+    <span class="modal-pill neutral">Avg/Month ${money(avgMonthlyExpense)}</span>
+  `;
+
+  const entries = calc.daily
+    .flatMap((day) => day.transactions)
+    .map((transaction) => {
+      const participantIds = Array.isArray(transaction.participantIds)
+        ? transaction.participantIds
+        : [];
+      const paid = transaction.paid.get(person.id) || 0;
+      const share = transaction.shares.get(person.id) || 0;
+      const change = transaction.changes.get(person.id) || 0;
+      const participated = participantIds.includes(person.id);
+
+      return {
+        date: transaction.day.date,
+        label: transaction.day.label || transaction.day.type || "Transaction",
+        paid,
+        share,
+        change,
+        participated,
+        total: transaction.total
+      };
+    })
+    .filter((entry) => entry.participated || entry.paid > 0)
+    .sort((a, b) => b.date.localeCompare(a.date));
+
+  const totalPaid = entries.reduce((sum, entry) => sum + (Number(entry.paid) || 0), 0);
+  const totalShare = entries.reduce((sum, entry) => sum + (Number(entry.share) || 0), 0);
+  const totalChange = entries.reduce((sum, entry) => sum + (Number(entry.change) || 0), 0);
+
+  summary.innerHTML = `
+    <div class="summary-card">
+      <span>Total Paid</span>
+      <strong>${money(totalPaid)}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Total Share</span>
+      <strong>${money(totalShare)}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Net Change</span>
+      <strong class="${totalChange > 0 ? "positive" : totalChange < 0 ? "negative" : "zero"}">${money(totalChange, true)}</strong>
+    </div>
+    <div class="summary-card">
+      <span>Current Wallet</span>
+      <strong class="${balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"}">${money(balance, true)}</strong>
+    </div>
+  `;
+
+  tableBody.innerHTML =
+    entries
+      .map((entry) => `
+        <tr>
+          <td data-label="Date">${dateLabel(entry.date)}</td>
+          <td data-label="Transaction">${escapeHtml(entry.label)}</td>
+          <td data-label="Paid">${entry.paid ? money(entry.paid) : "—"}</td>
+          <td data-label="Share">${entry.share ? money(entry.share) : "—"}</td>
+          <td data-label="Change" class="${entry.change > 0 ? "positive" : entry.change < 0 ? "negative" : "zero"}">
+            ${money(entry.change, true)}
+          </td>
+          <td data-label="Status">
+            <span class="pill ${entry.participated ? "yes" : "no"}">
+              ${entry.participated ? "Participated" : "Paid only"}
+            </span>
+          </td>
+        </tr>
+      `)
+      .join("") || `
+        <tr>
+          <td colspan="6" class="empty">No transaction history available.</td>
+        </tr>
+      `;
+
+  modal.classList.remove("hidden");
+  modal.setAttribute("aria-hidden", "false");
+}
+
+function closePersonHistoryModal() {
+  const modal = $("personModal");
+  if (!modal) {
+    return;
+  }
+
+  modal.classList.add("hidden");
+  modal.setAttribute("aria-hidden", "true");
+}
+
 function renderWallets(calc) {
   const averageMonthlyExpenses = getAverageMonthlyExpenseByPerson(calc);
 
@@ -505,6 +624,11 @@ function renderWallets(calc) {
             ${money(balance, true)}
           </span>
         </span>
+
+        <button class="wallet-detail-btn" data-person-id="${p.id}" type="button">
+          <span class="wallet-detail-icon" aria-hidden="true">↗</span>
+          View details
+        </button>
       </div>
     `;
       })
@@ -741,9 +865,33 @@ function renderHistory(calc) {
   `;
 }
 
+function attachModalEvents() {
+  const modal = $("personModal");
+  const closeButton = $("personModalClose");
+
+  if (!modal || !closeButton) {
+    return;
+  }
+
+  closeButton.addEventListener("click", closePersonHistoryModal);
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closePersonHistoryModal();
+    }
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !modal.classList.contains("hidden")) {
+      closePersonHistoryModal();
+    }
+  });
+}
+
 async function init() {
   try {
     initializeTheme();
+    attachModalEvents();
 
     const response = await fetch("data.json");
 
