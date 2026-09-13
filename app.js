@@ -230,14 +230,104 @@ function getMonthKey(dateValue) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
 }
 
-function getCurrentMonthTotal(daily) {
+function getCurrentMonthTotals(days) {
   const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
 
-  return daily.reduce((sum, day) => {
-    const dayKey = getMonthKey(day.day.date);
+  return days.reduce(
+    (totals, day) => {
+      const dayKey = getMonthKey(day.date);
 
-    return dayKey === currentMonthKey ? sum + (Number(day.total) || 0) : sum;
-  }, 0);
+      if (dayKey !== currentMonthKey) {
+        return totals;
+      }
+
+      const total = (Array.isArray(day.expenses) ? day.expenses : []).reduce(
+        (sum, expense) => sum + (Number(expense.amount) || 0),
+        0
+      );
+
+      const label = String(day.label || "").trim();
+
+      if (label.toLowerCase() === "exchange") {
+        totals.budget += total;
+      } else {
+        totals.consumed += total;
+      }
+
+      return totals;
+    },
+    { budget: 0, consumed: 0 }
+  );
+}
+
+function buildMonthlyPersonExpenses(calc) {
+  const monthlyData = {};
+
+  for (const day of calc.days) {
+    const label = String(day.label || "").trim();
+
+    if (label.toLowerCase() === "exchange") {
+      continue;
+    }
+
+    const date = new Date(`${day.date}T00:00:00`);
+    const monthKey = date.toLocaleDateString("en-PK", {
+      year: "numeric",
+      month: "long"
+    });
+
+    if (!monthlyData[monthKey]) {
+      monthlyData[monthKey] = {};
+      for (const person of calc.people) {
+        monthlyData[monthKey][person.id] = 0;
+      }
+    }
+
+    const total = (Array.isArray(day.expenses) ? day.expenses : []).reduce(
+      (sum, expense) => sum + (Number(expense.amount) || 0),
+      0
+    );
+
+    for (const person of calc.people) {
+      if (!getParticipantIds(day.participants || []).includes(person.id)) {
+        continue;
+      }
+
+      monthlyData[monthKey][person.id] += getParticipantShare(day, person.id, total);
+    }
+  }
+
+  return monthlyData;
+}
+
+function getAverageMonthlyExpenseByPerson(calc) {
+  const monthlyData = buildMonthlyPersonExpenses(calc);
+  const monthKeys = Object.keys(monthlyData);
+
+  if (!monthKeys.length) {
+    return new Map(calc.people.map((person) => [person.id, 0]));
+  }
+
+  const averages = new Map(calc.people.map((person) => [person.id, 0]));
+
+  for (const monthKey of monthKeys) {
+    const personExpenses = monthlyData[monthKey] || {};
+
+    for (const person of calc.people) {
+      averages.set(
+        person.id,
+        (averages.get(person.id) || 0) + (personExpenses[person.id] || 0)
+      );
+    }
+  }
+
+  const monthCount = monthKeys.length;
+
+  for (const person of calc.people) {
+    averages.set(person.id, (averages.get(person.id) || 0) / monthCount);
+  }
+
+  return averages;
 }
 
 function render() {
@@ -262,23 +352,20 @@ function render() {
   $('lunchDateHeading').textContent = dateLabel(today.day.date);
   $("todayExpense").textContent = money(today.total);
 
-  $("perHead").textContent = money(today.perHead);
-
-  $("peopleAte").textContent = today.participantIds.length;
-
-  $("peoplePaid").textContent = `${today.paid.size} people paid`;
-
   $("todayParticipants").textContent =
     `${today.participantIds.length} participants`;
 
-  const currentMonthTotal = getCurrentMonthTotal(calc.daily);
+  const currentMonthTotals = getCurrentMonthTotals(calc.days);
   const currentMonthLabel = new Date().toLocaleDateString("en-PK", {
     month: "long",
     year: "numeric"
   });
 
-  $("thisMonthExpense").textContent = money(currentMonthTotal);
-  $("thisMonthLabel").textContent = currentMonthLabel;
+  $("monthBudget").textContent = money(currentMonthTotals.budget);
+  $("monthBudgetLabel").textContent = currentMonthLabel;
+
+  $("monthConsumed").textContent = money(currentMonthTotals.consumed);
+  $("monthConsumedLabel").textContent = currentMonthLabel;
 
   $("todayBadge").textContent = `${today.participantIds.length} people`;
 
@@ -374,6 +461,8 @@ function renderPeople(calc, today) {
 }
 
 function renderWallets(calc) {
+  const averageMonthlyExpenses = getAverageMonthlyExpenseByPerson(calc);
+
   $("walletList").innerHTML =
     [...calc.people]
       .sort(
@@ -382,8 +471,7 @@ function renderWallets(calc) {
       )
       .map((p) => {
         const balance = calc.balances.get(p.id) || 0;
-        const startingBalance = Number(p.initialBalance) || 0;
-        const walletActivity = calc.activity.get(p.id) || 0;
+        const avgMonthlyExpense = averageMonthlyExpenses.get(p.id) || 0;
 
         const isPositiveWallet = balance > 0;
         const isNegativeWallet = balance < 0;
@@ -405,9 +493,7 @@ function renderWallets(calc) {
           </span>
 
           <span class="wallet-sub">
-            Starting ${money(startingBalance, true)}
-            <span class="wallet-separator">·</span>
-            Activity ${money(walletActivity, true)}
+            Avg/Month ${money(avgMonthlyExpense)}
           </span>
         </div>
 
@@ -463,41 +549,7 @@ function renderExpenses(today, people) {
 }
 
 function renderMonthlyExpenses(calc) {
-  const monthlyData = {};
-
-  for (const day of calc.days) {
-    const label = String(day.label || "").trim();
-
-    if (label.toLowerCase() === "exchange") {
-      continue;
-    }
-
-    const date = new Date(`${day.date}T00:00:00`);
-    const monthKey = date.toLocaleDateString("en-PK", {
-      year: "numeric",
-      month: "long"
-    });
-
-    if (!monthlyData[monthKey]) {
-      monthlyData[monthKey] = {};
-      for (const person of calc.people) {
-        monthlyData[monthKey][person.id] = 0;
-      }
-    }
-
-    const total = (Array.isArray(day.expenses) ? day.expenses : []).reduce(
-      (sum, expense) => sum + (Number(expense.amount) || 0),
-      0
-    );
-
-    for (const person of calc.people) {
-      if (!getParticipantIds(day.participants || []).includes(person.id)) {
-        continue;
-      }
-
-      monthlyData[monthKey][person.id] += getParticipantShare(day, person.id, total);
-    }
-  }
+  const monthlyData = buildMonthlyPersonExpenses(calc);
 
   const monthlyHtml = Object.entries(monthlyData)
     .reverse()
