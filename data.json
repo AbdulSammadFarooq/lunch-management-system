@@ -32,7 +32,8 @@
     {
       "id": 6,
       "name": "Arslan",
-      "initialBalance": 295.69
+      "initialBalance": 295.69,
+      "hidden": true
     },
     {
       "id": 7,
@@ -42,7 +43,8 @@
     {
       "id": 8,
       "name": "Kashif",
-      "initialBalance": 0
+      "initialBalance": 0,
+      "hidden": true
     }
   ],
   "days": [

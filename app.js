@@ -581,9 +581,10 @@ function closePersonHistoryModal() {
 
 function renderWallets(calc) {
   const averageMonthlyExpenses = getAverageMonthlyExpenseByPerson(calc);
+  const visiblePeople = [...calc.people].filter((person) => !person.hidden);
 
   $("walletList").innerHTML =
-    [...calc.people]
+    visiblePeople
       .sort(
         (a, b) =>
           (calc.balances.get(b.id) || 0) - (calc.balances.get(a.id) || 0)
