@@ -640,7 +640,7 @@ body.dark-mode .formula-grid div {
 body.dark-mode .formula-grid span {
   color: #94a3b8;
 }
-}
+
 footer {
   text-align: center;
   color: #94a3b8;
@@ -872,6 +872,8 @@ body.dark-mode .monthly-total-row strong {
 body.dark-mode .monthly-total-amount {
   color: #60a5fa;
 }
+
+@media (max-width: 1200px) {
   .stats {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -885,6 +887,7 @@ body.dark-mode .monthly-total-amount {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
 @media (max-width: 1024px) {
   .grid-2 {
     grid-template-columns: 1fr;
