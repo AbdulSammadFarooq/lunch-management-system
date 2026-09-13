@@ -601,7 +601,6 @@ function renderWallets(calc) {
           <span class="wallet-name">
             ${escapeHtml(p.name)}
             ${isPositiveWallet ? `
-              <span class="positive-mark" aria-hidden="true">In the green</span>
               <span class="confetti" aria-hidden="true">
                 <i></i><i></i><i></i><i></i><i></i><i></i>
               </span>
@@ -791,71 +790,101 @@ function renderHistory(calc) {
     recentDates.includes(transaction.day.date)
   );
 
+  const groupedByDate = new Map();
+
+  recentTransactions.forEach((transaction) => {
+    const dateKey = transaction.day.date;
+
+    if (!groupedByDate.has(dateKey)) {
+      groupedByDate.set(dateKey, []);
+    }
+
+    groupedByDate.get(dateKey).push(transaction);
+  });
+
+  const groups = [...groupedByDate.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+
   $("history").innerHTML =
-    recentTransactions
-      .map((transaction) => {
-        const splitLabel =
-          transaction.day.splitType === "custom" ? "Custom split" : "Equal split";
-        const participants = transaction.participantIds
-          .map((personId) => names.get(personId) || "Unknown")
-          .map(escapeHtml)
-          .join(", ");
-        const payers = [...transaction.paid.entries()]
-          .map(
-            ([personId, amount]) =>
-              `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
-          )
-          .join(", ");
-        const perHeadDetails =
-          transaction.day.splitType === "custom"
-            ? transaction.participants
-                .map((participant) => {
-                  const personId =
-                    typeof participant === "object" && participant !== null
-                      ? participant.personId
-                      : participant;
+    groups
+      .map(([dateKey, groupTransactions]) => {
+        const cardsHtml = groupTransactions
+          .map((transaction) => {
+            const splitLabel =
+              transaction.day.splitType === "custom" ? "Custom split" : "Equal split";
+            const participants = transaction.participantIds
+              .map((personId) => names.get(personId) || "Unknown")
+              .map(escapeHtml)
+              .join(", ");
+            const payers = [...transaction.paid.entries()]
+              .map(
+                ([personId, amount]) =>
+                  `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
+              )
+              .join(", ");
+            const perHeadDetails =
+              transaction.day.splitType === "custom"
+                ? transaction.participants
+                    .map((participant) => {
+                      const personId =
+                        typeof participant === "object" && participant !== null
+                          ? participant.personId
+                          : participant;
 
-                  const share =
-                    typeof participant === "object" && participant !== null
-                      ? Number(participant.share) || 0
-                      : 0;
+                      const share =
+                        typeof participant === "object" && participant !== null
+                          ? Number(participant.share) || 0
+                          : 0;
 
-                  return `${escapeHtml(names.get(personId) || "Unknown")} (${money(share)})`;
-                })
-                .join(", ")
-            : money(transaction.perHead || 0);
+                      return `${escapeHtml(names.get(personId) || "Unknown")} (${money(share)})`;
+                    })
+                    .join(", ")
+                : money(transaction.perHead || 0);
+
+            return `
+              <article class="history-card">
+                <div class="history-heading">
+                  <div>
+                    <span class="history-label">${escapeHtml(transaction.day.label || transaction.day.type || "Other")}</span>
+                    <span class="history-date">${dateLabel(transaction.day.date)}</span>
+                  </div>
+                  <strong class="history-total">${money(transaction.total)}</strong>
+                </div>
+
+                <div class="history-row">
+                  <span>Who joined (${transaction.participantIds.length})</span>
+                  <strong>${participants || "None"}</strong>
+                </div>
+
+                <div class="history-row">
+                  <span>Paid by</span>
+                  <strong>${payers || "None"}</strong>
+                </div>
+
+                <div class="history-row">
+                  <span>Split</span>
+                  <strong>${splitLabel}</strong>
+                </div>
+
+                <div class="history-row">
+                  <span>Per head</span>
+                  <strong>${perHeadDetails || "None"}</strong>
+                </div>
+              </article>
+            `;
+          })
+          .join("");
 
         return `
-      <article class="history-card">
-        <div class="history-heading">
-          <div>
-            <span class="history-label">${escapeHtml(transaction.day.label || transaction.day.type || "Other")}</span>
-            <span class="history-date">${dateLabel(transaction.day.date)}</span>
-          </div>
-          <strong class="history-total">${money(transaction.total)}</strong>
-        </div>
-
-        <div class="history-row">
-          <span>Who joined (${transaction.participantIds.length})</span>
-          <strong>${participants || "None"}</strong>
-        </div>
-
-        <div class="history-row">
-          <span>Paid by</span>
-          <strong>${payers || "None"}</strong>
-        </div>
-
-        <div class="history-row">
-          <span>Split</span>
-          <strong>${splitLabel}</strong>
-        </div>
-
-        <div class="history-row">
-          <span>Per head</span>
-          <strong>${perHeadDetails || "None"}</strong>
-        </div>
-      </article>
-    `;
+          <section class="history-group">
+            <div class="history-date-group-header">
+              <h3>${dateLabel(dateKey)}</h3>
+              <span>${groupTransactions.length} ${groupTransactions.length === 1 ? "entry" : "entries"}</span>
+            </div>
+            <div class="history-grid">
+              ${cardsHtml}
+            </div>
+          </section>
+        `;
       })
       .join("") ||
     `
