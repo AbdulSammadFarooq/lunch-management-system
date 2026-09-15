@@ -160,7 +160,7 @@ function calculate() {
 
       shares.set(p.id, personShare);
 
-      const change = isParticipant ? personPaid - personShare : 0;
+      const change = personPaid - personShare;
 
       changes.set(p.id, change);
 
@@ -403,7 +403,7 @@ function status(balance) {
 function renderPeople(calc, today) {
   $("peopleTable").innerHTML =
     calc.people
-      .filter((p) => today.participantIds.includes(p.id))
+      .filter((p) => today.participantIds.includes(p.id) || today.paid.has(p.id))
       .map((p) => {
         const paid = today.paid.get(p.id) || 0;
 

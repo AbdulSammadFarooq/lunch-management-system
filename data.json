@@ -742,6 +742,24 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-15",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 210,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
