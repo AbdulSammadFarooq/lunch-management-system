@@ -690,7 +690,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-14",
       "label": "Snacks",
       "participants": [
@@ -710,6 +710,35 @@
       "expenses": [
         {
           "amount": 190,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-15",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":86.66
+        },
+        {
+          "personId": 2,
+          "share":86.66
+        },
+        {
+          "personId": 3,
+          "share":50
+        },
+        {
+          "personId": 5,
+          "share":86.66
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 310,
           "paidBy": 1
         }
       ]
