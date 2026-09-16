@@ -760,6 +760,73 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-15",
+      "label": "Soan Garden Chaiy",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":100
+        },
+        {
+          "personId": 3,
+          "share":100
+        },
+        {
+          "personId": 5,
+          "share":90
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 290,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-16",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 530,
+          "paidBy": 1
+        }
+      ]
+    },
+     {
+      "date": "2026-09-16",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 140,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
