@@ -828,7 +828,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-17",
       "label": "Breakfast",
       "participants": [
@@ -854,7 +854,7 @@
           "personId": 3
         },
         {
-          "personId": 4
+          "personId": 5
         },
         {
           "personId": 7
@@ -863,6 +863,30 @@
       "expenses": [
         {
           "amount": 784,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 200,
           "paidBy": 1
         }
       ]
