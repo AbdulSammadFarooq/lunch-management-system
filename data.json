@@ -890,6 +890,45 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-18",
+      "label": "Friday Lunch (Cash 1000 & 150 for next cola)",
+      "participants": [
+        {
+          "personId": 4
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1150,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-18",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1980,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
