@@ -793,23 +793,24 @@ function renderHistory(calc) {
 
   const groupedByDate = new Map();
 
-  recentTransactions.forEach((transaction) => {
+  recentTransactions.forEach((transaction, index) => {
     const dateKey = transaction.day.date;
 
     if (!groupedByDate.has(dateKey)) {
       groupedByDate.set(dateKey, []);
     }
 
-    groupedByDate.get(dateKey).push(transaction);
+    groupedByDate.get(dateKey).push({ transaction, serialNumber: index + 1 });
   });
 
   const groups = [...groupedByDate.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+  $("historyRecordCount").textContent = `${recentTransactions.length} ${recentTransactions.length === 1 ? "record" : "records"}`;
 
   $("history").innerHTML =
     groups
       .map(([dateKey, groupTransactions]) => {
         const cardsHtml = groupTransactions
-          .map((transaction) => {
+          .map(({ transaction, serialNumber }) => {
             const splitLabel =
               transaction.day.splitType === "custom" ? "Custom split" : "Equal split";
             const participants = transaction.participantIds
@@ -842,9 +843,10 @@ function renderHistory(calc) {
                 : money(transaction.perHead || 0);
 
             return `
-              <article class="history-card">
+              <article class="history-card" style="--history-delay: ${Math.min(serialNumber - 1, 12) * 65 + 240}ms">
                 <div class="history-heading">
                   <div>
+                    <span class="history-serial">#${serialNumber}</span>
                     <span class="history-label">${escapeHtml(transaction.day.label || transaction.day.type || "Other")}</span>
                     <span class="history-date">${dateLabel(transaction.day.date)}</span>
                   </div>

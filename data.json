@@ -937,11 +937,11 @@
       "participants": [
         {
           "personId": 1,
-          "share":147.5
+          "share":145
         },
         {
           "personId": 2,
-          "share":147.5
+          "share":145
         },
         {
           "personId": 3,
@@ -949,16 +949,43 @@
         },
         {
           "personId": 4,
-          "share":147.5
+          "share":145
         },
         {
           "personId": 5,
-          "share":147.5
+          "share":145
         }
       ],
       "expenses": [
         {
           "amount": 630,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-21",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 220,
           "paidBy": 1
         }
       ]
