@@ -302,7 +302,31 @@ function buildMonthlyPersonExpenses(calc) {
 
 function getAverageMonthlyExpenseByPerson(calc) {
   const monthlyData = buildMonthlyPersonExpenses(calc);
-  const monthKeys = Object.keys(monthlyData);
+  const includedMonthKeys = new Set();
+
+  for (const day of calc.days) {
+    const label = String(day.label || "").trim();
+
+    if (label.toLowerCase() === "exchange") {
+      continue;
+    }
+
+    const date = new Date(`${day.date}T00:00:00`);
+    const monthNumber = date.getMonth() + 1;
+
+    if (monthNumber >= 9) {
+      includedMonthKeys.add(
+        date.toLocaleDateString("en-PK", {
+          year: "numeric",
+          month: "long"
+        })
+      );
+    }
+  }
+
+  const monthKeys = Object.keys(monthlyData).filter((monthKey) =>
+    includedMonthKeys.has(monthKey)
+  );
 
   if (!monthKeys.length) {
     return new Map(calc.people.map((person) => [person.id, 0]));
@@ -804,7 +828,8 @@ function renderHistory(calc) {
   });
 
   const groups = [...groupedByDate.entries()].sort((a, b) => b[0].localeCompare(a[0]));
-  $("historyRecordCount").textContent = `${recentTransactions.length} ${recentTransactions.length === 1 ? "record" : "records"}`;
+  const totalActivities = transactions.length;
+  $("historyRecordCount").textContent = `${totalActivities} ${totalActivities === 1 ? "activity" : "activities"}`;
 
   $("history").innerHTML =
     groups

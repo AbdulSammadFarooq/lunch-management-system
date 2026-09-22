@@ -989,6 +989,66 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-21",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 220,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-22",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":102.5
+        },
+        {
+          "personId": 2,
+          "share":102.5
+        },
+        {
+          "personId": 3,
+          "share":60
+        },
+        {
+          "personId": 4,
+          "share":102.5
+        },
+        {
+          "personId": 5,
+          "share":102.5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 470,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
