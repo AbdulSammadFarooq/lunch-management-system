@@ -16,7 +16,13 @@ Each person has an `initialBalance`.
 Each day has:
 - `participants`: IDs of people who ate lunch
 - `expenses`: one or more payments, each with `amount` and `paidBy`
-- optional `label`: a name such as `Lunch`, `Snacks`, or `Dinner`
+- optional `label`: a name such as `Lunch`, `Snacks`, `Dinner`, or `Funding`
+
+Use `Funding` for monthly budget entries. Monthly budget totals include only
+funding entries. Monthly consumption totals include participant shares from all
+other labels, except person ID `1` (Abdul Sammad). The per-person monthly view
+excludes funding entries and shows each participant's share. Remaining budget is
+calculated as total budget minus total consumption.
 
 Multiple entries may use the same `date`. Each entry is calculated with its own participants and split, then the dashboard combines them into one date while keeping the transactions separate and labeled.
 

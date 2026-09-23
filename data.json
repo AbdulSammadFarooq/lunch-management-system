@@ -367,7 +367,7 @@
     },
     {
       "date": "2026-09-08",
-      "label": "Exchange",
+      "label": "Funding",
       "splitType": "custom",
       "participants": [
         {
@@ -1046,6 +1046,30 @@
       "expenses": [
         {
           "amount": 670,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-23",
+      "label": "Lunch at office",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 220,
           "paidBy": 1
         }
       ]

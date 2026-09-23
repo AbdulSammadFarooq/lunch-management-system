@@ -149,6 +149,15 @@ body.dark-mode .panel {
   margin: 7px 0 4px;
   letter-spacing: -0.02em;
 }
+.stat strong.positive {
+  color: #16824a;
+}
+.stat strong.danger {
+  color: #d44747;
+}
+.stat strong.zero {
+  color: #64748b;
+}
 .stat small {
   font-size: 12px;
 }
@@ -436,6 +445,10 @@ body.dark-mode .negative-wallet {
   color: #d44747;
   font-weight: 800;
 }
+.danger {
+  color: #d44747;
+  font-weight: 800;
+}
 .zero {
   color: #64748b;
 }
@@ -466,6 +479,12 @@ body.dark-mode .negative-wallet {
   align-items: center;
   padding: 12px 0;
   border-bottom: 1px solid #edf0f4;
+}
+
+.wallet-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(140px, 1fr) auto;
+  column-gap: 24px;
 }
 .wallet-item:last-child,
 .expense-item:last-child {
@@ -525,7 +544,8 @@ body.dark-mode .expense-item {
 .wallet-current {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: center;
+  justify-self: center;
   gap: 3px;
 }
 .wallet-current-label {
@@ -1241,12 +1261,36 @@ body.dark-mode .monthly-total-month {
   letter-spacing: -0.02em;
 }
 
+.monthly-total-row strong.positive {
+  color: #16824a;
+}
+
+.monthly-total-row strong.danger {
+  color: #d44747;
+}
+
+.monthly-total-row strong.zero {
+  color: #64748b;
+}
+
 body.dark-mode .monthly-total-row span {
   color: #cbd5e1;
 }
 
 body.dark-mode .monthly-total-row strong {
   color: #60a5fa;
+}
+
+body.dark-mode .monthly-total-row strong.positive {
+  color: #4ade80;
+}
+
+body.dark-mode .monthly-total-row strong.danger {
+  color: #f87171;
+}
+
+body.dark-mode .monthly-total-row strong.zero {
+  color: #94a3b8;
 }
 
 .monthly-total-amount {
@@ -1384,12 +1428,14 @@ body.dark-mode .monthly-total-amount {
   }
 
   .wallet-item {
+    display: flex;
     gap: 12px;
     padding: 14px 0;
   }
 
   .wallet-current {
-    align-items: flex-start;
+    align-items: center;
+    justify-self: center;
   }
 
   .wallet-detail-btn {
