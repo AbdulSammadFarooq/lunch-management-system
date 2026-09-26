@@ -1184,6 +1184,33 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-26",
+      "label": "Friday Cricket Match",
+      "participants": [
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        },
+        {
+          "personId": 7
+        },
+        {
+          "personId": 1
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1991.65,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
