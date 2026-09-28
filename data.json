@@ -1216,7 +1216,7 @@
     },
     {
       "date": "2026-09-28",
-      "label": "Lunch Rasheed Sweets",
+      "label": "Lunch Rasheed Sweets & Snacks",
       "participants": [
         {
           "personId": 1
@@ -1233,7 +1233,7 @@
       ],
       "expenses": [
         {
-          "amount": 904,
+          "amount": 1054,
           "paidBy": 1
         }
       ]
