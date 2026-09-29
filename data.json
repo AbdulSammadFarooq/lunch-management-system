@@ -1237,6 +1237,54 @@
           "paidBy": 1
         }
       ]
+    },
+     {
+      "date": "2026-09-29",
+      "label": "Funding",
+      "participants": [
+        {
+          "personId": 1
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 500,
+          "paidBy": 2
+        }
+      ]
+    },
+     {
+      "date": "2026-09-29",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":162.5
+        },
+        {
+          "personId": 2,
+          "share":162.5
+        },
+        {
+          "personId": 3,
+          "share":162.5
+        },
+        {
+          "personId": 4,
+          "share":50
+        },
+        {
+          "personId": 5,
+          "share":162.5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 700,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
