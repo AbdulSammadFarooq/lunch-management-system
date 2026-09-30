@@ -1357,6 +1357,48 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-09-30",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 290,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "label": "Exchange",
+      "participants": [
+        {
+          "personId": 2
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 200,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
