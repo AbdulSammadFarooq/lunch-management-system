@@ -1238,7 +1238,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-29",
       "label": "Funding",
       "participants": [
@@ -1253,30 +1253,30 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-09-29",
       "label": "Lunch",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":162.5
+          "share": 162.5
         },
         {
           "personId": 2,
-          "share":162.5
+          "share": 162.5
         },
         {
           "personId": 3,
-          "share":162.5
+          "share": 162.5
         },
         {
           "personId": 4,
-          "share":50
+          "share": 50
         },
         {
           "personId": 5,
-          "share":162.5
+          "share": 162.5
         }
       ],
       "expenses": [
@@ -1309,6 +1309,51 @@
       "expenses": [
         {
           "amount": 230,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "label": "Cake",
+      "participants": [
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 80,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-09-30",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 250,
           "paidBy": 1
         }
       ]

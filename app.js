@@ -405,7 +405,7 @@ function render() {
     0
   ).getDate();
   const elapsedDays = currentDate.getDate();
-  const remainingDays = Math.max(daysInMonth - elapsedDays, 0);
+  const remainingDays = Math.max(daysInMonth - elapsedDays + 1, 0);
   const remainingBudget = currentMonthTotals.budget - currentMonthTotals.consumed;
   const dailyBudgetPace = currentMonthTotals.budget / daysInMonth;
   const remainingDailyPace =
