@@ -1399,6 +1399,123 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Lunch",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share":122.5
+        },
+        {
+          "personId": 2,
+          "share":122.5
+        },
+        {
+          "personId": 3,
+          "share":50
+        },
+        {
+          "personId": 4,
+          "share":122.5
+        },
+        {
+          "personId": 5,
+          "share":122.5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 540,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-01",
+      "label": "Snacks",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 250,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-02",
+      "label": "Breakfast",
+      "participants": [
+        {
+          "personId": 3
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 100,
+          "paidBy": 1
+        }
+      ]
+    },
+     {
+      "date": "2026-10-02",
+      "label": "Lunch at Savour Food",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 3600,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-02",
+      "label": "Exchange",
+      "participants": [
+        {
+          "personId": 1
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 400,
+          "paidBy": 8
+        }
+      ]
     }
   ]
 }

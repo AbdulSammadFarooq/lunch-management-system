@@ -246,34 +246,62 @@ function getDayConsumed(day) {
 
   const total = getDayTotal(day);
   return getParticipantIds(day.participants || [])
-    .filter((personId) => personId !== 1)
     .reduce(
       (sum, personId) => sum + getParticipantShare(day, personId, total),
       0
     );
 }
 
-function getCurrentMonthTotals(days) {
+function getDayBudget(day) {
+  if (isFunding(day)) return getDayTotal(day);
+
+  return getParticipantShare(day, 1, getDayTotal(day));
+}
+
+function getMonthlyTotals(days, includeCurrentMonth = false) {
+  const monthlyTotals = new Map();
+
+  for (const day of days) {
+    const monthKey = getMonthKey(day.date);
+    const totals = monthlyTotals.get(monthKey) || { budget: 0, consumed: 0 };
+
+    totals.budget += getDayBudget(day);
+
+    if (!isFunding(day)) {
+      totals.consumed += getDayConsumed(day);
+    }
+
+    monthlyTotals.set(monthKey, totals);
+  }
+
   const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
 
-  return days.reduce(
-    (totals, day) => {
-      const dayKey = getMonthKey(day.date);
+  if (includeCurrentMonth && !monthlyTotals.has(currentMonthKey)) {
+    monthlyTotals.set(currentMonthKey, { budget: 0, consumed: 0 });
+  }
 
-      if (dayKey !== currentMonthKey) {
-        return totals;
-      }
+  const rolloverStartMonth = days
+    .filter(isFunding)
+    .map((day) => getMonthKey(day.date))
+    .sort()[0];
+  let carriedForward = 0;
 
-      if (isFunding(day)) {
-        totals.budget += getDayTotal(day);
-      } else {
-        totals.consumed += getDayConsumed(day);
-      }
+  for (const monthKey of [...monthlyTotals.keys()].sort()) {
+    if (!rolloverStartMonth || monthKey < rolloverStartMonth) {
+      continue;
+    }
 
-      return totals;
-    },
-    { budget: 0, consumed: 0 }
-  );
+    const totals = monthlyTotals.get(monthKey);
+    totals.budget += carriedForward;
+    carriedForward = totals.budget - totals.consumed;
+  }
+
+  return monthlyTotals;
+}
+
+function getCurrentMonthTotals(days) {
+  const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
+  return getMonthlyTotals(days, true).get(currentMonthKey);
 }
 
 function buildMonthlyPersonExpenses(calc) {
@@ -441,7 +469,7 @@ function render() {
           : "Spending matches the target pace";
 
   $("monthBudget").textContent = money(currentMonthTotals.budget);
-  $("monthBudgetLabel").textContent = currentMonthLabel;
+  $("monthBudgetLabel").textContent = `${currentMonthLabel}, incl. carry-forward and Abdul's share`;
 
   $("monthConsumed").textContent = money(currentMonthTotals.consumed);
   $("monthConsumedLabel").textContent = currentMonthLabel;
@@ -827,30 +855,16 @@ function renderMonthlyExpenses(calc) {
 }
 
 function renderMonthlyTotals(calc) {
-  const monthlyTotals = {};
+  const monthlyTotals = getMonthlyTotals(calc.days, true);
 
-  for (const day of calc.days) {
-    const date = new Date(`${day.date}T00:00:00`);
-    const monthKey = date.toLocaleDateString("en-PK", { year: "numeric", month: "long" });
-
-    if (!monthlyTotals[monthKey]) {
-      monthlyTotals[monthKey] = {
-        collection: 0,
-        consume: 0
-      };
-    }
-
-    if (isFunding(day)) {
-      monthlyTotals[monthKey].collection += getDayTotal(day);
-    } else {
-      monthlyTotals[monthKey].consume += getDayConsumed(day);
-    }
-  }
-
-  const monthlyHtml = Object.entries(monthlyTotals)
-    .reverse()
-    .map(([month, totals]) => {
-      const remainingBudget = totals.collection - totals.consume;
+  const monthlyHtml = [...monthlyTotals.entries()]
+    .sort(([monthA], [monthB]) => monthB.localeCompare(monthA))
+    .map(([monthKey, totals]) => {
+      const month = new Date(`${monthKey}-01T00:00:00`).toLocaleDateString("en-PK", {
+        year: "numeric",
+        month: "long"
+      });
+      const remainingBudget = totals.budget - totals.consumed;
       const remainingBudgetClass =
         remainingBudget > 0 ? "positive" : remainingBudget < 0 ? "danger" : "zero";
 
@@ -859,11 +873,11 @@ function renderMonthlyTotals(calc) {
         <div class="monthly-total-month">${month}</div>
         <div class="monthly-total-row">
           <span>Total Budget</span>
-          <strong>${money(totals.collection)}</strong>
+          <strong>${money(totals.budget)}</strong>
         </div>
         <div class="monthly-total-row">
           <span>Total Consume</span>
-          <strong>${money(totals.consume)}</strong>
+          <strong>${money(totals.consumed)}</strong>
         </div>
         <div class="monthly-total-row">
           <span>Remaining Budget</span>
