@@ -234,6 +234,10 @@ function isFunding(day) {
   return String(day.label || "").trim().toLowerCase() === "funding";
 }
 
+function isExchange(day) {
+  return String(day.label || "").trim().toLowerCase() === "exchange";
+}
+
 function getDayTotal(day) {
   return (Array.isArray(day.expenses) ? day.expenses : []).reduce(
     (sum, expense) => sum + (Number(expense.amount) || 0),
@@ -308,7 +312,7 @@ function buildMonthlyPersonExpenses(calc) {
   const monthlyData = {};
 
   for (const day of calc.days) {
-    if (isFunding(day)) {
+    if (isFunding(day) || isExchange(day)) {
       continue;
     }
 

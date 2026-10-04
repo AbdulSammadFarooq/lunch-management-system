@@ -1402,6 +1402,23 @@
     },
     {
       "date": "2026-10-01",
+      "label": "Funding",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 4000
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 4000,
+          "paidBy": 3
+        }
+      ]
+    },
+    {
+      "date": "2026-10-01",
       "label": "Lunch",
       "splitType":"custom",
       "participants": [
