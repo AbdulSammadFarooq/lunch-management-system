@@ -1407,13 +1407,17 @@
       "participants": [
         {
           "personId": 1,
-          "share": 4000
+          "share": 9000
         }
       ],
       "expenses": [
         {
           "amount": 4000,
           "paidBy": 3
+        },
+         {
+          "amount": 5000,
+          "paidBy": 2
         }
       ]
     },
@@ -1531,6 +1535,33 @@
         {
           "amount": 400,
           "paidBy": 8
+        }
+      ]
+    },
+    {
+      "date": "2026-10-05",
+      "label": "Lunch (Kbab)",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1610,
+          "paidBy": 1
         }
       ]
     }
