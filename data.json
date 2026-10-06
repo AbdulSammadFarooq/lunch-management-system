@@ -1564,6 +1564,30 @@
           "paidBy": 1
         }
       ]
+    },
+      {
+      "date": "2026-10-06",
+      "label": "Lunch at Pulao Khana",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1190,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
