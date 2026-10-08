@@ -1407,7 +1407,7 @@
       "participants": [
         {
           "personId": 1,
-          "share": 9000
+          "share": 12000
         }
       ],
       "expenses": [
@@ -1418,6 +1418,10 @@
          {
           "amount": 5000,
           "paidBy": 2
+        },
+        {
+          "amount": 3000,
+          "paidBy": 4
         }
       ]
     },
@@ -1585,6 +1589,45 @@
       "expenses": [
         {
           "amount": 1190,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-07",
+      "label": "Exchange",
+      "participants": [
+        {
+          "personId": 3
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 200,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-08",
+      "label": "Lunch Rasheed Sweets",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1970,
           "paidBy": 1
         }
       ]
