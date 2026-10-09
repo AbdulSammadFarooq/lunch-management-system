@@ -1407,7 +1407,7 @@
       "participants": [
         {
           "personId": 1,
-          "share": 12000
+          "share": 16000
         }
       ],
       "expenses": [
@@ -1422,6 +1422,10 @@
         {
           "amount": 3000,
           "paidBy": 4
+        },
+        {
+          "amount": 4000,
+          "paidBy": 5
         }
       ]
     },
@@ -1628,6 +1632,30 @@
       "expenses": [
         {
           "amount": 1970,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "label": "Friday Lunch (Pulao Khana)",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 1800,
           "paidBy": 1
         }
       ]
