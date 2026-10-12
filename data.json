@@ -1659,6 +1659,39 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-10-12",
+      "label": "Lunch at office",
+      "splitType":"custom",
+      "participants": [
+        {
+          "personId": 1,
+          "share": 102.5
+        },
+        {
+          "personId": 2,
+          "share": 102.5
+        },
+        {
+          "personId": 3,
+          "share": 160
+        },
+        {
+          "personId": 4,
+          "share": 102.5
+        },
+        {
+          "personId": 5,
+          "share": 102.5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 570,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
