@@ -406,6 +406,14 @@ function getAverageMonthlyExpenseByPerson(calc) {
 
 function render() {
   const calc = calculate();
+  const expenseHistoryDays = calc.days.filter((day) => !isFunding(day));
+  const overallConsumed = expenseHistoryDays.reduce(
+    (total, day) => total + getDayConsumed(day),
+    0
+  );
+  const expenseHistoryDates = [
+    ...new Set(expenseHistoryDays.map((day) => day.date))
+  ].sort();
 
   const today = calc.daily[calc.daily.length - 1] || {
     day: {
@@ -444,6 +452,25 @@ function render() {
     remainingDays > 0 ? Math.max(remainingBudget, 0) / remainingDays : 0;
   const currentCostPace =
     elapsedDays > 0 ? currentMonthTotals.consumed / elapsedDays : 0;
+  const budgetUsagePercent =
+    currentMonthTotals.budget > 0
+      ? (currentMonthTotals.consumed / currentMonthTotals.budget) * 100
+      : 0;
+  let budgetRunway;
+
+  if (currentMonthTotals.budget <= 0) {
+    budgetRunway = "Add a Funding entry to track budget usage.";
+  } else if (remainingBudget <= 0) {
+    budgetRunway = `Budget exhausted; over by ${money(Math.abs(remainingBudget))}.`;
+  } else if (currentCostPace <= 0) {
+    budgetRunway = "No consumption yet; time estimate unavailable.";
+  } else {
+    const daysUntilExhausted = Math.ceil(remainingBudget / currentCostPace);
+    budgetRunway = `At this pace, budget will run out in about ${daysUntilExhausted} ${
+      daysUntilExhausted === 1 ? "day" : "days"
+    }.`;
+  }
+
   const projectedConsumption = currentCostPace * daysInMonth;
   const paceStatus =
     projectedConsumption > currentMonthTotals.budget
@@ -471,6 +498,43 @@ function render() {
         : paceStatus === "positive"
           ? `${money(paceDifference)}/day below target`
           : "Spending matches the target pace";
+
+  $("budgetUsagePercent").textContent = `${budgetUsagePercent.toLocaleString(
+    "en-PK",
+    { maximumFractionDigits: 1 }
+  )}%`;
+  $("budgetUsageDetail").textContent =
+    `${money(currentMonthTotals.consumed)} consumed of ${money(currentMonthTotals.budget)}`;
+
+  const budgetUsageProgress = $("budgetUsageProgress");
+  const progressBar = budgetUsageProgress.parentElement;
+  const boundedUsagePercent = Math.min(Math.max(budgetUsagePercent, 0), 100);
+  budgetUsageProgress.style.width = `${boundedUsagePercent}%`;
+  budgetUsageProgress.className =
+    `budget-usage-progress${budgetUsagePercent > 100 ? " danger" : ""}`;
+  progressBar.setAttribute("aria-valuenow", String(boundedUsagePercent));
+  progressBar.setAttribute(
+    "aria-valuetext",
+    `${budgetUsagePercent.toLocaleString("en-PK", {
+      maximumFractionDigits: 1
+    })}% consumed`
+  );
+
+  $("budgetRunway").textContent = budgetRunway;
+
+  $("overallConsumed").textContent = money(overallConsumed);
+  $("overallConsumedPeriod").textContent =
+    expenseHistoryDates.length === 0
+      ? "Across all recorded expense history"
+      : expenseHistoryDates.length === 1
+        ? `Recorded on ${dateLabel(expenseHistoryDates[0])}`
+        : `${dateLabel(expenseHistoryDates[0])} – ${dateLabel(
+            expenseHistoryDates[expenseHistoryDates.length - 1]
+          )}`;
+  $("overallConsumedDays").textContent =
+    `${expenseHistoryDates.length} ${
+      expenseHistoryDates.length === 1 ? "day" : "days"
+    } with recorded expenses`;
 
   $("monthBudget").textContent = money(currentMonthTotals.budget);
   $("monthBudgetLabel").textContent = `${currentMonthLabel}, incl. carry-forward and Abdul's share`;

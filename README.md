@@ -23,6 +23,11 @@ funding entries. Monthly consumption totals include participant shares from all
 other labels, except person ID `1` (Abdul Sammad). The per-person monthly view
 excludes funding entries and shows each participant's share. Remaining budget is
 calculated as total budget minus total consumption.
+The dashboard also shows overall consumption across all recorded non-funding
+history, together with the date range covered.
+The top dashboard card shows the current month's consumed percentage and
+estimates how many days the remaining budget will last using the average daily
+consumption so far this month.
 
 Multiple entries may use the same `date`. Each entry is calculated with its own participants and split, then the dashboard combines them into one date while keeping the transactions separate and labeled.
 

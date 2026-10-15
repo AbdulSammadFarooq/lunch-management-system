@@ -25,6 +25,29 @@
 
     <main>
       <section class="stats">
+        <article class="stat budget-usage-stat">
+          <span>Budget Used</span>
+          <strong id="budgetUsagePercent">0%</strong>
+          <div
+            class="budget-usage-bar"
+            role="progressbar"
+            aria-label="Monthly budget consumed"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="0"
+            aria-valuetext="0% consumed"
+          >
+            <span id="budgetUsageProgress" class="budget-usage-progress"></span>
+          </div>
+          <small id="budgetUsageDetail">Rs. 0 consumed of Rs. 0</small>
+          <small id="budgetRunway">Add a Funding entry to track budget usage.</small>
+        </article>
+        <article class="stat overall-history-stat">
+          <span>Overall Consumed</span>
+          <strong id="overallConsumed">Rs. 0</strong>
+          <small id="overallConsumedPeriod">Across all recorded expense history</small>
+          <small id="overallConsumedDays">No expense history yet</small>
+        </article>
         <article class="stat"><span>Budget Status</span><strong id="budgetStatus">No Budget</strong><small id="budgetStatusDetail">Set a Funding amount to begin</small></article>
         <article class="stat"><span>Total Budget</span><strong id="monthBudget">Rs. 0</strong><small id="monthBudgetLabel">Current month</small></article>
         <article class="stat"><span>Total Consumed</span><strong id="monthConsumed">Rs. 0</strong><small id="monthConsumedLabel">Current month</small></article>
