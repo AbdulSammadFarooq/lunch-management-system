@@ -1415,7 +1415,7 @@
           "amount": 5000,
           "paidBy": 3
         },
-         {
+        {
           "amount": 5000,
           "paidBy": 2
         },
@@ -1432,27 +1432,27 @@
     {
       "date": "2026-10-01",
       "label": "Lunch",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":122.5
+          "share": 122.5
         },
         {
           "personId": 2,
-          "share":122.5
+          "share": 122.5
         },
         {
           "personId": 3,
-          "share":50
+          "share": 50
         },
         {
           "personId": 4,
-          "share":122.5
+          "share": 122.5
         },
         {
           "personId": 5,
-          "share":122.5
+          "share": 122.5
         }
       ],
       "expenses": [
@@ -1504,7 +1504,7 @@
         }
       ]
     },
-     {
+    {
       "date": "2026-10-02",
       "label": "Lunch at Savour Food",
       "participants": [
@@ -1573,7 +1573,7 @@
         }
       ]
     },
-      {
+    {
       "date": "2026-10-06",
       "label": "Lunch at Pulao Khana",
       "participants": [
@@ -1663,7 +1663,7 @@
     {
       "date": "2026-10-12",
       "label": "Lunch at office",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
@@ -1747,7 +1747,7 @@
     {
       "date": "2026-10-14",
       "label": "Lunch at Office",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 2,
@@ -1857,24 +1857,49 @@
     {
       "date": "2026-10-16",
       "label": "Lunch at Pulao Khana",
-      "splitType":"custom",
+      "splitType": "custom",
       "participants": [
         {
           "personId": 1,
-          "share":620
+          "share": 620
         },
         {
           "personId": 2,
-          "share":570
+          "share": 570
         },
         {
           "personId": 3,
-          "share":430
+          "share": 430
         }
       ],
       "expenses": [
         {
-          "amount":1620,
+          "amount": 1620,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-16",
+      "label": "Snacks",
+      "splitType": "custom",
+      "participants": [
+        {
+          "personId": 2,
+          "share": 80
+        },
+        {
+          "personId": 3,
+          "share": 40
+        },
+        {
+          "personId": 4,
+          "share": 40
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 160,
           "paidBy": 1
         }
       ]
