@@ -2100,6 +2100,33 @@
           "paidBy": 1
         }
       ]
+    },
+    {
+      "date": "2026-10-23",
+      "label": "Lunch at Eat and Spicy",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 2850,
+          "paidBy": 1
+        }
+      ]
     }
   ]
 }
