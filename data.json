@@ -2129,6 +2129,24 @@
       ]
     },
     {
+      "date": "2026-10-26",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 680,
+          "paidBy": 5
+        }
+      ]
+    },
+    {
       "date": "2026-10-27",
       "label": "Lunch at Office",
       "splitType": "custom",
@@ -2222,6 +2240,33 @@
       "expenses": [
         {
           "amount": 120,
+          "paidBy": 1
+        }
+      ]
+    },
+    {
+      "date": "2026-10-29",
+      "label": "Lunch",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 310,
           "paidBy": 1
         }
       ]
