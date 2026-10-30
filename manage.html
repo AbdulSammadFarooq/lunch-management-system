@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta id="themeColor" name="theme-color" content="#e7eef0">
+  <title>Update the lunch book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    try {
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    } catch (error) {}
+  </script>
+</head>
+<body>
+  <div class="app page-manage">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">This computer only</p>
+        <h1>Update the book</h1>
+        <p class="lede">Add a meal, pot money, or a transfer. Saving writes <code>data.json</code>. Commit and push that file when everyone else should see it.</p>
+      </div>
+      <div class="header-actions">
+        <a class="button ghost" href="index.html">View the book</a>
+        <button id="themeToggle" class="button ghost" type="button">Dark</button>
+      </div>
+    </header>
+
+    <div id="offline" class="banner" hidden>
+      <h2>Open this page from the local server</h2>
+      <p>In this folder, run <code>npm start</code>, then open <code>http://127.0.0.1:5501/manage.html</code>.</p>
+      <p>GitHub Pages can show the book, but it cannot save changes.</p>
+    </div>
+
+    <main id="workspace" hidden>
+      <p id="saveStatus" class="save-status" role="status" hidden></p>
+
+      <div class="manage-layout">
+        <form id="entryForm" class="panel composer" novalidate>
+          <div class="row-between">
+            <h2 id="formTitle">Add an entry</h2>
+          </div>
+
+          <div class="type-switch">
+            <label><input type="radio" name="type" value="meal" checked> Meal</label>
+            <label><input type="radio" name="type" value="pot"> Pot</label>
+            <label><input type="radio" name="type" value="settle"> Transfer</label>
+          </div>
+          <p id="typeHelp" class="help">Someone paid for food. The bill is split across the people who joined.</p>
+
+          <div class="split-fields">
+            <label>Date
+              <input name="date" type="date" required>
+            </label>
+            <label>Name
+              <input name="title" type="text" placeholder="Lunch" required>
+            </label>
+          </div>
+          <div id="titleChips" class="chips">
+            <button class="button ghost small" type="button" data-title="Lunch">Lunch</button>
+            <button class="button ghost small" type="button" data-title="Snacks">Snacks</button>
+            <button class="button ghost small" type="button" data-title="Breakfast">Breakfast</button>
+          </div>
+
+          <div id="groupFields">
+            <div class="row-between">
+              <h3>Who joined?</h3>
+              <div>
+                <button id="selectAll" class="button ghost small" type="button">Everyone</button>
+                <button id="selectNone" class="button ghost small" type="button">Clear</button>
+              </div>
+            </div>
+            <div id="memberGrid" class="choice-grid"></div>
+
+            <fieldset class="split-choice">
+              <legend class="help">How is the bill split?</legend>
+              <label><input type="radio" name="split" value="equal" checked> Equal</label>
+              <label><input type="radio" name="split" value="custom"> Custom amounts</label>
+            </fieldset>
+            <div id="shareGrid" class="share-grid" hidden></div>
+
+            <h3>Who paid?</h3>
+            <div id="paymentRows"></div>
+            <button id="addPayer" class="button ghost small" type="button">Add another payer</button>
+          </div>
+
+          <div id="potFields" hidden>
+            <label>Who is holding the cash?
+              <select id="heldBy" name="heldBy"></select>
+            </label>
+            <h3>Who put money in?</h3>
+            <div id="potGrid" class="share-grid"></div>
+          </div>
+
+          <div id="preview" class="preview" aria-live="polite"></div>
+          <p id="formError" class="form-error" hidden></p>
+          <div class="form-actions">
+            <button id="saveEntry" class="button" type="submit">Save entry</button>
+            <button id="cancelEdit" class="button ghost" type="button" hidden>Cancel edit</button>
+          </div>
+        </form>
+
+        <section class="panel">
+          <div class="panel-head">
+            <h2>Saved entries</h2>
+            <p id="entryCount" class="muted"></p>
+          </div>
+          <input id="entrySearch" class="search" type="search" placeholder="Search name, person, or date" aria-label="Search entries">
+          <div id="entryList"></div>
+        </section>
+      </div>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>People</h2>
+          <p>Opening balance is the wallet before the first entry. Hide someone to keep their history off the shared page.</p>
+          <p id="bookNet" class="book-net"></p>
+        </div>
+        <form id="addPersonForm" class="add-person">
+          <label>Name
+            <input name="name" type="text" placeholder="New person" required>
+          </label>
+          <label>Opening balance
+            <input name="openingBalance" type="number" step="0.01" value="0">
+          </label>
+          <button class="button" type="submit">Add person</button>
+        </form>
+        <div id="peopleList"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="ledger.js"></script>
+  <script src="manage.js"></script>
+</body>
+</html>

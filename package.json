@@ -1,0 +1,8 @@
+{
+  "name": "lunch-ledger",
+  "private": true,
+  "description": "Shared lunch expenses. Run npm start to update the book on this computer.",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

@@ -3,158 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0f172a">
-  <title>Lunch Ledger</title>
+  <meta id="themeColor" name="theme-color" content="#e7eef0">
+  <title>Lunch book</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script>
+    try {
+      if (localStorage.getItem("theme") === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+      }
+    } catch (error) {}
+  </script>
 </head>
 <body>
   <div class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Daily Expense Tracker</p>
-        <h1>🍛 Lunch Ledger</h1>
-        <p class="muted">Track participants, expenses and wallet balances from one JSON file.</p>
+        <p class="eyebrow">Shared lunch book</p>
+        <h1>Lunch book</h1>
+        <p class="lede">Who is ahead, who owes, and what is left in the pot.</p>
       </div>
       <div class="header-actions">
-        <button id="themeToggle" class="theme-toggle" title="Toggle dark mode">
-          <span class="theme-icon">🌙</span>
-        </button>
-        <div class="date-chip" id="currentDate">—</div>
+        <a id="manageLink" class="button" href="manage.html" hidden>Update the book</a>
+        <button id="themeToggle" class="button ghost" type="button">Dark</button>
       </div>
     </header>
 
     <main>
-      <section class="stats">
-        <article class="stat budget-usage-stat">
-          <span>Budget Used</span>
-          <strong id="budgetUsagePercent">0%</strong>
-          <div
-            class="budget-usage-bar"
-            role="progressbar"
-            aria-label="Monthly budget consumed"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow="0"
-            aria-valuetext="0% consumed"
-          >
-            <span id="budgetUsageProgress" class="budget-usage-progress"></span>
-          </div>
-          <small id="budgetUsageDetail">Rs. 0 consumed of Rs. 0</small>
-          <small id="budgetRunway">Add a Funding entry to track budget usage.</small>
-        </article>
-        <article class="stat overall-history-stat">
-          <span>Overall Consumed</span>
-          <strong id="overallConsumed">Rs. 0</strong>
-          <small id="overallConsumedPeriod">Across all recorded expense history</small>
-          <small id="overallConsumedDays">No expense history yet</small>
-        </article>
-        <article class="stat"><span>Budget Status</span><strong id="budgetStatus">No Budget</strong><small id="budgetStatusDetail">Set a Funding amount to begin</small></article>
-        <article class="stat"><span>Total Budget</span><strong id="monthBudget">Rs. 0</strong><small id="monthBudgetLabel">Current month</small></article>
-        <article class="stat"><span>Total Consumed</span><strong id="monthConsumed">Rs. 0</strong><small id="monthConsumedLabel">Current month</small></article>
-        <article class="stat"><span>Remaining Budget</span><strong id="monthRemaining">Rs. 0</strong><small id="monthRemainingLabel">After consumption</small></article>
-        <article class="stat"><span>Monthly Budget Daily Target</span><strong id="dailyBudgetPace">Rs. 0</strong><small id="dailyBudgetPaceLabel">Budget divided by all days in the month</small></article>
-        <article class="stat"><span>Remaining Daily Limit</span><strong id="remainingDailyPace">Rs. 0</strong><small id="remainingDailyPaceLabel">Spend this per remaining day</small></article>
-        <article class="stat"><span>Current Cost Pace</span><strong id="currentCostPace">Rs. 0/day</strong><small id="projectedConsumption">Projected: Rs. 0 this month</small></article>
-        <article class="stat"><span>Net Wallet</span><strong id="netWallet">Rs. 0</strong><small>All current balances</small></article>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <div><h2 id="lunchDateHeading">Today's Transactions</h2><p>Each transaction keeps its own participants and share calculation.</p></div>
-          <span class="badge" id="todayBadge">0 people</span>
-        </div>
-
-        <div class="today-summary">
-          <div><span>Total Expense</span><strong id="summaryExpense">Rs. 0</strong></div>
-          <div><span>Participants</span><strong id="summaryParticipants">0</strong></div>
-          <div><span>Average Share</span><strong id="summaryPerHead">Rs. 0</strong></div>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Id</th>
-                <th>Person</th>
-                <th>Paid Today</th>
-                <th>Share</th>
-                <th>Today's Change</th>
-                <th>Current Wallet</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="peopleTable"></tbody>
-          </table>
-        </div>
-      </section>
-
-      <section class="grid-2">
-        <div class="panel">
-          <div class="panel-head"><div><h2>Wallet Overview</h2><p>Current balance with each person’s average monthly expense.</p></div></div>
-          <div id="walletList" class="wallet-list"></div>
-        </div>
-
-        <div class="panel">
-          <div class="panel-head"><div><h2>Today's Transactions</h2><p>Payments grouped by lunch, snacks, or any other transaction.</p></div></div>
-          <div id="expenseList" class="expense-list"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head"><div><h2>Monthly Expenses by Person</h2><p>Total expenses per person for each month.</p></div></div>
-        <div id="monthlyExpenses" class="monthly-expenses"></div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head"><div><h2>Monthly Total Expenses</h2><p>Budget includes collections, Abdul Sammad's share, and prior-month remaining budget; consumption includes everyone.</p></div></div>
-        <div id="monthlyTotals" class="monthly-totals"></div>
-      </section>
-
-      <details class="panel recent-activity" open>
-        <summary class="panel-head">
-          <div><h2>Recent Activity</h2><p>Every lunch, snack, and other transaction from the last 30 days.</p></div>
-          <span class="badge" id="historyRecordCount">0 records</span>
-        </summary>
-        <div id="history" class="history"></div>
-      </details>
+      <p id="loading" class="loading">Loading the book…</p>
+      <section id="wallets"></section>
+      <section id="month"></section>
+      <section id="latest"></section>
+      <section id="activity" hidden></section>
+      <section id="months"></section>
+      <footer class="foot">This page only reads the book. The person who keeps it updates <code>data.json</code>, then pushes so everyone else can see the change.</footer>
     </main>
-
-    <!-- <footer>Data source: <code>data.json</code> · Edit the JSON, refresh the page.</footer> -->
   </div>
 
-  <div class="modal-backdrop hidden" id="personModal" aria-hidden="true">
-    <div class="person-modal" role="dialog" aria-modal="true" aria-labelledby="personModalTitle">
-      <button class="person-modal-close" id="personModalClose" type="button" aria-label="Close details">×</button>
-      <div class="person-modal-header">
-        <div>
-          <p class="eyebrow">Wallet detail</p>
-          <h3 id="personModalTitle">Person</h3>
-        </div>
-        <div class="person-modal-metrics" id="personModalMetrics"></div>
-      </div>
-
-      <div class="person-modal-body">
-        <div class="person-modal-summary" id="personModalSummary"></div>
-
-        <div class="table-wrap person-modal-table-wrap">
-          <table class="person-modal-table">
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Transaction</th>
-                <th>Paid</th>
-                <th>Share</th>
-                <th>Change</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody id="personModalTableBody"></tbody>
-          </table>
-        </div>
+  <div id="personModal" class="modal" hidden>
+    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="personTitle">
+      <button id="closePerson" class="icon-button" type="button" aria-label="Close">×</button>
+      <p class="eyebrow">Wallet</p>
+      <h2 id="personTitle">Person</h2>
+      <p id="personMath" class="lede"></p>
+      <div id="personSummary" class="summary-row"></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Entry</th>
+              <th>Paid</th>
+              <th>Share</th>
+              <th>Change</th>
+            </tr>
+          </thead>
+          <tbody id="personRows"></tbody>
+        </table>
       </div>
     </div>
   </div>
 
+  <script src="ledger.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

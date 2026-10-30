@@ -1,2327 +1,2238 @@
 {
   "settings": {
     "currency": "Rs.",
-    "currencyCode": "PKR"
+    "currencyCode": "PKR",
+    "budgetPersonId": 1,
+    "statsFrom": "2026-09"
   },
   "people": [
     {
       "id": 1,
       "name": "Abdul Sammad",
-      "initialBalance": -702.43
+      "openingBalance": -702.43,
+      "active": true
     },
     {
       "id": 2,
       "name": "Wajahat Hussain",
-      "initialBalance": 446.97
+      "openingBalance": 446.97,
+      "active": true
     },
     {
       "id": 3,
       "name": "Umair Zafar",
-      "initialBalance": -1344.98
+      "openingBalance": -1344.98,
+      "active": true
     },
     {
       "id": 4,
       "name": "Rizwan Khan",
-      "initialBalance": -1421.15
+      "openingBalance": -1421.15,
+      "active": true
     },
     {
       "id": 5,
       "name": "Muhammad Junaid",
-      "initialBalance": 2535.73
+      "openingBalance": 2535.73,
+      "active": true
     },
     {
       "id": 6,
       "name": "Arslan",
-      "initialBalance": 295.69,
-      "hidden": true
+      "openingBalance": 295.69,
+      "active": false
     },
     {
       "id": 7,
       "name": "Adeel Ahmed",
-      "initialBalance": 190.17
+      "openingBalance": 190.17,
+      "active": true
     },
     {
       "id": 8,
       "name": "Kashif",
-      "initialBalance": 0
+      "openingBalance": 0,
+      "active": true
     }
   ],
-  "days": [
+  "entries": [
     {
+      "id": "e1",
       "date": "2026-08-28",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 882.37
+          "amount": 3528
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 882.37
         },
         {
           "personId": 2,
-          "share": 881.875
+          "amount": 881.875
         },
         {
           "personId": 3,
-          "share": 881.875
+          "amount": 881.875
         },
         {
           "personId": 5,
-          "share": 881.875
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 3528,
-          "paidBy": 1
+          "amount": 881.875
         }
       ]
     },
     {
+      "id": "e2",
       "date": "2026-08-28",
-      "label": "French Fries (PWD)",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "French Fries (PWD)",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 700,
-          "paidBy": 3
+          "personId": 3,
+          "amount": 700
         }
       ]
     },
     {
+      "id": "e3",
       "date": "2026-08-31",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        6,
+        1,
+        3,
+        5,
+        4
+      ],
+      "paid": [
+        {
+          "personId": 4,
+          "amount": 430
+        }
+      ],
+      "shares": [
         {
           "personId": 6,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 1,
-          "share": 95
+          "amount": 95
         },
         {
           "personId": 3,
-          "share": 95
+          "amount": 95
         },
         {
           "personId": 5,
-          "share": 95
+          "amount": 95
         },
         {
           "personId": 4,
-          "share": 95
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 430,
-          "paidBy": 4
+          "amount": 95
         }
       ]
     },
     {
+      "id": "e4",
       "date": "2026-08-31",
-      "label": "Snacks",
-      "splitType": "custom",
-      "participants": [
+      "title": "Snacks",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        6,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 5,
+          "amount": 200
+        }
+      ],
+      "shares": [
         {
           "personId": 1,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 2,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 3,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 6,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 5,
-          "share": 0
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 200,
-          "paidBy": 5
+          "amount": 0
         }
       ]
     },
     {
+      "id": "e5",
       "date": "2026-08-31",
-      "label": "Exchange",
-      "splitType": "custom",
-      "participants": [
+      "title": "Exchange",
+      "type": "settle",
+      "split": "custom",
+      "members": [
+        1,
+        6
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 0
+          "amount": 195.69
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 0
         },
         {
           "personId": 6,
-          "share": 195.69
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 195.69,
-          "paidBy": 1
+          "amount": 195.69
         }
       ]
     },
     {
+      "id": "e6",
       "date": "2026-09-01",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 273.33
+          "amount": 870
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 273.33
         },
         {
           "personId": 2,
-          "share": 273.33
+          "amount": 273.33
         },
         {
           "personId": 3,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 5,
-          "share": 273.33
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 870,
-          "paidBy": 1
+          "amount": 273.33
         }
       ]
     },
     {
+      "id": "e7",
       "date": "2026-09-02",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 400,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-02",
-      "label": "Snacks",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 500
+          "amount": 400
+        }
+      ]
+    },
+    {
+      "id": "e8",
+      "date": "2026-09-02",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 500
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 500
         },
         {
           "personId": 2,
-          "share": 0
+          "amount": 0
         },
         {
           "personId": 3,
-          "share": 0
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 500,
-          "paidBy": 1
+          "amount": 0
         }
       ]
     },
     {
+      "id": "e9",
       "date": "2026-09-03",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 300,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 300
         }
       ]
     },
     {
+      "id": "e10",
       "date": "2026-09-04",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 500,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 500
         }
       ]
     },
     {
+      "id": "e11",
       "date": "2026-09-04",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 3
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 500,
-          "paidBy": 3
+          "personId": 3,
+          "amount": 500
         }
       ]
     },
     {
+      "id": "e12",
       "date": "2026-09-04",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1260,
-          "paidBy": 5
+          "personId": 5,
+          "amount": 1260
         }
       ]
     },
     {
+      "id": "e13",
       "date": "2026-09-07",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 115
+          "amount": 520
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 115
         },
         {
           "personId": 2,
-          "share": 115
+          "amount": 115
         },
         {
           "personId": 3,
-          "share": 60
+          "amount": 60
         },
         {
           "personId": 4,
-          "share": 115
+          "amount": 115
         },
         {
           "personId": 5,
-          "share": 115
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 520,
-          "paidBy": 1
+          "amount": 115
         }
       ]
     },
     {
+      "id": "e14",
       "date": "2026-09-08",
-      "label": "Funding",
-      "splitType": "custom",
-      "participants": [
-        {
-          "personId": 1,
-          "share": 22700
-        },
+      "title": "Funding",
+      "type": "pot",
+      "heldBy": 1,
+      "paid": [
         {
           "personId": 3,
-          "share": 0
+          "amount": 7200
         },
         {
           "personId": 5,
-          "share": 0
+          "amount": 3500
         },
         {
           "personId": 2,
-          "share": 0
+          "amount": 5000
         },
         {
           "personId": 4,
-          "share": 0
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 7200,
-          "paidBy": 3
-        },
-        {
-          "amount": 3500,
-          "paidBy": 5
-        },
-        {
-          "amount": 5000,
-          "paidBy": 2
-        },
-        {
-          "amount": 7000,
-          "paidBy": 4
+          "amount": 7000
         }
       ]
     },
     {
+      "id": "e15",
       "date": "2026-09-08",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 700,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 700
         }
       ]
     },
     {
+      "id": "e16",
       "date": "2026-09-08",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 150,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 150
         }
       ]
     },
     {
+      "id": "e17",
       "date": "2026-09-09",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 720,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 720
         }
       ]
     },
     {
+      "id": "e18",
       "date": "2026-09-09",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 150,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 150
         }
       ]
     },
     {
+      "id": "e19",
       "date": "2026-09-09",
-      "label": "PWD BURGERS",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        },
-        {
-          "personId": 7
-        }
+      "title": "PWD BURGERS",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4,
+        5,
+        7
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1560,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1560
         }
       ]
     },
     {
+      "id": "e20",
       "date": "2026-09-10",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 0
+          "amount": 670
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 0
         },
         {
           "personId": 2,
-          "share": 203.33
+          "amount": 203.33
         },
         {
           "personId": 3,
-          "share": 60
+          "amount": 60
         },
         {
           "personId": 4,
-          "share": 203.33
+          "amount": 203.33
         },
         {
           "personId": 5,
-          "share": 203.33
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 670,
-          "paidBy": 1
+          "amount": 203.33
         }
       ]
     },
     {
+      "id": "e21",
       "date": "2026-09-10",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 200,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 200
         }
       ]
     },
     {
+      "id": "e22",
       "date": "2026-09-11",
-      "label": "Breakfast",
-      "splitType": "custom",
-      "participants": [
+      "title": "Breakfast",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        3
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 0
+          "amount": 120
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 0
         },
         {
           "personId": 3,
-          "share": 120
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 120,
-          "paidBy": 1
+          "amount": 120
         }
       ]
     },
     {
+      "id": "e23",
       "date": "2026-09-11",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 550
+          "amount": 2170
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 550
         },
         {
           "personId": 2,
-          "share": 540
+          "amount": 540
         },
         {
           "personId": 3,
-          "share": 540
+          "amount": 540
         },
         {
           "personId": 5,
-          "share": 540
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 2170,
-          "paidBy": 1
+          "amount": 540
         }
       ]
     },
     {
+      "id": "e24",
       "date": "2026-09-11",
-      "label": "Sweet Ice-cream I8",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        }
+      "title": "Sweet Ice-cream I8",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4
       ],
-      "expenses": [
-        {
-          "amount": 548,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-14",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 60
+          "amount": 548
+        }
+      ]
+    },
+    {
+      "id": "e25",
+      "date": "2026-09-14",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 570
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 60
         },
         {
           "personId": 2,
-          "share": 170
+          "amount": 170
         },
         {
           "personId": 3,
-          "share": 170
+          "amount": 170
         },
         {
           "personId": 4,
-          "share": 170
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 570,
-          "paidBy": 1
+          "amount": 170
         }
       ]
     },
     {
+      "id": "e26",
       "date": "2026-09-14",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 190,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 190
         }
       ]
     },
     {
+      "id": "e27",
       "date": "2026-09-15",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 86.66
+          "amount": 310
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 86.66
         },
         {
           "personId": 2,
-          "share": 86.66
+          "amount": 86.66
         },
         {
           "personId": 3,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 5,
-          "share": 86.66
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 310,
-          "paidBy": 1
+          "amount": 86.66
         }
       ]
     },
     {
+      "id": "e28",
       "date": "2026-09-15",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3
       ],
-      "expenses": [
-        {
-          "amount": 210,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-15",
-      "label": "Soan Garden Chaiy",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 100
+          "amount": 210
+        }
+      ]
+    },
+    {
+      "id": "e29",
+      "date": "2026-09-15",
+      "title": "Soan Garden Chaiy",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 290
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 100
         },
         {
           "personId": 3,
-          "share": 100
+          "amount": 100
         },
         {
           "personId": 5,
-          "share": 90
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 290,
-          "paidBy": 1
+          "amount": 90
         }
       ]
     },
     {
+      "id": "e30",
       "date": "2026-09-16",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 530,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 530
         }
       ]
     },
     {
+      "id": "e31",
       "date": "2026-09-16",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 140,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 140
         }
       ]
     },
     {
+      "id": "e32",
       "date": "2026-09-17",
-      "label": "Breakfast",
-      "participants": [
-        {
-          "personId": 3
-        }
+      "title": "Breakfast",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 500,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 500
         }
       ]
     },
     {
+      "id": "e33",
       "date": "2026-09-17",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        },
-        {
-          "personId": 7
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        5,
+        7
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 784,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 784
         }
       ]
     },
     {
+      "id": "e34",
       "date": "2026-09-17",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 200,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 200
         }
       ]
     },
     {
+      "id": "e35",
       "date": "2026-09-18",
-      "label": "Friday Lunch (Cash 1000 & 150 for next cola)",
-      "participants": [
-        {
-          "personId": 4
-        }
+      "title": "Friday Lunch (Cash 1000 & 150 for next cola)",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        4
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1150,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1150
         }
       ]
     },
     {
+      "id": "e36",
       "date": "2026-09-18",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1980,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1980
         }
       ]
     },
     {
+      "id": "e37",
       "date": "2026-09-21",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 145
+          "amount": 630
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 145
         },
         {
           "personId": 2,
-          "share": 145
+          "amount": 145
         },
         {
           "personId": 3,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 4,
-          "share": 145
+          "amount": 145
         },
         {
           "personId": 5,
-          "share": 145
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 630,
-          "paidBy": 1
+          "amount": 145
         }
       ]
     },
     {
+      "id": "e38",
       "date": "2026-09-21",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 220,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 220
         }
       ]
     },
     {
+      "id": "e39",
       "date": "2026-09-21",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 220,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 220
         }
       ]
     },
     {
+      "id": "e40",
       "date": "2026-09-22",
-      "label": "Lunch & Snacks",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch & Snacks",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 142.5
+          "amount": 670
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 142.5
         },
         {
           "personId": 2,
-          "share": 142.5
+          "amount": 142.5
         },
         {
           "personId": 3,
-          "share": 100
+          "amount": 100
         },
         {
           "personId": 4,
-          "share": 142.5
+          "amount": 142.5
         },
         {
           "personId": 5,
-          "share": 142.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 670,
-          "paidBy": 1
+          "amount": 142.5
         }
       ]
     },
     {
+      "id": "e41",
       "date": "2026-09-23",
-      "label": "Lunch at office",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at office",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        4,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 150,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-23",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 200,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-24",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 72.5
+          "amount": 150
+        }
+      ]
+    },
+    {
+      "id": "e42",
+      "date": "2026-09-23",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 200
+        }
+      ]
+    },
+    {
+      "id": "e43",
+      "date": "2026-09-24",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 350
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 72.5
         },
         {
           "personId": 2,
-          "share": 72.5
+          "amount": 72.5
         },
         {
           "personId": 3,
-          "share": 72.5
+          "amount": 72.5
         },
         {
           "personId": 4,
-          "share": 60
+          "amount": 60
         },
         {
           "personId": 5,
-          "share": 72.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 350,
-          "paidBy": 1
+          "amount": 72.5
         }
       ]
     },
     {
+      "id": "e44",
       "date": "2026-09-24",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 220,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 220
         }
       ]
     },
     {
+      "id": "e45",
       "date": "2026-09-25",
-      "label": "Friday Lunch (Pulao Khana)",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Friday Lunch (Pulao Khana)",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1467,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1467
         }
       ]
     },
     {
+      "id": "e46",
       "date": "2026-09-26",
-      "label": "Friday Cricket Match",
-      "participants": [
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        },
-        {
-          "personId": 7
-        },
-        {
-          "personId": 1
-        },
-        {
-          "personId": 8
-        }
+      "title": "Friday Cricket Match",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3,
+        4,
+        5,
+        7,
+        1,
+        8
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 2389.98,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 2389.98
         }
       ]
     },
     {
+      "id": "e47",
       "date": "2026-09-28",
-      "label": "Lunch Rasheed Sweets & Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch Rasheed Sweets & Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 1054,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-29",
-      "label": "Funding",
-      "participants": [
-        {
-          "personId": 1
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 500,
-          "paidBy": 2
-        }
-      ]
-    },
-    {
-      "date": "2026-09-29",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 162.5
+          "amount": 1054
+        }
+      ]
+    },
+    {
+      "id": "e48",
+      "date": "2026-09-29",
+      "title": "Funding",
+      "type": "pot",
+      "heldBy": 1,
+      "paid": [
+        {
+          "personId": 2,
+          "amount": 500
+        }
+      ]
+    },
+    {
+      "id": "e49",
+      "date": "2026-09-29",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 700
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 162.5
         },
         {
           "personId": 2,
-          "share": 162.5
+          "amount": 162.5
         },
         {
           "personId": 3,
-          "share": 162.5
+          "amount": 162.5
         },
         {
           "personId": 4,
-          "share": 50
+          "amount": 50
         },
         {
           "personId": 5,
-          "share": 162.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 700,
-          "paidBy": 1
+          "amount": 162.5
         }
       ]
     },
     {
+      "id": "e50",
       "date": "2026-09-29",
-      "label": "Kulcha Party",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Kulcha Party",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 230,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-30",
-      "label": "Cake",
-      "participants": [
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 80,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-30",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 250,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-30",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 290,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-09-30",
-      "label": "Exchange",
-      "participants": [
-        {
-          "personId": 2
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 200,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-01",
-      "label": "Funding",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 17000
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 5000,
-          "paidBy": 3
-        },
-        {
-          "amount": 5000,
-          "paidBy": 2
-        },
-        {
-          "amount": 3000,
-          "paidBy": 4
-        },
-        {
-          "amount": 4000,
-          "paidBy": 5
+          "amount": 230
         }
       ]
     },
     {
-      "date": "2026-10-01",
-      "label": "Lunch",
-      "splitType": "custom",
-      "participants": [
+      "id": "e51",
+      "date": "2026-09-30",
+      "title": "Cake",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 122.5
+          "amount": 80
+        }
+      ]
+    },
+    {
+      "id": "e52",
+      "date": "2026-09-30",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 250
+        }
+      ]
+    },
+    {
+      "id": "e53",
+      "date": "2026-09-30",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 290
+        }
+      ]
+    },
+    {
+      "id": "e54",
+      "date": "2026-09-30",
+      "title": "Exchange",
+      "type": "settle",
+      "split": "equal",
+      "members": [
+        2
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 200
+        }
+      ]
+    },
+    {
+      "id": "e55",
+      "date": "2026-10-01",
+      "title": "Funding",
+      "type": "pot",
+      "heldBy": 1,
+      "paid": [
+        {
+          "personId": 3,
+          "amount": 5000
         },
         {
           "personId": 2,
-          "share": 122.5
-        },
-        {
-          "personId": 3,
-          "share": 50
+          "amount": 5000
         },
         {
           "personId": 4,
-          "share": 122.5
+          "amount": 3000
         },
         {
           "personId": 5,
-          "share": 122.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 540,
-          "paidBy": 1
+          "amount": 4000
         }
       ]
     },
     {
+      "id": "e56",
       "date": "2026-10-01",
-      "label": "Snacks",
-      "participants": [
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
+          "personId": 1,
+          "amount": 540
         }
       ],
-      "expenses": [
+      "shares": [
         {
-          "amount": 250,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 122.5
+        },
+        {
+          "personId": 2,
+          "amount": 122.5
+        },
+        {
+          "personId": 3,
+          "amount": 50
+        },
+        {
+          "personId": 4,
+          "amount": 122.5
+        },
+        {
+          "personId": 5,
+          "amount": 122.5
         }
       ]
     },
     {
+      "id": "e57",
+      "date": "2026-10-01",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 250
+        }
+      ]
+    },
+    {
+      "id": "e58",
       "date": "2026-10-02",
-      "label": "Breakfast",
-      "participants": [
-        {
-          "personId": 3
-        }
+      "title": "Breakfast",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 100,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 100
         }
       ]
     },
     {
+      "id": "e59",
       "date": "2026-10-02",
-      "label": "Lunch at Savour Food",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Savour Food",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 3600,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 3600
         }
       ]
     },
     {
+      "id": "e60",
       "date": "2026-10-02",
-      "label": "Exchange",
-      "participants": [
-        {
-          "personId": 1
-        }
+      "title": "Exchange",
+      "type": "settle",
+      "split": "equal",
+      "members": [
+        1
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 400,
-          "paidBy": 8
+          "personId": 8,
+          "amount": 400
         }
       ]
     },
     {
+      "id": "e61",
       "date": "2026-10-05",
-      "label": "Lunch (Kbab)",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch (Kbab)",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1610,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1610
         }
       ]
     },
     {
+      "id": "e62",
       "date": "2026-10-06",
-      "label": "Lunch at Pulao Khana",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Pulao Khana",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1190,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1190
         }
       ]
     },
     {
+      "id": "e63",
       "date": "2026-10-07",
-      "label": "Exchange",
-      "participants": [
-        {
-          "personId": 3
-        }
+      "title": "Exchange",
+      "type": "settle",
+      "split": "equal",
+      "members": [
+        3
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 200,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 200
         }
       ]
     },
     {
+      "id": "e64",
       "date": "2026-10-08",
-      "label": "Lunch Rasheed Sweets",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch Rasheed Sweets",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1970,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1970
         }
       ]
     },
     {
+      "id": "e65",
       "date": "2026-10-09",
-      "label": "Friday Lunch (Pulao Khana)",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Friday Lunch (Pulao Khana)",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 1800,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 1800
         }
       ]
     },
     {
+      "id": "e66",
       "date": "2026-10-12",
-      "label": "Lunch at office",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch at office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
         {
           "personId": 1,
-          "share": 102.5
+          "amount": 570
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 102.5
         },
         {
           "personId": 2,
-          "share": 102.5
+          "amount": 102.5
         },
         {
           "personId": 3,
-          "share": 160
+          "amount": 160
         },
         {
           "personId": 4,
-          "share": 102.5
+          "amount": 102.5
         },
         {
           "personId": 5,
-          "share": 102.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 570,
-          "paidBy": 1
+          "amount": 102.5
         }
       ]
     },
     {
+      "id": "e67",
       "date": "2026-10-12",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 200,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 200
         }
       ]
     },
     {
+      "id": "e68",
       "date": "2026-10-13",
-      "label": "Lunch at Quetta Chinar",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Quetta Chinar",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 930,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 930
         }
       ]
     },
     {
+      "id": "e69",
       "date": "2026-10-14",
-      "label": "Lunch at Office",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 470
+        }
+      ],
+      "shares": [
         {
           "personId": 2,
-          "share": 136.66
+          "amount": 136.66
         },
         {
           "personId": 3,
-          "share": 60
+          "amount": 60
         },
         {
           "personId": 4,
-          "share": 136.66
+          "amount": 136.66
         },
         {
           "personId": 5,
-          "share": 136.66
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 470,
-          "paidBy": 1
+          "amount": 136.66
         }
       ]
     },
     {
+      "id": "e70",
       "date": "2026-10-14",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 230,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-15",
-      "label": "Lunch at Pulao Khana",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 1460,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-15",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 210,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-16",
-      "label": "Lunch at Pulao Khana",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 620
-        },
-        {
-          "personId": 2,
-          "share": 570
-        },
-        {
-          "personId": 3,
-          "share": 430
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 1620,
-          "paidBy": 1
+          "amount": 230
         }
       ]
     },
     {
+      "id": "e71",
+      "date": "2026-10-15",
+      "title": "Lunch at Pulao Khana",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 1460
+        }
+      ]
+    },
+    {
+      "id": "e72",
+      "date": "2026-10-15",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 210
+        }
+      ]
+    },
+    {
+      "id": "e73",
       "date": "2026-10-16",
-      "label": "Snacks",
-      "splitType": "custom",
-      "participants": [
+      "title": "Lunch at Pulao Khana",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 1620
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 620
+        },
         {
           "personId": 2,
-          "share": 80
+          "amount": 570
         },
         {
           "personId": 3,
-          "share": 40
+          "amount": 430
+        }
+      ]
+    },
+    {
+      "id": "e74",
+      "date": "2026-10-16",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        2,
+        3,
+        4
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 160
+        }
+      ],
+      "shares": [
+        {
+          "personId": 2,
+          "amount": 80
+        },
+        {
+          "personId": 3,
+          "amount": 40
         },
         {
           "personId": 4,
-          "share": 40
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 160,
-          "paidBy": 1
+          "amount": 40
         }
       ]
     },
     {
+      "id": "e75",
       "date": "2026-10-19",
-      "label": "Lunch at Office",
-      "participants": [
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        4,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 280,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-19",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 200,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-20",
-      "label": "Lunch at Office",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 60
+          "amount": 280
+        }
+      ]
+    },
+    {
+      "id": "e76",
+      "date": "2026-10-19",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 200
+        }
+      ]
+    },
+    {
+      "id": "e77",
+      "date": "2026-10-20",
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 835
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 60
         },
         {
           "personId": 2,
-          "share": 258.75
+          "amount": 258.75
         },
         {
           "personId": 3,
-          "share": 258.75
+          "amount": 258.75
         },
         {
           "personId": 5,
-          "share": 258.75
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 835,
-          "paidBy": 1
+          "amount": 258.75
         }
       ]
     },
     {
+      "id": "e78",
       "date": "2026-10-20",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 200,
-          "paidBy": 5
+          "personId": 5,
+          "amount": 200
         }
       ]
     },
     {
+      "id": "e79",
       "date": "2026-10-21",
-      "label": "Lunch at Office",
-      "participants": [
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 125,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-21",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 200,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-22",
-      "label": "Lunch at Office",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 60
+          "amount": 125
+        }
+      ]
+    },
+    {
+      "id": "e80",
+      "date": "2026-10-21",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 200
+        }
+      ]
+    },
+    {
+      "id": "e81",
+      "date": "2026-10-22",
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 660
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 60
         },
         {
           "personId": 2,
-          "share": 150
+          "amount": 150
         },
         {
           "personId": 3,
-          "share": 150
+          "amount": 150
         },
         {
           "personId": 4,
-          "share": 150
+          "amount": 150
         },
         {
           "personId": 5,
-          "share": 150
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 660,
-          "paidBy": 1
+          "amount": 150
         }
       ]
     },
     {
+      "id": "e82",
       "date": "2026-10-22",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 160,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 160
         }
       ]
     },
     {
+      "id": "e83",
       "date": "2026-10-23",
-      "label": "Lunch at Eat and Spicy",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch at Eat and Spicy",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
-        {
-          "amount": 2850,
-          "paidBy": 1
-        }
-      ]
-    },
-    {
-      "date": "2026-10-26",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 680,
-          "paidBy": 5
-        }
-      ]
-    },
-    {
-      "date": "2026-10-27",
-      "label": "Lunch at Office",
-      "splitType": "custom",
-      "participants": [
+      "paid": [
         {
           "personId": 1,
-          "share": 102.5
+          "amount": 2850
+        }
+      ]
+    },
+    {
+      "id": "e84",
+      "date": "2026-10-26",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 5,
+          "amount": 680
+        }
+      ]
+    },
+    {
+      "id": "e85",
+      "date": "2026-10-27",
+      "title": "Lunch at Office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 860
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 102.5
         },
         {
           "personId": 2,
-          "share": 327.5
+          "amount": 327.5
         },
         {
           "personId": 4,
-          "share": 102.5
+          "amount": 102.5
         },
         {
           "personId": 5,
-          "share": 327.5
-        }
-      ],
-      "expenses": [
-        {
-          "amount": 860,
-          "paidBy": 1
+          "amount": 327.5
         }
       ]
     },
     {
+      "id": "e86",
       "date": "2026-10-27",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 210,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 210
         }
       ]
     },
     {
+      "id": "e87",
       "date": "2026-10-28",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 400,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 400
         }
       ]
     },
     {
+      "id": "e88",
       "date": "2026-10-28",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 120,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 120
         }
       ]
     },
     {
+      "id": "e89",
       "date": "2026-10-29",
-      "label": "Lunch",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 310,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 310
         }
       ]
     },
     {
+      "id": "e90",
       "date": "2026-10-29",
-      "label": "Snacks",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 400,
-          "paidBy": 1
+          "personId": 1,
+          "amount": 400
         }
       ]
     },
-     {
+    {
+      "id": "e91",
       "date": "2026-10-30",
-      "label": "Lunch at Savour Food",
-      "participants": [
-        {
-          "personId": 1
-        },
-        {
-          "personId": 2
-        },
-        {
-          "personId": 3
-        },
-        {
-          "personId": 4
-        },
-        {
-          "personId": 5
-        }
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
       ],
-      "expenses": [
+      "paid": [
         {
-          "amount": 3561,
-          "paidBy": 5
+          "personId": 5,
+          "amount": 3561
         }
       ]
     }

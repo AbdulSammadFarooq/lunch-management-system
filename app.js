@@ -1,1136 +1,408 @@
-let data = null;
+let view = null;
+let showAllActivity = false;
 
 const $ = (id) => document.getElementById(id);
 
-// Initialize theme on page load
-function initializeTheme() {
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  if (savedTheme === 'dark') {
-    document.body.classList.add('dark-mode');
-    updateThemeIcon('☀️');
-  } else {
-    updateThemeIcon('🌙');
-  }
-
-  const themeToggle = $('themeToggle');
-  if (themeToggle) {
-    themeToggle.addEventListener('click', toggleTheme);
-  }
-}
-
-function toggleTheme() {
-  const isDarkMode = document.body.classList.toggle('dark-mode');
-  localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-  updateThemeIcon(isDarkMode ? '☀️' : '🌙');
-}
-
-function updateThemeIcon(icon) {
-  const themeIcon = document.querySelector('.theme-icon');
-  if (themeIcon) {
-    themeIcon.textContent = icon;
-  }
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  })[char]);
 }
 
 function money(value, signed = false) {
-  const n = Number(value) || 0;
-  const prefix = signed && n > 0 ? "+" : n < 0 ? "-" : "";
-
-  return `${prefix}${data.settings?.currency || "Rs."} ${Math.abs(
-    n
-  ).toLocaleString("en-PK", {
-    maximumFractionDigits: 2
-  })}`;
+  return LunchLedger.formatMoney(value, view?.currency || "Rs.", signed);
 }
 
 function dateLabel(value) {
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-PK", {
-    day: "2-digit",
+  if (!value) return "";
+  return new Date(`${value}T00:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
     month: "short",
     year: "numeric"
   });
 }
 
-function escapeHtml(value) {
-  return String(value).replace(
-    /[&<>"']/g,
-    (c) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;"
-      })[c]
-  );
+function personName(personId) {
+  return LunchLedger.personName(view.people, personId);
 }
 
-function getParticipantIds(participants) {
-  if (!Array.isArray(participants)) return [];
-
-  return participants.map((participant) => {
-    if (typeof participant === "object" && participant !== null) {
-      return participant.personId;
-    }
-
-    return participant;
-  });
-}
-
-function getParticipant(participants, personId) {
-  if (!Array.isArray(participants)) return null;
-
-  return (
-    participants.find((participant) => {
-      if (typeof participant === "object" && participant !== null) {
-        return participant.personId === personId;
-      }
-
-      return participant === personId;
-    }) || null
-  );
-}
-
-function getParticipantShare(day, personId, total) {
-  const participants = Array.isArray(day.participants) ? day.participants : [];
-
-  if (!participants.length) return 0;
-
-  const participant = getParticipant(participants, personId);
-
-  if (!participant) return 0;
-
-  if (typeof participant === "object") {
-    if (day.splitType === "custom") {
-      return Number(participant.share) || 0;
-    }
-
-    return total / participants.length;
-  }
-
-  return total / participants.length;
-}
-
-function calculate() {
-  const people = data.people || [];
-
-  const days = [...(data.days || [])].sort((a, b) =>
-    a.date.localeCompare(b.date)
-  );
-
-  const balances = new Map(
-    people.map((p) => [p.id, Number(p.initialBalance) || 0])
-  );
-  const activity = new Map(people.map((p) => [p.id, 0]));
-
-  const dailyByDate = new Map();
-
-  for (const day of days) {
-    const participants = Array.isArray(day.participants)
-      ? day.participants
-      : [];
-
-    const participantIds = getParticipantIds(participants);
-
-    const expenses = Array.isArray(day.expenses) ? day.expenses : [];
-
-    const total = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-
-    const perHead = participantIds.length ? total / participantIds.length : 0;
-
-    const paid = new Map();
-
-    for (const expense of expenses) {
-      const id = expense.paidBy;
-      const amount = Number(expense.amount) || 0;
-
-      paid.set(id, (paid.get(id) || 0) + amount);
-    }
-
-    const changes = new Map();
-    const shares = new Map();
-
-    for (const p of people) {
-      const isParticipant = participantIds.includes(p.id);
-
-      const personPaid = paid.get(p.id) || 0;
-
-      const personShare = isParticipant
-        ? getParticipantShare(day, p.id, total)
-        : 0;
-
-      shares.set(p.id, personShare);
-
-      const change = personPaid - personShare;
-
-      changes.set(p.id, change);
-
-      balances.set(p.id, (balances.get(p.id) || 0) + change);
-      activity.set(p.id, (activity.get(p.id) || 0) + change);
-    }
-
-    const transaction = {
-      day,
-      participants,
-      participantIds,
-      expenses,
-      total,
-      perHead,
-      paid,
-      shares,
-      changes
-    };
-
-    const grouped = dailyByDate.get(day.date) || {
-      day: { date: day.date },
-      participants: [],
-      participantIds: [],
-      expenses: [],
-      total: 0,
-      participantSlots: 0,
-      paid: new Map(),
-      shares: new Map(),
-      changes: new Map(),
-      transactions: []
-    };
-
-    grouped.transactions.push(transaction);
-    grouped.total += total;
-    grouped.participantSlots += participantIds.length;
-    grouped.participantIds = [...new Set([...grouped.participantIds, ...participantIds])];
-    grouped.participants = grouped.participantIds;
-    grouped.expenses.push(...expenses);
-
-    for (const [personId, amount] of paid) {
-      grouped.paid.set(personId, (grouped.paid.get(personId) || 0) + amount);
-    }
-    for (const [personId, share] of shares) {
-      grouped.shares.set(personId, (grouped.shares.get(personId) || 0) + share);
-    }
-    for (const [personId, change] of changes) {
-      grouped.changes.set(personId, (grouped.changes.get(personId) || 0) + change);
-    }
-    grouped.perHead = grouped.participantSlots ? grouped.total / grouped.participantSlots : 0;
-    dailyByDate.set(day.date, grouped);
-  }
-
-  const daily = [...dailyByDate.values()].sort((a, b) => a.day.date.localeCompare(b.day.date));
-
-  return {
-    people,
-    days,
-    daily,
-    balances,
-    activity
+function setupTheme() {
+  const button = $("themeToggle");
+  const color = $("themeColor");
+  const paint = () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    button.textContent = dark ? "Light" : "Dark";
+    if (color) color.content = dark ? "#0e171c" : "#e7eef0";
   };
-}
-
-function getMonthKey(dateValue) {
-  const date = new Date(`${dateValue}T00:00:00`);
-
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-}
-
-function isFunding(day) {
-  return String(day.label || "").trim().toLowerCase() === "funding";
-}
-
-function isExchange(day) {
-  return String(day.label || "").trim().toLowerCase() === "exchange";
-}
-
-function getDayTotal(day) {
-  return (Array.isArray(day.expenses) ? day.expenses : []).reduce(
-    (sum, expense) => sum + (Number(expense.amount) || 0),
-    0
-  );
-}
-
-function getDayConsumed(day) {
-  if (isFunding(day)) return 0;
-
-  const total = getDayTotal(day);
-  return getParticipantIds(day.participants || [])
-    .reduce(
-      (sum, personId) => sum + getParticipantShare(day, personId, total),
-      0
-    );
-}
-
-function getDayBudget(day) {
-  if (isFunding(day)) return getDayTotal(day);
-
-  return getParticipantShare(day, 1, getDayTotal(day));
-}
-
-function getMonthlyTotals(days, includeCurrentMonth = false) {
-  const monthlyTotals = new Map();
-
-  for (const day of days) {
-    const monthKey = getMonthKey(day.date);
-    const totals = monthlyTotals.get(monthKey) || { budget: 0, consumed: 0 };
-
-    totals.budget += getDayBudget(day);
-
-    if (!isFunding(day)) {
-      totals.consumed += getDayConsumed(day);
+  paint();
+  button.addEventListener("click", () => {
+    const dark = document.documentElement.getAttribute("data-theme") === "dark";
+    if (dark) {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("theme", "light");
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("theme", "dark");
     }
-
-    monthlyTotals.set(monthKey, totals);
-  }
-
-  const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
-
-  if (includeCurrentMonth && !monthlyTotals.has(currentMonthKey)) {
-    monthlyTotals.set(currentMonthKey, { budget: 0, consumed: 0 });
-  }
-
-  const rolloverStartMonth = days
-    .filter(isFunding)
-    .map((day) => getMonthKey(day.date))
-    .sort()[0];
-  let carriedForward = 0;
-
-  for (const monthKey of [...monthlyTotals.keys()].sort()) {
-    if (!rolloverStartMonth || monthKey < rolloverStartMonth) {
-      continue;
-    }
-
-    const totals = monthlyTotals.get(monthKey);
-    totals.budget += carriedForward;
-    carriedForward = totals.budget - totals.consumed;
-  }
-
-  return monthlyTotals;
-}
-
-function getCurrentMonthTotals(days) {
-  const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
-  return getMonthlyTotals(days, true).get(currentMonthKey);
-}
-
-function buildMonthlyPersonExpenses(calc) {
-  const monthlyData = {};
-
-  for (const day of calc.days) {
-    if (isFunding(day) || isExchange(day)) {
-      continue;
-    }
-
-    const date = new Date(`${day.date}T00:00:00`);
-    const monthKey = date.toLocaleDateString("en-PK", {
-      year: "numeric",
-      month: "long"
-    });
-
-    if (!monthlyData[monthKey]) {
-      monthlyData[monthKey] = {};
-      for (const person of calc.people) {
-        monthlyData[monthKey][person.id] = 0;
-      }
-    }
-
-    const total = getDayTotal(day);
-
-    for (const person of calc.people) {
-      if (!getParticipantIds(day.participants || []).includes(person.id)) {
-        continue;
-      }
-
-      monthlyData[monthKey][person.id] += getParticipantShare(day, person.id, total);
-    }
-  }
-
-  return monthlyData;
-}
-
-function getAverageMonthlyExpenseByPerson(calc) {
-  const monthlyData = buildMonthlyPersonExpenses(calc);
-  const includedMonthKeys = new Set();
-  const currentMonthKey = getMonthKey(new Date().toISOString().slice(0, 10));
-  const currentMonthDisplayKey = new Date().toLocaleDateString("en-PK", {
-    year: "numeric",
-    month: "long"
-  });
-
-  for (const day of calc.days) {
-    if (isFunding(day)) {
-      continue;
-    }
-
-    const date = new Date(`${day.date}T00:00:00`);
-    const monthKey = getMonthKey(day.date);
-
-    if (date.getMonth() + 1 >= 9 && monthKey < currentMonthKey) {
-      includedMonthKeys.add(
-        date.toLocaleDateString("en-PK", {
-          year: "numeric",
-          month: "long"
-        })
-      );
-    }
-  }
-
-  if (!includedMonthKeys.size && monthlyData[currentMonthDisplayKey]) {
-    includedMonthKeys.add(currentMonthDisplayKey);
-  }
-
-  const monthKeys = Object.keys(monthlyData).filter((monthKey) =>
-    includedMonthKeys.has(monthKey)
-  );
-
-  if (!monthKeys.length) {
-    return new Map(calc.people.map((person) => [person.id, 0]));
-  }
-
-  const averages = new Map(calc.people.map((person) => [person.id, 0]));
-
-  for (const monthKey of monthKeys) {
-    const personExpenses = monthlyData[monthKey] || {};
-
-    for (const person of calc.people) {
-      averages.set(
-        person.id,
-        (averages.get(person.id) || 0) + (personExpenses[person.id] || 0)
-      );
-    }
-  }
-
-  const monthCount = monthKeys.length;
-
-  for (const person of calc.people) {
-    averages.set(person.id, (averages.get(person.id) || 0) / monthCount);
-  }
-
-  return averages;
-}
-
-function render() {
-  const calc = calculate();
-  const expenseHistoryDays = calc.days.filter((day) => !isFunding(day));
-  const overallConsumed = expenseHistoryDays.reduce(
-    (total, day) => total + getDayConsumed(day),
-    0
-  );
-  const expenseHistoryDates = [
-    ...new Set(expenseHistoryDays.map((day) => day.date))
-  ].sort();
-
-  const today = calc.daily[calc.daily.length - 1] || {
-    day: {
-      date: new Date().toISOString().slice(0, 10)
-    },
-    participants: [],
-    participantIds: [],
-    expenses: [],
-    total: 0,
-    perHead: 0,
-    paid: new Map(),
-    shares: new Map(),
-    changes: new Map(),
-    transactions: []
-  };
-
-  $("currentDate").textContent = dateLabel(today.day.date);
-  $('lunchDateHeading').textContent = dateLabel(today.day.date);
-
-  const currentMonthTotals = getCurrentMonthTotals(calc.days);
-  const currentMonthLabel = new Date().toLocaleDateString("en-PK", {
-    month: "long",
-    year: "numeric"
-  });
-  const currentDate = new Date();
-  const daysInMonth = new Date(
-    currentDate.getFullYear(),
-    currentDate.getMonth() + 1,
-    0
-  ).getDate();
-  const elapsedDays = currentDate.getDate();
-  const remainingDays = Math.max(daysInMonth - elapsedDays + 1, 0);
-  const remainingBudget = currentMonthTotals.budget - currentMonthTotals.consumed;
-  const dailyBudgetPace = currentMonthTotals.budget / daysInMonth;
-  const remainingDailyPace =
-    remainingDays > 0 ? Math.max(remainingBudget, 0) / remainingDays : 0;
-  const currentCostPace =
-    elapsedDays > 0 ? currentMonthTotals.consumed / elapsedDays : 0;
-  const budgetUsagePercent =
-    currentMonthTotals.budget > 0
-      ? (currentMonthTotals.consumed / currentMonthTotals.budget) * 100
-      : 0;
-  let budgetRunway;
-
-  if (currentMonthTotals.budget <= 0) {
-    budgetRunway = "Add a Funding entry to track budget usage.";
-  } else if (remainingBudget <= 0) {
-    budgetRunway = `Budget exhausted; over by ${money(Math.abs(remainingBudget))}.`;
-  } else if (currentCostPace <= 0) {
-    budgetRunway = "No consumption yet; time estimate unavailable.";
-  } else {
-    const daysUntilExhausted = Math.ceil(remainingBudget / currentCostPace);
-    budgetRunway = `At this pace, budget will run out in about ${daysUntilExhausted} ${
-      daysUntilExhausted === 1 ? "day" : "days"
-    }.`;
-  }
-
-  const projectedConsumption = currentCostPace * daysInMonth;
-  const paceStatus =
-    projectedConsumption > currentMonthTotals.budget
-      ? "danger"
-      : projectedConsumption < currentMonthTotals.budget
-        ? "positive"
-        : "zero";
-  const budgetStatus =
-    currentMonthTotals.budget <= 0
-      ? "No Budget"
-      : paceStatus === "danger"
-        ? "Over Spending Pace"
-        : paceStatus === "positive"
-          ? "On Track"
-          : "Exactly On Target";
-  const paceDifference = Math.abs(currentCostPace - dailyBudgetPace);
-
-  $("budgetStatus").textContent = budgetStatus;
-  $("budgetStatus").className = paceStatus;
-  $("budgetStatusDetail").textContent =
-    currentMonthTotals.budget <= 0
-      ? "Set a Funding amount to begin"
-      : paceStatus === "danger"
-        ? `${money(paceDifference)}/day above target`
-        : paceStatus === "positive"
-          ? `${money(paceDifference)}/day below target`
-          : "Spending matches the target pace";
-
-  $("budgetUsagePercent").textContent = `${budgetUsagePercent.toLocaleString(
-    "en-PK",
-    { maximumFractionDigits: 1 }
-  )}%`;
-  $("budgetUsageDetail").textContent =
-    `${money(currentMonthTotals.consumed)} consumed of ${money(currentMonthTotals.budget)}`;
-
-  const budgetUsageProgress = $("budgetUsageProgress");
-  const progressBar = budgetUsageProgress.parentElement;
-  const boundedUsagePercent = Math.min(Math.max(budgetUsagePercent, 0), 100);
-  budgetUsageProgress.style.width = `${boundedUsagePercent}%`;
-  budgetUsageProgress.className =
-    `budget-usage-progress${budgetUsagePercent > 100 ? " danger" : ""}`;
-  progressBar.setAttribute("aria-valuenow", String(boundedUsagePercent));
-  progressBar.setAttribute(
-    "aria-valuetext",
-    `${budgetUsagePercent.toLocaleString("en-PK", {
-      maximumFractionDigits: 1
-    })}% consumed`
-  );
-
-  $("budgetRunway").textContent = budgetRunway;
-
-  $("overallConsumed").textContent = money(overallConsumed);
-  $("overallConsumedPeriod").textContent =
-    expenseHistoryDates.length === 0
-      ? "Across all recorded expense history"
-      : expenseHistoryDates.length === 1
-        ? `Recorded on ${dateLabel(expenseHistoryDates[0])}`
-        : `${dateLabel(expenseHistoryDates[0])} – ${dateLabel(
-            expenseHistoryDates[expenseHistoryDates.length - 1]
-          )}`;
-  $("overallConsumedDays").textContent =
-    `${expenseHistoryDates.length} ${
-      expenseHistoryDates.length === 1 ? "day" : "days"
-    } with recorded expenses`;
-
-  $("monthBudget").textContent = money(currentMonthTotals.budget);
-  $("monthBudgetLabel").textContent = `${currentMonthLabel}, incl. carry-forward and Abdul's share`;
-
-  $("monthConsumed").textContent = money(currentMonthTotals.consumed);
-  $("monthConsumedLabel").textContent = currentMonthLabel;
-
-  $("monthRemaining").textContent = money(remainingBudget);
-  $("monthRemaining").className =
-    remainingBudget > 0 ? "positive" : remainingBudget < 0 ? "danger" : "zero";
-  $("monthRemainingLabel").textContent =
-    `${remainingDays} ${remainingDays === 1 ? "day" : "days"} left`;
-
-  $("dailyBudgetPace").textContent = money(dailyBudgetPace);
-  $("dailyBudgetPaceLabel").textContent =
-    `Budget divided by ${daysInMonth} days in ${currentMonthLabel}`;
-
-  $("remainingDailyPace").textContent = money(remainingDailyPace);
-  $("remainingDailyPace").className =
-    remainingBudget > 0 ? "positive" : remainingBudget < 0 ? "danger" : "zero";
-  $("remainingDailyPaceLabel").textContent =
-    `Spend this each day for the remaining ${remainingDays} ${remainingDays === 1 ? "day" : "days"}`;
-
-  $("currentCostPace").textContent = `${money(currentCostPace)}/day`;
-  $("currentCostPace").className = paceStatus;
-  $("projectedConsumption").textContent =
-    `Projected: ${money(projectedConsumption)} this month`;
-
-  $("todayBadge").textContent = `${today.participantIds.length} people`;
-
-  $("summaryExpense").textContent = money(today.total);
-
-  $("summaryParticipants").textContent = today.participantIds.length;
-
-  $("summaryPerHead").textContent = money(today.perHead);
-
-  const net = [...calc.balances.values()].reduce((a, b) => a + b, 0);
-
-  $("netWallet").textContent = money(net, true);
-
-  renderPeople(calc, today);
-  renderWallets(calc);
-  bindWalletDetailButtons(calc);
-  renderExpenses(today, calc.people);
-  renderMonthlyExpenses(calc);
-  renderMonthlyTotals(calc);
-  renderHistory(calc);
-}
-
-function status(balance) {
-  if (balance > 0) {
-    return ["Credit", "status-credit"];
-  }
-
-  if (balance < 0) {
-    return ["Due", "status-due"];
-  }
-
-  return ["Settled", "status-settled"];
-}
-
-function renderPeople(calc, today) {
-  $("peopleTable").innerHTML =
-    calc.people
-      .filter((p) => today.participantIds.includes(p.id) || today.paid.has(p.id))
-      .map((p) => {
-        const paid = today.paid.get(p.id) || 0;
-
-        const share = today.shares.get(p.id) || 0;
-
-        const change = today.changes.get(p.id) || 0;
-
-        const current = calc.balances.get(p.id) || 0;
-
-        const [label, cls] = status(current);
-
-        return `
-      <tr>
-        <td data-label="Id">${escapeHtml(p.id)}</td>
-
-        <td class="person" data-label="Person">
-          ${escapeHtml(p.name)}
-        </td>
-
-        <td data-label="Paid Today">
-          ${paid ? money(paid) : "—"}
-        </td>
-
-        <td data-label="Share">
-          ${share ? money(share) : "—"}
-        </td>
-
-        <td data-label="Today's Change" class="${
-          change > 0 ? "positive" : change < 0 ? "negative" : "zero"
-        }">
-          ${money(change, true)}
-        </td>
-
-        <td data-label="Current Wallet" class="${
-          current > 0 ? "positive" : current < 0 ? "negative" : "zero"
-        }">
-          ${money(current, true)}
-        </td>
-
-        <td data-label="Status">
-          <span class="pill ${cls}">
-            ${label}
-          </span>
-        </td>
-      </tr>
-    `;
-      })
-      .join("") ||
-    `
-    <tr>
-      <td colspan="6" class="empty">
-        No people participated today.
-      </td>
-    </tr>
-  `;
-}
-
-function bindWalletDetailButtons(calc) {
-  document.querySelectorAll(".wallet-detail-btn").forEach((button) => {
-    button.addEventListener("click", () => {
-      const personId = Number(button.dataset.personId);
-      openPersonHistoryModal(calc, personId);
-    });
+    paint();
   });
 }
 
-function openPersonHistoryModal(calc, personId) {
-  const person = (calc.people || []).find((entry) => entry.id === personId);
-
-  if (!person) {
-    return;
-  }
-
-  const modal = $("personModal");
-  const title = $("personModalTitle");
-  const metrics = $("personModalMetrics");
-  const summary = $("personModalSummary");
-  const tableBody = $("personModalTableBody");
-
-  const balance = calc.balances.get(person.id) || 0;
-  const avgMonthlyExpense = getAverageMonthlyExpenseByPerson(calc).get(person.id) || 0;
-
-  title.textContent = `${person.name}`;
-  metrics.innerHTML = `
-    <span class="modal-pill ${balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"}">
-      Current ${money(balance, true)}
-    </span>
-    <span class="modal-pill neutral">Avg/Month ${money(avgMonthlyExpense)}</span>
-  `;
-
-  const entries = calc.daily
-    .flatMap((day) => day.transactions)
-    .map((transaction) => {
-      const participantIds = Array.isArray(transaction.participantIds)
-        ? transaction.participantIds
-        : [];
-      const paid = transaction.paid.get(person.id) || 0;
-      const share = transaction.shares.get(person.id) || 0;
-      const change = transaction.changes.get(person.id) || 0;
-      const participated = participantIds.includes(person.id);
-
-      return {
-        date: transaction.day.date,
-        label: transaction.day.label || transaction.day.type || "Transaction",
-        paid,
-        share,
-        change,
-        participated,
-        total: transaction.total
-      };
-    })
-    .filter((entry) => entry.participated || entry.paid > 0)
-    .sort((a, b) => b.date.localeCompare(a.date));
-
-  const totalPaid = entries.reduce((sum, entry) => sum + (Number(entry.paid) || 0), 0);
-  const totalShare = entries.reduce((sum, entry) => sum + (Number(entry.share) || 0), 0);
-  const totalChange = entries.reduce((sum, entry) => sum + (Number(entry.change) || 0), 0);
-
-  summary.innerHTML = `
-    <div class="summary-card">
-      <span>Total Paid</span>
-      <strong>${money(totalPaid)}</strong>
-    </div>
-    <div class="summary-card">
-      <span>Total Share</span>
-      <strong>${money(totalShare)}</strong>
-    </div>
-    <div class="summary-card">
-      <span>Net Change</span>
-      <strong class="${totalChange > 0 ? "positive" : totalChange < 0 ? "negative" : "zero"}">${money(totalChange, true)}</strong>
-    </div>
-    <div class="summary-card">
-      <span>Current Wallet</span>
-      <strong class="${balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"}">${money(balance, true)}</strong>
-    </div>
-  `;
-
-  tableBody.innerHTML =
-    entries
-      .map((entry) => `
-        <tr>
-          <td data-label="Date">${dateLabel(entry.date)}</td>
-          <td data-label="Transaction">${escapeHtml(entry.label)}</td>
-          <td data-label="Paid">${entry.paid ? money(entry.paid) : "—"}</td>
-          <td data-label="Share">${entry.share ? money(entry.share) : "—"}</td>
-          <td data-label="Change" class="${entry.change > 0 ? "positive" : entry.change < 0 ? "negative" : "zero"}">
-            ${money(entry.change, true)}
-          </td>
-          <td data-label="Status">
-            <span class="pill ${entry.participated ? "yes" : "no"}">
-              ${entry.participated ? "Participated" : "Paid only"}
-            </span>
-          </td>
-        </tr>
-      `)
-      .join("") || `
-        <tr>
-          <td colspan="6" class="empty">No transaction history available.</td>
-        </tr>
-      `;
-
-  modal.classList.remove("hidden");
-  modal.setAttribute("aria-hidden", "false");
+function walletPhrase(balance) {
+  if (balance > 0.009) return { word: "Ahead", className: "is-ahead", amount: balance };
+  if (balance < -0.009) return { word: "Owes", className: "is-owes", amount: Math.abs(balance) };
+  return { word: "Settled", className: "is-settled", amount: 0 };
 }
 
-function closePersonHistoryModal() {
-  const modal = $("personModal");
-  if (!modal) {
-    return;
-  }
+function renderWallets() {
+  const cards = view.people
+    .filter((person) => person.active !== false)
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((person) => {
+      const balance = view.balances.get(person.id) || 0;
+      const phrase = walletPhrase(balance);
+      const food = view.foodByMonth.get(view.current.key)?.get(person.id) || 0;
+      const typical = view.averageFood.get(person.id) || 0;
+      const typicalLine = view.averageIsCurrentOnly || !typical
+        ? ""
+        : `<p class="wallet-meta">${escapeHtml(view.averageLabel)} ${money(typical)}</p>`;
 
-  modal.classList.add("hidden");
-  modal.setAttribute("aria-hidden", "true");
-}
-
-function renderWallets(calc) {
-  const averageMonthlyExpenses = getAverageMonthlyExpenseByPerson(calc);
-  const visiblePeople = [...calc.people].filter((person) => !person.hidden);
-
-  $("walletList").innerHTML =
-    visiblePeople
-      .sort(
-        (a, b) =>
-          (calc.balances.get(b.id) || 0) - (calc.balances.get(a.id) || 0)
-      )
-      .map((p) => {
-        const balance = calc.balances.get(p.id) || 0;
-        const avgMonthlyExpense = averageMonthlyExpenses.get(p.id) || 0;
-
-        const isPositiveWallet = balance > 0;
-        const isNegativeWallet = balance < 0;
-
-        return `
-      <div class="wallet-item ${isPositiveWallet ? "positive-wallet" : isNegativeWallet ? "negative-wallet" : ""}">
-        <div>
-          <span class="wallet-name">
-            ${escapeHtml(p.name)}
-            ${isPositiveWallet ? `
-              <span class="confetti" aria-hidden="true">
-                <i></i><i></i><i></i><i></i><i></i><i></i>
-              </span>
-            ` : ""}
-            ${isNegativeWallet ? `
-              <span class="negative-mark" role="img" aria-label="Negative balance">⚠️</span>
-            ` : ""}
-          </span>
-
-          <span class="wallet-sub">
-            Avg/Month ${money(avgMonthlyExpense)}
-          </span>
-        </div>
-
-        <span class="wallet-current">
-          <span class="wallet-current-label">Current</span>
-          <span class="wallet-value ${
-            balance > 0 ? "positive" : balance < 0 ? "negative" : "zero"
-          }">
-            ${money(balance, true)}
-          </span>
-        </span>
-
-        <button class="wallet-detail-btn" data-person-id="${p.id}" type="button">
-          <span class="wallet-detail-icon" aria-hidden="true">↗</span>
-          View details
+      return `
+        <button class="wallet ${phrase.className}" type="button" data-open-person="${person.id}">
+          <h3>${escapeHtml(person.name)}</h3>
+          <p class="balance">${phrase.word}${phrase.amount ? ` ${money(phrase.amount)}` : ""}</p>
+          <p class="wallet-meta">This month ${money(food)}</p>
+          ${typicalLine}
         </button>
-      </div>
-    `;
-      })
-      .join("") ||
-    `
-    <div class="empty">
-      No people configured.
-    </div>
-  `;
-}
-
-function renderExpenses(today, people) {
-  const names = new Map(people.map((p) => [p.id, p.name]));
-
-  $("expenseList").innerHTML =
-    today.transactions
-      .map(
-        (transaction, index) => `
-    <div class="transaction-item">
-      <div class="transaction-heading">
-        <span class="expense-name">${escapeHtml(transaction.day.label || transaction.day.type || `Transaction ${index + 1}`)}</span>
-        <span class="expense-amount">${money(transaction.total)}</span>
-      </div>
-      ${transaction.expenses.map((expense) => `
-        <div class="expense-item">
-          <div>
-            <span class="expense-name">${escapeHtml(names.get(expense.paidBy) || "Unknown")}</span>
-            <span class="expense-sub">Paid for this transaction</span>
-          </div>
-          <span class="expense-amount">${money(expense.amount)}</span>
-        </div>
-      `).join("")}
-    </div>
-  `
-      )
-      .join("") ||
-    `
-    <div class="empty">
-      No expenses recorded for today.
-    </div>
-  `;
-}
-
-function renderMonthlyExpenses(calc) {
-  const monthlyData = buildMonthlyPersonExpenses(calc);
-
-  const monthlyHtml = Object.entries(monthlyData)
-    .reverse()
-    .map(([month, personExpenses]) => {
-      const rows = [...calc.people]
-        .map((person) => {
-          const amount = personExpenses[person.id] || 0;
-          return { person, amount };
-        })
-        .sort((a, b) => {
-          if (b.amount !== a.amount) {
-            return b.amount - a.amount;
-          }
-
-          return (a.person.name || "").localeCompare(b.person.name || "");
-        })
-        .map(({ person, amount }) => `
-        <tr>
-          <td class="person" data-label="Person">${escapeHtml(person.name)}</td>
-          <td class="${amount > 0 ? "positive" : "zero"}" data-label="Amount Ate">
-            ${money(amount)}
-          </td>
-        </tr>
-      `)
-        .join("");
-
-      return `
-      <div class="monthly-card">
-        <div class="monthly-month">${month}</div>
-        <table class="monthly-table">
-          <thead>
-            <tr>
-              <th>Person</th>
-              <th>Amount Ate</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows}
-          </tbody>
-        </table>
-      </div>
-    `;
+      `;
     })
     .join("");
 
-  $("monthlyExpenses").innerHTML = monthlyHtml || `
-    <div class="empty">
-      No expense data available.
+  $("wallets").innerHTML = `
+    <div class="section-head">
+      <h2>Wallets</h2>
+      <p>Green means the group owes them. Red means they owe the group. Open a name to see why.</p>
     </div>
+    <div class="wallets">${cards || `<p class="empty">No one is on the shared page yet.</p>`}</div>
+    <p class="book-net">All wallets together: ${money(view.net, true)}. That includes each person's opening balance.</p>
   `;
 }
 
-function renderMonthlyTotals(calc) {
-  const monthlyTotals = getMonthlyTotals(calc.days, true);
+function renderMonth() {
+  const current = view.current;
+  const available = current.collected + current.carriedIn;
+  const ratio = available > 0 ? current.groupSpend / available : current.groupSpend > 0 ? 1 : 0;
+  const percent = Math.max(0, Math.min(100, ratio * 100));
+  const over = current.left < -0.009;
+  let lead = "The pot is exactly used up.";
+  if (current.left > 0.009) lead = `${money(current.left)} is left in the pot.`;
+  if (over) lead = `The pot is short by ${money(Math.abs(current.left))}.`;
 
-  const monthlyHtml = [...monthlyTotals.entries()]
-    .sort(([monthA], [monthB]) => monthB.localeCompare(monthA))
-    .map(([monthKey, totals]) => {
-      const month = new Date(`${monthKey}-01T00:00:00`).toLocaleDateString("en-PK", {
-        year: "numeric",
-        month: "long"
-      });
-      const remainingBudget = totals.budget - totals.consumed;
-      const remainingBudgetClass =
-        remainingBudget > 0 ? "positive" : remainingBudget < 0 ? "danger" : "zero";
-
-      return `
-      <div class="monthly-total-card">
-        <div class="monthly-total-month">${month}</div>
-        <div class="monthly-total-row">
-          <span>Total Budget</span>
-          <strong>${money(totals.budget)}</strong>
-        </div>
-        <div class="monthly-total-row">
-          <span>Total Consume</span>
-          <strong>${money(totals.consumed)}</strong>
-        </div>
-        <div class="monthly-total-row">
-          <span>Remaining Budget</span>
-          <strong class="${remainingBudgetClass}">${money(remainingBudget)}</strong>
-        </div>
-      </div>
-    `;
-    })
-    .join("");
-
-  $("monthlyTotals").innerHTML = monthlyHtml || `
-    <div class="empty">
-      No expense data available.
-    </div>
-  `;
-}
-
-function renderHistory(calc) {
-  const names = new Map((data.people || []).map((person) => [person.id, person.name]));
-  const transactions = calc.daily
-    .flatMap((day) => day.transactions)
-    .sort((a, b) => b.day.date.localeCompare(a.day.date));
-  const recentDates = [...new Set(transactions.map((transaction) => transaction.day.date))].slice(0, 30);
-
-  // Show every labeled transaction from the thirty most recent calendar days.
-  const recentTransactions = transactions.filter((transaction) =>
-    recentDates.includes(transaction.day.date)
-  );
-
-  const groupedByDate = new Map();
-
-  recentTransactions.forEach((transaction, index) => {
-    const dateKey = transaction.day.date;
-
-    if (!groupedByDate.has(dateKey)) {
-      groupedByDate.set(dateKey, []);
+  let pace = "";
+  if (current.left > 0.009 && current.groupPace > 0 && current.daysOfPot !== null) {
+    const days = Math.max(0, Math.floor(current.daysOfPot));
+    pace = `So far everyone else has used ${money(current.groupPace)} a day, which covers about ${days} more ${days === 1 ? "day" : "days"}.`;
+    if (current.daysLeft > 0) {
+      pace += ` To last the month, keep the next ${current.daysLeft} ${current.daysLeft === 1 ? "day" : "days"} under ${money(current.dailyRoom)} a day.`;
     }
+  } else if (current.left > 0.009 && current.daysLeft > 0) {
+    pace = `${money(current.dailyRoom)} a day would use what is left evenly over the next ${current.daysLeft} ${current.daysLeft === 1 ? "day" : "days"}.`;
+  }
 
-    groupedByDate.get(dateKey).push({ transaction, serialNumber: index + 1 });
-  });
+  const own = current.ownShare
+    ? `${escapeHtml(view.budgetPersonName)}'s own food this month is ${money(current.ownShare)} and is not taken out of the pot.`
+    : "";
+  const history = view.overall.days
+    ? `All recorded spending is ${money(view.overall.spent)}, from ${dateLabel(view.overall.firstDate)} to ${dateLabel(view.overall.lastDate)}.`
+    : "";
 
-  const groups = [...groupedByDate.entries()].sort((a, b) => b[0].localeCompare(a[0]));
-  const totalActivities = transactions.length;
-  $("historyRecordCount").textContent = `${totalActivities} ${totalActivities === 1 ? "activity" : "activities"}`;
-
-  $("history").innerHTML =
-    groups
-      .map(([dateKey, groupTransactions]) => {
-        const cardsHtml = groupTransactions
-          .map(({ transaction, serialNumber }) => {
-            const splitLabel =
-              transaction.day.splitType === "custom" ? "Custom split" : "Equal split";
-            const participants = transaction.participantIds
-              .map((personId) => names.get(personId) || "Unknown")
-              .map(escapeHtml)
-              .join(", ");
-            const payers = [...transaction.paid.entries()]
-              .map(
-                ([personId, amount]) =>
-                  `${escapeHtml(names.get(personId) || "Unknown")} (${money(amount)})`
-              )
-              .join(", ");
-            const perHeadDetails =
-              transaction.day.splitType === "custom"
-                ? transaction.participants
-                    .map((participant) => {
-                      const personId =
-                        typeof participant === "object" && participant !== null
-                          ? participant.personId
-                          : participant;
-
-                      const share =
-                        typeof participant === "object" && participant !== null
-                          ? Number(participant.share) || 0
-                          : 0;
-
-                      return `${escapeHtml(names.get(personId) || "Unknown")} (${money(share)})`;
-                    })
-                    .join(", ")
-                : money(transaction.perHead || 0);
-
-            return `
-              <article class="history-card" style="--history-delay: ${Math.min(serialNumber - 1, 12) * 65 + 240}ms">
-                <div class="history-heading">
-                  <div>
-                    <span class="history-serial">#${serialNumber}</span>
-                    <span class="history-label">${escapeHtml(transaction.day.label || transaction.day.type || "Other")}</span>
-                    <span class="history-date">${dateLabel(transaction.day.date)}</span>
-                  </div>
-                  <strong class="history-total">${money(transaction.total)}</strong>
-                </div>
-
-                <div class="history-row">
-                  <span>Who joined (${transaction.participantIds.length})</span>
-                  <strong>${participants || "None"}</strong>
-                </div>
-
-                <div class="history-row">
-                  <span>Paid by</span>
-                  <strong>${payers || "None"}</strong>
-                </div>
-
-                <div class="history-row">
-                  <span>Split</span>
-                  <strong>${splitLabel}</strong>
-                </div>
-
-                <div class="history-row">
-                  <span>Per head</span>
-                  <strong>${perHeadDetails || "None"}</strong>
-                </div>
-              </article>
-            `;
-          })
-          .join("");
-
-        return `
-          <section class="history-group">
-            <div class="history-date-group-header">
-              <h3>${dateLabel(dateKey)}</h3>
-              <span>${groupTransactions.length} ${groupTransactions.length === 1 ? "entry" : "entries"}</span>
-            </div>
-            <div class="history-grid">
-              ${cardsHtml}
-            </div>
-          </section>
-        `;
-      })
-      .join("") ||
-    `
-    <div class="empty">
-      No lunch history available.
-    </div>
+  $("month").innerHTML = `
+    <article class="month-card">
+      <p class="eyebrow">${escapeHtml(current.label)}</p>
+      <p class="month-lead">${lead}</p>
+      <div class="month-facts">
+        <div><span>Collected</span><strong>${money(current.collected)}</strong></div>
+        <div><span>Brought forward</span><strong>${money(current.carriedIn)}</strong></div>
+        <div><span>Charged to everyone else</span><strong>${money(current.groupSpend)}</strong></div>
+      </div>
+      <div class="bar ${over || ratio > 1 ? "is-over" : ""}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent.toFixed(0)}" aria-label="Pot used this month">
+        <span style="width: ${percent}%"></span>
+      </div>
+      ${pace ? `<p class="month-note">${pace}</p>` : ""}
+      ${own ? `<p class="month-note">${own}</p>` : ""}
+      ${history ? `<p class="month-note">${history}</p>` : ""}
+    </article>
   `;
 }
 
-function attachModalEvents() {
-  const modal = $("personModal");
-  const closeButton = $("personModalClose");
+function paidText(effect) {
+  return [...effect.paid.entries()]
+    .filter(([, amount]) => amount)
+    .map(([personId, amount]) => `${personName(personId)} ${money(amount)}`)
+    .join(", ");
+}
 
-  if (!modal || !closeButton) {
+function renderLatest() {
+  const latest = view.effects[view.effects.length - 1];
+  if (!latest) {
+    $("latest").innerHTML = `<section class="panel"><h2>Latest day</h2><p class="empty">No entries yet.</p></section>`;
     return;
   }
 
-  closeButton.addEventListener("click", closePersonHistoryModal);
+  const date = latest.entry.date;
+  const effects = view.effects.filter((effect) => effect.entry.date === date);
+  const isToday = date === LunchLedger.todayISO();
+  let spent = 0;
+  let collected = 0;
+  const paid = new Map();
+  const shares = new Map();
+  const changes = new Map();
 
-  modal.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closePersonHistoryModal();
+  for (const effect of effects) {
+    if (effect.entry.type === "pot") collected += effect.total;
+    else spent += effect.total;
+    for (const [personId, amount] of effect.paid) paid.set(personId, (paid.get(personId) || 0) + amount);
+    for (const [personId, amount] of effect.shares) shares.set(personId, (shares.get(personId) || 0) + amount);
+    for (const [personId, amount] of effect.changes) changes.set(personId, (changes.get(personId) || 0) + amount);
+  }
+
+  const lines = effects.map((effect) => {
+    const kind = effect.entry.type === "pot" ? "Pot" : effect.entry.type === "settle" ? "Transfer" : "Meal";
+    return `
+      <div class="day-line">
+        <span><span class="badge">${kind}</span> ${escapeHtml(effect.entry.title)}</span>
+        <strong>${money(effect.total)}</strong>
+      </div>
+    `;
+  }).join("");
+
+  const people = [...new Set([...paid.keys(), ...shares.keys()])].sort((a, b) =>
+    personName(a).localeCompare(personName(b))
+  );
+  const cards = people.map((personId) => {
+    const change = changes.get(personId) || 0;
+    const balance = view.balances.get(personId) || 0;
+    const tone = change > 0 ? "positive" : change < 0 ? "negative" : "";
+    return `
+      <article class="today-person">
+        <button class="linkish" type="button" data-open-person="${personId}">${escapeHtml(personName(personId))}</button>
+        <p><span>Paid</span><strong>${paid.get(personId) ? money(paid.get(personId)) : "—"}</strong></p>
+        <p><span>Share</span><strong>${shares.get(personId) ? money(shares.get(personId)) : "—"}</strong></p>
+        <p class="${tone}"><span>Change</span><strong>${money(change, true)}</strong></p>
+        <p><span>Wallet</span><strong class="${balance > 0 ? "positive" : balance < 0 ? "negative" : ""}">${money(balance, true)}</strong></p>
+      </article>
+    `;
+  }).join("");
+
+  const totals = [
+    spent ? `${money(spent)} spent` : "",
+    collected ? `${money(collected)} put into the pot` : ""
+  ].filter(Boolean).join(" · ");
+
+  $("latest").innerHTML = `
+    <section class="panel today-panel">
+      <div class="today-head">
+        <p class="eyebrow">${isToday ? "Today" : "Latest day"}</p>
+        <h2>${dateLabel(date)}</h2>
+        <p class="muted">${totals}</p>
+      </div>
+      <div class="day-lines">${lines}</div>
+      <div class="today-people">${cards}</div>
+    </section>
+  `;
+}
+
+function groupedEffects() {
+  const groups = new Map();
+  for (const effect of view.effects) {
+    if (!groups.has(effect.entry.date)) groups.set(effect.entry.date, []);
+    groups.get(effect.entry.date).push(effect);
+  }
+  return [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+}
+
+function entryCard(effect) {
+  const entry = effect.entry;
+  const kind = entry.type === "pot" ? "Pot" : entry.type === "settle" ? "Transfer" : entry.split === "custom" ? "Custom" : "Equal";
+  let detail = "";
+  if (entry.type === "pot") {
+    detail = `Held by ${personName(entry.heldBy)}. ${paidText(effect) || "No payments"}.`;
+  } else {
+    const members = (entry.members || []).map(personName).join(", ");
+    detail = `${members || "No one"}. Paid by ${paidText(effect) || "no one"}.`;
+  }
+
+  return `
+    <article class="entry-card">
+      <div class="entry-top">
+        <strong>${escapeHtml(entry.title)}</strong>
+        <strong>${money(effect.total)}</strong>
+      </div>
+      <p><span class="badge">${kind}</span></p>
+      <p class="muted">${escapeHtml(detail)}</p>
+    </article>
+  `;
+}
+
+function renderActivity() {
+  const groups = groupedEffects();
+  const visible = showAllActivity ? groups : groups.slice(0, 12);
+  const wasOpen = $("activity").querySelector("details")?.open ?? true;
+  const days = visible.map(([date, effects]) => `
+    <div class="activity-day">
+      <h3>${dateLabel(date)} <span>${effects.length} ${effects.length === 1 ? "entry" : "entries"}</span></h3>
+      <div class="history-grid">${effects.map(entryCard).join("")}</div>
+    </div>
+  `).join("");
+
+  const more = !showAllActivity && groups.length > 12
+    ? `<button id="showOlder" class="button ghost" type="button">Show older entries</button>`
+    : "";
+
+  $("activity").hidden = false;
+  $("activity").innerHTML = `
+    <details class="panel" ${wasOpen ? "open" : ""}>
+      <summary><h2>Activity</h2></summary>
+      <p class="muted">Every meal, pot collection, and transfer.</p>
+      ${days || `<p class="empty">No entries yet.</p>`}
+      ${more}
+    </details>
+  `;
+}
+
+function renderMonths() {
+  const monthCards = [...view.months].reverse().map((month) => `
+    <article class="month-block">
+      <h3>${escapeHtml(month.label)}</h3>
+      <p>Collected ${money(month.collected)}</p>
+      <p>Brought forward ${money(month.carriedIn)}</p>
+      <p>Charged to everyone else ${money(month.groupSpend)}</p>
+      <p class="${month.left < 0 ? "negative" : "positive"}">Left ${money(month.left, true)}</p>
+    </article>
+  `).join("");
+
+  const foodKeys = [...view.foodByMonth.keys()].sort((a, b) => b.localeCompare(a));
+  const foodCards = foodKeys.map((key) => {
+    const food = view.foodByMonth.get(key);
+    const rows = [...food.entries()]
+      .filter(([, amount]) => amount > 0)
+      .sort((a, b) => b[1] - a[1])
+      .map(([personId, amount]) => `<tr><td data-label="Person">${escapeHtml(personName(personId))}</td><td class="num" data-label="Food">${money(amount)}</td></tr>`)
+      .join("");
+    return `
+      <article class="food-card">
+        <h3>${escapeHtml(LunchLedger.monthLabel(key))}</h3>
+        <table><tbody>${rows}</tbody></table>
+      </article>
+    `;
+  }).join("");
+
+  $("months").innerHTML = `
+    <details class="panel">
+      <summary><h2>Each month</h2></summary>
+      <div class="month-list">${monthCards}</div>
+    </details>
+    <details class="panel">
+      <summary><h2>Food by person</h2></summary>
+      <p class="muted">Meals only. Transfers and pot money are not food.</p>
+      <div class="food-list">${foodCards || `<p class="empty">No food recorded.</p>`}</div>
+    </details>
+  `;
+}
+
+function openPerson(personId) {
+  const person = view.people.find((item) => item.id === personId);
+  if (!person) return;
+
+  const rows = [];
+  let paidTotal = 0;
+  let shareTotal = 0;
+  for (const effect of view.effects) {
+    const paid = effect.paid.get(personId) || 0;
+    const share = effect.shares.get(personId) || 0;
+    const change = (effect.changes.get(personId) || 0);
+    if (!paid && !share && !change) continue;
+    paidTotal += paid;
+    shareTotal += share;
+    rows.push({ effect, paid, share, change });
+  }
+  rows.reverse();
+
+  const balance = view.balances.get(personId) || 0;
+  $("personTitle").textContent = person.name;
+  $("personMath").textContent = "Now = opening balance + what they paid − their share.";
+  $("personSummary").innerHTML = `
+    <div><span>Opening</span><strong>${money(person.openingBalance, true)}</strong></div>
+    <div><span>Paid</span><strong>${money(paidTotal)}</strong></div>
+    <div><span>Share</span><strong>${money(shareTotal)}</strong></div>
+    <div><span>Now</span><strong class="${balance > 0 ? "positive" : balance < 0 ? "negative" : ""}">${money(balance, true)}</strong></div>
+  `;
+  $("personRows").innerHTML = rows.map(({ effect, paid, share, change }) => `
+    <tr>
+      <td data-label="Date">${dateLabel(effect.entry.date)}</td>
+      <td data-label="Entry">${escapeHtml(effect.entry.title)}</td>
+      <td class="num" data-label="Paid">${paid ? money(paid) : "—"}</td>
+      <td class="num" data-label="Share">${share ? money(share) : "—"}</td>
+      <td class="num ${change > 0 ? "positive" : change < 0 ? "negative" : ""}" data-label="Change">${money(change, true)}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="5">No entries yet.</td></tr>`;
+
+  const modal = $("personModal");
+  modal.hidden = false;
+  $("closePerson").focus();
+}
+
+function closePerson() {
+  $("personModal").hidden = true;
+}
+
+function bindPage() {
+  document.body.addEventListener("click", (event) => {
+    const trigger = event.target.closest("[data-open-person]");
+    if (trigger) openPerson(Number(trigger.dataset.openPerson));
+    if (event.target.id === "showOlder") {
+      showAllActivity = true;
+      renderActivity();
     }
   });
 
+  $("closePerson").addEventListener("click", closePerson);
+  $("personModal").addEventListener("click", (event) => {
+    if (event.target === $("personModal")) closePerson();
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !modal.classList.contains("hidden")) {
-      closePersonHistoryModal();
-    }
+    if (event.key === "Escape" && !$("personModal").hidden) closePerson();
   });
 }
 
 async function init() {
+  setupTheme();
+  bindPage();
+  const host = location.hostname;
+  if (host === "localhost" || host === "127.0.0.1") $("manageLink").hidden = false;
+
   try {
-    initializeTheme();
-    attachModalEvents();
-
-    const response = await fetch("data.json");
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    data = await response.json();
-
-    render();
-  } catch (err) {
-    document.querySelector("main").innerHTML = `
-      <div class="error">
-        <strong>Could not load data.json.</strong>
-        <br>
-        Run this project with VS Code Live Server
-        (or another local HTTP server)
-        instead of opening index.html directly.
-      </div>
+    const response = await fetch("data.json", { cache: "no-store" });
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const ledger = await response.json();
+    view = LunchLedger.compute(ledger);
+    $("loading").hidden = true;
+    renderWallets();
+    renderMonth();
+    renderLatest();
+    renderActivity();
+    renderMonths();
+  } catch (error) {
+    $("loading").innerHTML = `
+      <strong>The book could not be loaded.</strong>
+      From this folder run <code>npm start</code>, then open <code>http://127.0.0.1:5501</code>.
     `;
-
-    console.error(err);
+    console.error(error);
   }
 }
 
