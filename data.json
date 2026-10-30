@@ -2297,6 +2297,33 @@
           "paidBy": 1
         }
       ]
+    },
+     {
+      "date": "2026-10-30",
+      "label": "Lunch at Savour Food",
+      "participants": [
+        {
+          "personId": 1
+        },
+        {
+          "personId": 2
+        },
+        {
+          "personId": 3
+        },
+        {
+          "personId": 4
+        },
+        {
+          "personId": 5
+        }
+      ],
+      "expenses": [
+        {
+          "amount": 3561,
+          "paidBy": 5
+        }
+      ]
     }
   ]
 }
