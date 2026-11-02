@@ -36,7 +36,7 @@ function setupTheme() {
   const paint = () => {
     const dark = document.documentElement.getAttribute("data-theme") === "dark";
     button.textContent = dark ? "Light" : "Dark";
-    if (color) color.content = dark ? "#0e171c" : "#e7eef0";
+    if (color) color.content = dark ? "#12110e" : "#f3eee4";
   };
   paint();
   button.addEventListener("click", () => {
@@ -58,38 +58,67 @@ function walletPhrase(balance) {
   return { word: "Settled", className: "is-settled", amount: 0 };
 }
 
-function renderWallets() {
-  const cards = view.people
-    .filter((person) => person.active !== false)
-    .slice()
-    .sort((a, b) => a.name.localeCompare(b.name))
-    .map((person) => {
-      const balance = view.balances.get(person.id) || 0;
-      const phrase = walletPhrase(balance);
-      const food = view.foodByMonth.get(view.current.key)?.get(person.id) || 0;
-      const typical = view.averageFood.get(person.id) || 0;
-      const typicalLine = view.averageIsCurrentOnly || !typical
-        ? ""
-        : `<p class="wallet-meta">${escapeHtml(view.averageLabel)} ${money(typical)}</p>`;
+function initials(name) {
+  const parts = String(name).trim().split(/\s+/).filter(Boolean);
+  if (!parts.length) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
+}
 
-      return `
-        <button class="wallet ${phrase.className}" type="button" data-open-person="${person.id}">
-          <h3>${escapeHtml(person.name)}</h3>
-          <p class="balance">${phrase.word}${phrase.amount ? ` ${money(phrase.amount)}` : ""}</p>
-          <p class="wallet-meta">This month ${money(food)}</p>
-          ${typicalLine}
-        </button>
-      `;
-    })
-    .join("");
+function personNote(personId) {
+  const food = view.foodByMonth.get(view.current.key)?.get(personId) || 0;
+  const typical = view.averageFood.get(personId) || 0;
+  const bits = [];
+  if (food > 0.009) bits.push(`Ate ${money(food)} this month`);
+  if (!view.averageIsCurrentOnly && typical > 0.009) bits.push(`usually ${money(typical)}`);
+  return bits.join(" · ");
+}
+
+function personButton(person, balance) {
+  const phrase = walletPhrase(balance);
+  const note = personNote(person.id);
+  return `
+    <button class="person ${phrase.className}" type="button" data-open-person="${person.id}">
+      <span class="avatar" aria-hidden="true">${escapeHtml(initials(person.name))}</span>
+      <span class="person-copy">
+        <strong>${escapeHtml(person.name)}</strong>
+        ${note ? `<span>${escapeHtml(note)}</span>` : ""}
+      </span>
+      <span class="person-end">
+        <span class="tag">${phrase.word}</span>
+        <span class="person-amount">${phrase.amount ? money(phrase.amount) : money(0)}</span>
+      </span>
+    </button>
+  `;
+}
+
+function renderWallets() {
+  const rows = view.people
+    .filter((person) => person.active !== false)
+    .map((person) => ({ person, balance: view.balances.get(person.id) || 0 }));
+  const owes = rows.filter((row) => row.balance < -0.009).sort((a, b) => a.balance - b.balance);
+  const ahead = rows.filter((row) => row.balance > 0.009).sort((a, b) => b.balance - a.balance);
+  const settled = rows.filter((row) => Math.abs(row.balance) <= 0.009).sort((a, b) => a.person.name.localeCompare(b.person.name));
+
+  const column = (title, hint, items, empty) => `
+    <section class="board-col">
+      <header>
+        <h2>${title}</h2>
+        <p>${hint}</p>
+      </header>
+      <div class="person-list">
+        ${items.length ? items.map((row) => personButton(row.person, row.balance)).join("") : `<p class="empty">${empty}</p>`}
+      </div>
+    </section>
+  `;
 
   $("wallets").innerHTML = `
-    <div class="section-head">
-      <h2>Wallets</h2>
-      <p>Green means the group owes them. Red means they owe the group. Open a name to see why.</p>
+    <div class="board">
+      ${column("Needs to pay", "Largest amount first. Tap a name for the history.", owes, "Nobody owes the group.")}
+      ${column("Gets money back", "They paid more than their share.", ahead, "Nobody is ahead.")}
     </div>
-    <div class="wallets">${cards || `<p class="empty">No one is on the shared page yet.</p>`}</div>
-    <p class="book-net">All wallets together: ${money(view.net, true)}. That includes each person's opening balance.</p>
+    ${settled.length ? `<div class="settled-list">${settled.map((row) => personButton(row.person, row.balance)).join("")}</div>` : ""}
+    <p class="book-net">Add every wallet and the book is ${money(view.net, true)}. A number near zero means the book balances.</p>
   `;
 }
 
@@ -99,9 +128,18 @@ function renderMonth() {
   const ratio = available > 0 ? current.groupSpend / available : current.groupSpend > 0 ? 1 : 0;
   const percent = Math.max(0, Math.min(100, ratio * 100));
   const over = current.left < -0.009;
-  let lead = "The pot is exactly used up.";
-  if (current.left > 0.009) lead = `${money(current.left)} is left in the pot.`;
-  if (over) lead = `The pot is short by ${money(Math.abs(current.left))}.`;
+  let lead = "The pot is used up.";
+  let story = "What was collected has been spent.";
+  if (current.left > 0.009) {
+    lead = `${money(current.left)} left`;
+    story = "This is still available for lunches.";
+  }
+  if (over) {
+    lead = `Short ${money(Math.abs(current.left))}`;
+    story = current.collected <= 0.009 && current.groupSpend <= 0.009
+      ? "Nothing has been added or spent this month. The gap is what last month left behind."
+      : "Lunches have used more than the money in the pot.";
+  }
 
   let pace = "";
   if (current.left > 0.009 && current.groupPace > 0 && current.daysOfPot !== null) {
@@ -121,21 +159,31 @@ function renderMonth() {
     ? `All recorded spending is ${money(view.overall.spent)}, from ${dateLabel(view.overall.firstDate)} to ${dateLabel(view.overall.lastDate)}.`
     : "";
 
+  const carried = current.carriedIn < -0.009
+    ? `Short ${money(Math.abs(current.carriedIn))}`
+    : money(current.carriedIn);
+  const showBar = available > 0.009 || current.groupSpend > 0.009;
+
   $("month").innerHTML = `
-    <article class="month-card">
-      <p class="eyebrow">${escapeHtml(current.label)}</p>
-      <p class="month-lead">${lead}</p>
-      <div class="month-facts">
-        <div><span>Collected</span><strong>${money(current.collected)}</strong></div>
-        <div><span>Brought forward</span><strong>${money(current.carriedIn)}</strong></div>
-        <div><span>Charged to everyone else</span><strong>${money(current.groupSpend)}</strong></div>
+    <article class="hero ${over ? "is-short" : "is-ok"}">
+      <div class="hero-main">
+        <p class="eyebrow">${escapeHtml(current.label)}</p>
+        <p class="hero-lead">${lead}</p>
+        <p class="hero-story">${story}</p>
+        ${showBar ? `
+          <div class="bar ${over || ratio > 1 ? "is-over" : ""}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent.toFixed(0)}" aria-label="Pot used this month">
+            <span style="width: ${percent}%"></span>
+          </div>
+        ` : ""}
       </div>
-      <div class="bar ${over || ratio > 1 ? "is-over" : ""}" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${percent.toFixed(0)}" aria-label="Pot used this month">
-        <span style="width: ${percent}%"></span>
-      </div>
-      ${pace ? `<p class="month-note">${pace}</p>` : ""}
-      ${own ? `<p class="month-note">${own}</p>` : ""}
-      ${history ? `<p class="month-note">${history}</p>` : ""}
+      <dl class="hero-facts">
+        <div><dt>Added this month</dt><dd>${money(current.collected)}</dd></div>
+        <div><dt>From last month</dt><dd>${carried}</dd></div>
+        <div><dt>Other people's lunches</dt><dd>${money(current.groupSpend)}</dd></div>
+      </dl>
+      ${pace ? `<p class="hero-note">${pace}</p>` : ""}
+      ${own ? `<p class="hero-note">${own}</p>` : ""}
+      ${history ? `<p class="hero-note">${history}</p>` : ""}
     </article>
   `;
 }
@@ -175,27 +223,33 @@ function renderLatest() {
     const kind = effect.entry.type === "pot" ? "Pot" : effect.entry.type === "settle" ? "Transfer" : "Meal";
     return `
       <div class="day-line">
-        <span><span class="badge">${kind}</span> ${escapeHtml(effect.entry.title)}</span>
+        <span class="badge">${kind}</span>
+        <span>${escapeHtml(effect.entry.title)}</span>
         <strong>${money(effect.total)}</strong>
       </div>
     `;
   }).join("");
 
   const people = [...new Set([...paid.keys(), ...shares.keys()])].sort((a, b) =>
-    personName(a).localeCompare(personName(b))
+    (changes.get(b) || 0) - (changes.get(a) || 0)
   );
   const cards = people.map((personId) => {
     const change = changes.get(personId) || 0;
     const balance = view.balances.get(personId) || 0;
     const tone = change > 0 ? "positive" : change < 0 ? "negative" : "";
+    const name = personName(personId);
     return `
-      <article class="today-person">
-        <button class="linkish" type="button" data-open-person="${personId}">${escapeHtml(personName(personId))}</button>
-        <p><span>Paid</span><strong>${paid.get(personId) ? money(paid.get(personId)) : "—"}</strong></p>
-        <p><span>Share</span><strong>${shares.get(personId) ? money(shares.get(personId)) : "—"}</strong></p>
-        <p class="${tone}"><span>Change</span><strong>${money(change, true)}</strong></p>
-        <p><span>Wallet</span><strong class="${balance > 0 ? "positive" : balance < 0 ? "negative" : ""}">${money(balance, true)}</strong></p>
-      </article>
+      <button class="receipt-row" type="button" data-open-person="${personId}">
+        <span class="avatar" aria-hidden="true">${escapeHtml(initials(name))}</span>
+        <span class="receipt-who">
+          <strong>${escapeHtml(name)}</strong>
+          <span>Paid ${paid.get(personId) ? money(paid.get(personId)) : "nothing"} · share ${shares.get(personId) ? money(shares.get(personId)) : "none"}</span>
+        </span>
+        <span class="receipt-end">
+          <strong class="${tone}">${money(change, true)}</strong>
+          <span>Wallet ${money(balance, true)}</span>
+        </span>
+      </button>
     `;
   }).join("");
 
@@ -205,14 +259,14 @@ function renderLatest() {
   ].filter(Boolean).join(" · ");
 
   $("latest").innerHTML = `
-    <section class="panel today-panel">
+    <section class="panel receipt">
       <div class="today-head">
-        <p class="eyebrow">${isToday ? "Today" : "Latest day"}</p>
+        <p class="eyebrow">${isToday ? "Today" : "Latest lunch"}</p>
         <h2>${dateLabel(date)}</h2>
-        <p class="muted">${totals}</p>
+        <p class="muted">${totals}. Green went up, red went down.</p>
       </div>
       <div class="day-lines">${lines}</div>
-      <div class="today-people">${cards}</div>
+      <div class="receipt-list">${cards}</div>
     </section>
   `;
 }
@@ -231,20 +285,20 @@ function entryCard(effect) {
   const kind = entry.type === "pot" ? "Pot" : entry.type === "settle" ? "Transfer" : entry.split === "custom" ? "Custom" : "Equal";
   let detail = "";
   if (entry.type === "pot") {
-    detail = `Held by ${personName(entry.heldBy)}. ${paidText(effect) || "No payments"}.`;
+    detail = `${paidText(effect) || "No payments"} · held by ${personName(entry.heldBy)}`;
   } else {
-    const members = (entry.members || []).map(personName).join(", ");
-    detail = `${members || "No one"}. Paid by ${paidText(effect) || "no one"}.`;
+    const count = (entry.members || []).length;
+    detail = `${count} ${count === 1 ? "person" : "people"} · ${paidText(effect) || "nobody paid"}`;
   }
 
   return `
-    <article class="entry-card">
-      <div class="entry-top">
+    <article class="entry-line">
+      <span class="badge">${kind}</span>
+      <span class="entry-copy">
         <strong>${escapeHtml(entry.title)}</strong>
-        <strong>${money(effect.total)}</strong>
-      </div>
-      <p><span class="badge">${kind}</span></p>
-      <p class="muted">${escapeHtml(detail)}</p>
+        <span>${escapeHtml(detail)}</span>
+      </span>
+      <strong class="entry-amount">${money(effect.total)}</strong>
     </article>
   `;
 }
@@ -252,11 +306,11 @@ function entryCard(effect) {
 function renderActivity() {
   const groups = groupedEffects();
   const visible = showAllActivity ? groups : groups.slice(0, 12);
-  const wasOpen = $("activity").querySelector("details")?.open ?? true;
+  const wasOpen = $("activity").querySelector("details")?.open ?? false;
   const days = visible.map(([date, effects]) => `
     <div class="activity-day">
       <h3>${dateLabel(date)} <span>${effects.length} ${effects.length === 1 ? "entry" : "entries"}</span></h3>
-      <div class="history-grid">${effects.map(entryCard).join("")}</div>
+      <div class="entry-list">${effects.map(entryCard).join("")}</div>
     </div>
   `).join("");
 
@@ -266,9 +320,8 @@ function renderActivity() {
 
   $("activity").hidden = false;
   $("activity").innerHTML = `
-    <details class="panel" ${wasOpen ? "open" : ""}>
-      <summary><h2>Activity</h2></summary>
-      <p class="muted">Every meal, pot collection, and transfer.</p>
+    <details class="panel fold" ${wasOpen ? "open" : ""}>
+      <summary><h2>Activity</h2><span>Every meal, collection, and transfer</span></summary>
       ${days || `<p class="empty">No entries yet.</p>`}
       ${more}
     </details>
@@ -276,40 +329,52 @@ function renderActivity() {
 }
 
 function renderMonths() {
-  const monthCards = [...view.months].reverse().map((month) => `
-    <article class="month-block">
-      <h3>${escapeHtml(month.label)}</h3>
-      <p>Collected ${money(month.collected)}</p>
-      <p>Brought forward ${money(month.carriedIn)}</p>
-      <p>Charged to everyone else ${money(month.groupSpend)}</p>
-      <p class="${month.left < 0 ? "negative" : "positive"}">Left ${money(month.left, true)}</p>
-    </article>
-  `).join("");
+  const monthCards = [...view.months].reverse().map((month) => {
+    const short = month.left < -0.009;
+    const status = short ? `Short ${money(Math.abs(month.left))}` : month.left > 0.009 ? `${money(month.left)} left` : "Used up";
+    const carried = month.carriedIn < -0.009 ? `Short ${money(Math.abs(month.carriedIn))}` : money(month.carriedIn);
+    return `
+      <article class="month-tile">
+        <header>
+          <h3>${escapeHtml(month.label)}</h3>
+          <strong class="${short ? "negative" : "positive"}">${status}</strong>
+        </header>
+        <p><span>Added</span><b>${money(month.collected)}</b></p>
+        <p><span>From previous</span><b>${carried}</b></p>
+        <p><span>Other people's lunches</span><b>${money(month.groupSpend)}</b></p>
+      </article>
+    `;
+  }).join("");
 
   const foodKeys = [...view.foodByMonth.keys()].sort((a, b) => b.localeCompare(a));
   const foodCards = foodKeys.map((key) => {
     const food = view.foodByMonth.get(key);
     const rows = [...food.entries()]
       .filter(([, amount]) => amount > 0)
-      .sort((a, b) => b[1] - a[1])
-      .map(([personId, amount]) => `<tr><td data-label="Person">${escapeHtml(personName(personId))}</td><td class="num" data-label="Food">${money(amount)}</td></tr>`)
-      .join("");
+      .sort((a, b) => b[1] - a[1]);
+    const max = rows.reduce((highest, [, amount]) => Math.max(highest, amount), 0) || 1;
+    const lines = rows.map(([personId, amount]) => `
+      <div class="food-row">
+        <span>${escapeHtml(personName(personId))}</span>
+        <b>${money(amount)}</b>
+        <span class="food-track"><span style="width: ${(amount / max) * 100}%"></span></span>
+      </div>
+    `).join("");
     return `
       <article class="food-card">
         <h3>${escapeHtml(LunchLedger.monthLabel(key))}</h3>
-        <table><tbody>${rows}</tbody></table>
+        ${lines || `<p class="empty">No food.</p>`}
       </article>
     `;
   }).join("");
 
   $("months").innerHTML = `
-    <details class="panel">
-      <summary><h2>Each month</h2></summary>
+    <details class="panel fold">
+      <summary><h2>Each month</h2><span>Added, carried, and what was left</span></summary>
       <div class="month-list">${monthCards}</div>
     </details>
-    <details class="panel">
-      <summary><h2>Food by person</h2></summary>
-      <p class="muted">Meals only. Transfers and pot money are not food.</p>
+    <details class="panel fold">
+      <summary><h2>Food by person</h2><span>Meals only. Transfers and pot money are not food.</span></summary>
       <div class="food-list">${foodCards || `<p class="empty">No food recorded.</p>`}</div>
     </details>
   `;
@@ -334,8 +399,9 @@ function openPerson(personId) {
   rows.reverse();
 
   const balance = view.balances.get(personId) || 0;
+  const phrase = walletPhrase(balance);
   $("personTitle").textContent = person.name;
-  $("personMath").textContent = "Now = opening balance + what they paid − their share.";
+  $("personMath").textContent = `${phrase.word}${phrase.amount ? ` ${money(phrase.amount)}` : ""}. Now = what they started with + what they paid − their share.`;
   $("personSummary").innerHTML = `
     <div><span>Opening</span><strong>${money(person.openingBalance, true)}</strong></div>
     <div><span>Paid</span><strong>${money(paidTotal)}</strong></div>

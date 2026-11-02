@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta id="themeColor" name="theme-color" content="#e7eef0">
+  <meta id="themeColor" name="theme-color" content="#f3eee4">
   <title>Lunch book</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,13 +17,13 @@
     } catch (error) {}
   </script>
 </head>
-<body>
+<body class="book">
   <div class="app">
     <header class="topbar">
       <div>
-        <p class="eyebrow">Shared lunch book</p>
-        <h1>Lunch book</h1>
-        <p class="lede">Who is ahead, who owes, and what is left in the pot.</p>
+        <p class="eyebrow">Lunch book</p>
+        <h1>Who owes what</h1>
+        <p class="lede">Ahead means the group owes them. Owes means they still need to pay in.</p>
       </div>
       <div class="header-actions">
         <a id="manageLink" class="button" href="manage.html" hidden>Update the book</a>
@@ -33,12 +33,12 @@
 
     <main>
       <p id="loading" class="loading">Loading the book…</p>
-      <section id="wallets"></section>
       <section id="month"></section>
+      <section id="wallets"></section>
       <section id="latest"></section>
       <section id="activity" hidden></section>
       <section id="months"></section>
-      <footer class="foot">This page only reads the book. The person who keeps it updates <code>data.json</code>, then pushes so everyone else can see the change.</footer>
+      <footer class="foot">This page only shows the book. Tap a name to see how their number was worked out.</footer>
     </main>
   </div>
 

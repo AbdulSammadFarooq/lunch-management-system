@@ -404,11 +404,14 @@ input, select, .search {
 .type-switch label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
-.choice-grid, .share-grid {
+.choice-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
   gap: 8px;
   margin: 8px 0 12px;
+}
+.choice-grid.has-amounts {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 .choice {
   display: flex;
@@ -418,6 +421,18 @@ input, select, .search {
   border-radius: 12px;
   padding: 8px 10px;
   font-weight: 600;
+}
+.choice label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.choice .share-input {
+  width: 108px;
+  flex: 0 0 108px;
+  padding: 6px 8px;
 }
 .choice:has(input:checked) {
   border-color: var(--accent);
@@ -494,4 +509,251 @@ input, select, .search {
     font-weight: 600;
   }
   .num { text-align: right; }
+}
+
+/* Public book. The manage page does not use these. */
+body.book {
+  --bg: #f3eee4;
+  --card: #fffdf8;
+  --ink: #1c1915;
+  --muted: #6d6458;
+  --line: #e4d9c8;
+  --ahead: #0f7a4a;
+  --ahead-bg: #e5f6ec;
+  --owes: #c2412d;
+  --owes-bg: #fde8e3;
+  --accent: #e25b1a;
+  --accent-ink: #fff8f3;
+  --accent-soft: #ffe8d8;
+  --shadow: 0 14px 34px rgba(70, 42, 16, 0.08);
+  --hero: #1c3d32;
+  --hero-ink: #f7f3ea;
+  background:
+    radial-gradient(900px 380px at 100% -8%, rgba(226, 91, 26, 0.18), transparent 60%),
+    var(--bg);
+}
+
+html[data-theme="dark"] body.book {
+  --bg: #12110e;
+  --card: #1c1a16;
+  --ink: #f6f1e7;
+  --muted: #b7ab9a;
+  --line: #3a342c;
+  --ahead: #8ee0b5;
+  --ahead-bg: #163328;
+  --owes: #ffb4a8;
+  --owes-bg: #3a221c;
+  --accent: #ff8a4c;
+  --accent-ink: #2a1408;
+  --accent-soft: #3a271c;
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+  --hero: #243f34;
+  --hero-ink: #f6f1e7;
+  background:
+    radial-gradient(800px 320px at 100% -10%, rgba(255, 138, 76, 0.16), transparent 62%),
+    var(--bg);
+}
+
+.book .topbar { align-items: center; }
+.book h1 { font-size: clamp(2.5rem, 5vw, 3.8rem); }
+
+.book .hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(220px, 0.7fr);
+  gap: 18px 28px;
+  margin-top: 6px;
+  padding: 26px;
+  border-radius: 28px;
+  color: var(--hero-ink);
+  background:
+    radial-gradient(520px 220px at 92% 0%, rgba(226, 91, 26, 0.42), transparent 70%),
+    var(--hero);
+}
+.book .hero.is-short {
+  background:
+    radial-gradient(520px 240px at 88% 0%, rgba(194, 65, 45, 0.5), transparent 68%),
+    var(--hero);
+}
+.book .hero .eyebrow { color: #f0c14a; }
+.book .hero-lead {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: clamp(2.6rem, 6vw, 4.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.045em;
+}
+.book .hero-story { margin: 12px 0 0; max-width: 36rem; color: rgba(247, 243, 234, 0.82); }
+.book .hero .bar { margin-top: 18px; background: rgba(255, 255, 255, 0.14); }
+.book .hero .bar span { background: #f0c14a; }
+.book .hero .bar.is-over span { background: #ff8d7a; }
+.book .hero-facts { display: grid; gap: 8px; margin: 0; align-content: end; }
+.book .hero-facts div {
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(8, 22, 18, 0.28);
+}
+.book .hero-facts dt { color: rgba(247, 243, 234, 0.7); font-size: 0.82rem; }
+.book .hero-facts dd {
+  margin: 2px 0 0;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  letter-spacing: -0.03em;
+}
+.book .hero-note { grid-column: 1 / -1; margin: 0; color: rgba(247, 243, 234, 0.75); }
+
+.book .board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-top: 22px;
+}
+.book .board-col header h2 { font-size: 1.45rem; }
+.book .board-col header p { margin: 4px 0 12px; color: var(--muted); }
+.book .person-list, .book .receipt-list, .book .settled-list { display: grid; gap: 8px; }
+.book .settled-list { margin-top: 10px; }
+.book .person, .book .receipt-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--card);
+  box-shadow: var(--shadow);
+}
+.book .person.is-owes { background: var(--owes-bg); border-color: transparent; }
+.book .person.is-ahead { background: var(--ahead-bg); border-color: transparent; }
+.book .person:hover, .book .receipt-row:hover { transform: translateY(-1px); }
+.book .avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  border-radius: 14px;
+  background: rgba(28, 25, 21, 0.08);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.book .person-copy, .book .receipt-who, .book .person-end, .book .receipt-end, .book .entry-copy {
+  display: grid;
+  min-width: 0;
+}
+.book .person-copy, .book .receipt-who { flex: 1; }
+.book .person-end, .book .receipt-end { margin-left: auto; justify-items: end; }
+.book .person-copy span, .book .receipt-who span, .book .receipt-end span, .book .entry-copy span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.book .person-amount, .book .receipt-end strong {
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.book .is-owes .person-amount { color: var(--owes); }
+.book .is-ahead .person-amount { color: var(--ahead); }
+.book .tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.book .book-net { margin: 14px 2px 0; }
+
+.book .receipt { margin-top: 18px; }
+.book .today-head { text-align: left; }
+.book .day-lines { justify-content: flex-start; margin: 14px 0; }
+.book .day-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  flex: none;
+  width: 100%;
+  max-width: none;
+  background: var(--bg);
+}
+.book .day-line strong { font-variant-numeric: tabular-nums; }
+.book .receipt-row { background: var(--bg); box-shadow: none; }
+
+.book .fold > summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  list-style: none;
+}
+.book .fold > summary::-webkit-details-marker { display: none; }
+.book .fold > summary h2 { display: block; }
+.book .fold > summary span { margin-left: auto; color: var(--muted); font-weight: 600; text-align: right; }
+.book .fold > summary::after {
+  content: "";
+  width: 9px;
+  height: 9px;
+  margin-left: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: translateY(-3px) rotate(45deg);
+  flex: 0 0 auto;
+}
+.book .fold[open] > summary::after { transform: translateY(2px) rotate(225deg); }
+.book .activity-day h3 { justify-content: space-between; }
+.book .entry-list { display: grid; }
+.book .entry-line {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+}
+.book .entry-amount { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.book .month-list, .book .food-list { margin-top: 14px; }
+.book .month-tile {
+  background: var(--bg);
+  border: 0;
+}
+.book .month-tile header {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.book .month-tile p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 5px 0;
+}
+.book .month-tile span { color: var(--muted); }
+.book .food-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+.book .food-row .food-track { grid-column: 1 / -1; }
+.book .food-track {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--card);
+  overflow: hidden;
+}
+.book .food-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--accent);
+}
+.book .dialog { background: var(--card); }
+
+@media (max-width: 800px) {
+  .book .hero, .book .board { grid-template-columns: 1fr; }
+  .book .fold > summary span { display: none; }
+  .book .person, .book .receipt-row { align-items: flex-start; }
+  .book .person-amount, .book .receipt-end strong { font-size: 1.25rem; }
 }

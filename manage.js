@@ -98,41 +98,38 @@ function personOptions(selectedId) {
   return options.join("");
 }
 
-function renderMemberGrid(preselected) {
+function isCustomSplit() {
+  return document.querySelector('input[name="split"]:checked')?.value === "custom";
+}
+
+function renderMemberGrid(preselected, sharePreset) {
   const grid = $("memberGrid");
   const selected = preselected
     ? preselected
     : grid.childElementCount
       ? selectedMemberIds()
       : new Set(ledger.people.filter((person) => person.active).map((person) => person.id));
+  const custom = isCustomSplit();
+  const shares = sharePreset || valueMap("#memberGrid input[data-person]");
+  const hint = $("customHint");
+  if (hint) hint.hidden = !custom;
+  grid.classList.toggle("has-amounts", custom);
 
-  grid.innerHTML = ledger.people.map((person) => `
-    <label class="choice ${person.active ? "" : "is-hidden-person"}">
-      <input type="checkbox" value="${person.id}" ${selected.has(person.id) ? "checked" : ""}>
-      <span>${escapeHtml(person.name)}${person.active ? "" : " · hidden"}</span>
-    </label>
-  `).join("");
-  renderShareGrid();
-}
-
-function renderShareGrid(preset) {
-  const grid = $("shareGrid");
-  const custom = document.querySelector('input[name="split"]:checked')?.value === "custom";
-  if (!custom) {
-    grid.hidden = true;
-    grid.innerHTML = "";
-    return;
-  }
-
-  const previous = preset || valueMap("#shareGrid input[data-person]");
-  const selected = [...selectedMemberIds()];
-  grid.hidden = selected.length > 0;
-  grid.innerHTML = selected.map((personId) => `
-    <label>
-      <span>${escapeHtml(LunchLedger.personName(ledger.people, personId))}</span>
-      <input data-person="${personId}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Share" value="${escapeHtml(previous.get(personId) ?? "")}">
-    </label>
-  `).join("");
+  grid.innerHTML = ledger.people.map((person) => {
+    const checked = selected.has(person.id);
+    const amount = custom && checked
+      ? `<input class="share-input" data-person="${person.id}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Amount" aria-label="${escapeHtml(person.name)} amount" value="${escapeHtml(shares.get(person.id) ?? "")}">`
+      : "";
+    return `
+      <div class="choice ${person.active ? "" : "is-hidden-person"}">
+        <label>
+          <input type="checkbox" value="${person.id}" ${checked ? "checked" : ""}>
+          <span>${escapeHtml(person.name)}${person.active ? "" : " · hidden"}</span>
+        </label>
+        ${amount}
+      </div>
+    `;
+  }).join("");
 }
 
 function renderPotGrid(preset) {
@@ -223,7 +220,7 @@ function readForm(strict) {
   let shares;
   if (split === "custom") {
     shares = [];
-    for (const input of document.querySelectorAll("#shareGrid input")) {
+    for (const input of document.querySelectorAll("#memberGrid input[data-person]")) {
       const raw = input.value.trim();
       if (strict && raw === "") return { error: "Enter a share for each person, or use an equal split." };
       const amount = raw === "" ? 0 : Number(raw);
@@ -311,7 +308,7 @@ function clearAmounts() {
   $("formTitle").textContent = "Add an entry";
   $("saveEntry").textContent = "Save entry";
   $("cancelEdit").hidden = true;
-  document.querySelectorAll("#shareGrid input, #potGrid input, .pay-row input").forEach((input) => {
+  document.querySelectorAll("#memberGrid input[data-person], #potGrid input, .pay-row input").forEach((input) => {
     input.value = "";
   });
   setFormError("");
@@ -335,8 +332,10 @@ function editEntry(id) {
     renderPotGrid(new Map((entry.paid || []).map((payment) => [payment.personId, String(payment.amount)])));
   } else {
     document.querySelector(`input[name="split"][value="${entry.split}"]`).checked = true;
-    renderMemberGrid(new Set(entry.members || []));
-    renderShareGrid(new Map((entry.shares || []).map((share) => [share.personId, String(share.amount)])));
+    renderMemberGrid(
+      new Set(entry.members || []),
+      new Map((entry.shares || []).map((share) => [share.personId, String(share.amount)]))
+    );
     renderPaymentRows(entry.paid || []);
   }
 
@@ -491,7 +490,7 @@ function renderPeople() {
 
 function refreshPeopleUi() {
   const members = selectedMemberIds();
-  const shares = valueMap("#shareGrid input[data-person]");
+  const shares = valueMap("#memberGrid input[data-person]");
   const pot = valueMap("#potGrid input[data-person]");
   const payments = [...document.querySelectorAll(".pay-row")].map((row) => ({
     personId: row.querySelector("select").value,
@@ -499,8 +498,7 @@ function refreshPeopleUi() {
   }));
   const heldBy = $("heldBy").value;
   renderPeople();
-  renderMemberGrid(members);
-  renderShareGrid(shares);
+  renderMemberGrid(members, shares);
   renderPotGrid(pot);
   renderHeldBy(heldBy);
   renderPaymentRows(payments);
@@ -569,7 +567,8 @@ async function deletePerson(personId) {
 function onFormEdit(event) {
   setFormError("");
   if (event.target.name === "type") syncType();
-  if (event.target.closest("#memberGrid") || event.target.name === "split") renderShareGrid();
+  const memberToggled = event.target.type === "checkbox" && event.target.closest("#memberGrid");
+  if (event.target.name === "split" || memberToggled) renderMemberGrid();
   updatePreview();
 }
 

@@ -2235,6 +2235,48 @@
           "amount": 3561
         }
       ]
+    },
+    {
+      "id": "e92",
+      "date": "2026-11-02",
+      "title": "Lunch at office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 880
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 50
+        },
+        {
+          "personId": 2,
+          "amount": 207.5
+        },
+        {
+          "personId": 3,
+          "amount": 207.5
+        },
+        {
+          "personId": 4,
+          "amount": 207.5
+        },
+        {
+          "personId": 5,
+          "amount": 207.5
+        }
+      ]
     }
   ]
 }
