@@ -2295,6 +2295,67 @@
           "amount": 120
         }
       ]
+    },
+    {
+      "id": "e94",
+      "date": "2026-11-03",
+      "title": "Lunch at office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 1010
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 235
+        },
+        {
+          "personId": 2,
+          "amount": 235
+        },
+        {
+          "personId": 3,
+          "amount": 70
+        },
+        {
+          "personId": 4,
+          "amount": 235
+        },
+        {
+          "personId": 5,
+          "amount": 235
+        }
+      ]
+    },
+    {
+      "id": "e95",
+      "date": "2026-11-03",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 120
+        }
+      ]
     }
   ]
 }
