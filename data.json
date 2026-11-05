@@ -2405,6 +2405,62 @@
           "amount": 5000
         }
       ]
+    },
+    {
+      "id": "e98",
+      "date": "2026-11-05",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 500
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 80
+        },
+        {
+          "personId": 2,
+          "amount": 140
+        },
+        {
+          "personId": 3,
+          "amount": 140
+        },
+        {
+          "personId": 5,
+          "amount": 140
+        }
+      ]
+    },
+    {
+      "id": "e99",
+      "date": "2026-11-05",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 200
+        }
+      ]
     }
   ]
 }
