@@ -2479,6 +2479,19 @@
           "amount": 1470
         }
       ]
+    },
+    {
+      "id": "e101",
+      "date": "2026-11-06",
+      "title": "Funding",
+      "type": "pot",
+      "heldBy": 1,
+      "paid": [
+        {
+          "personId": 3,
+          "amount": 6000
+        }
+      ]
     }
   ]
 }
