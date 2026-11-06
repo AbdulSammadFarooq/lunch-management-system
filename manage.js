@@ -7,7 +7,9 @@ const $ = (id) => document.getElementById(id);
 const HELP = {
   meal: "Someone paid for food. The bill is split across the people who joined.",
   pot: "People hand cash to whoever is holding the lunch money. Payers go ahead. The holder goes down by the total, and the monthly pot goes up.",
-  settle: "Cash moved between people and it was not a meal. Wallets update, but this is not counted as food."
+  settle: "Cash moved between people and it was not a meal. Wallets update, but this is not counted as food.",
+  tax: "Tax comes off the wallets you fill in. It is not food and it does not change the pot.",
+  tip: "A tip comes off the wallets you fill in. It is not food and it does not change the pot."
 };
 
 function escapeHtml(value) {
@@ -132,6 +134,16 @@ function renderMemberGrid(preselected, sharePreset) {
   }).join("");
 }
 
+function renderChargeGrid(preset) {
+  const previous = preset || valueMap("#chargeGrid input[data-person]");
+  $("chargeGrid").innerHTML = ledger.people.map((person) => `
+    <label>
+      <span>${escapeHtml(person.name)}${person.active ? "" : " · hidden"}</span>
+      <input data-person="${person.id}" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Amount" aria-label="${escapeHtml(person.name)} charge" value="${escapeHtml(previous.get(person.id) ?? "")}">
+    </label>
+  `).join("");
+}
+
 function renderPotGrid(preset) {
   const previous = preset || valueMap("#potGrid input[data-person]");
   $("potGrid").innerHTML = ledger.people.map((person) => `
@@ -176,14 +188,33 @@ function refillPaymentOptions() {
 
 function syncType(options = {}) {
   const type = document.querySelector('input[name="type"]:checked').value;
-  $("groupFields").hidden = type === "pot";
+  const charge = type === "tax" || type === "tip";
+  $("groupFields").hidden = type === "pot" || charge;
   $("potFields").hidden = type !== "pot";
+  $("chargeFields").hidden = !charge;
   $("titleChips").hidden = type !== "meal";
   $("typeHelp").textContent = HELP[type];
   const title = document.querySelector('[name="title"]');
-  const defaults = ["Lunch", "Snacks", "Breakfast", "Funding", "Exchange", ""];
-  const next = { meal: "Lunch", pot: "Funding", settle: "Exchange" }[type];
+  const defaults = ["Lunch", "Snacks", "Breakfast", "Funding", "Exchange", "Tax", "Tip", ""];
+  const next = { meal: "Lunch", pot: "Funding", settle: "Exchange", tax: "Tax", tip: "Tip" }[type];
   if (!options.keepTitle && defaults.includes(title.value)) title.value = next;
+}
+
+function readCharges(strict, label) {
+  const charges = [];
+  for (const input of document.querySelectorAll("#chargeGrid input")) {
+    const raw = input.value.trim();
+    if (!raw) continue;
+    const amount = Number(raw);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return { error: `${label} amounts need to be above zero.` };
+    }
+    charges.push({ personId: Number(input.dataset.person), amount });
+  }
+  if (!charges.length) {
+    return { error: strict ? `Enter a ${label.toLowerCase()} for at least one person.` : `Enter a ${label.toLowerCase()} to see the wallet move.` };
+  }
+  return { charges };
 }
 
 function readForm(strict) {
@@ -192,6 +223,13 @@ function readForm(strict) {
   const title = document.querySelector('[name="title"]').value.trim();
   if (strict && !date) return { error: "Choose a date." };
   if (strict && !title) return { error: "Give this entry a name." };
+
+  if (type === "tax" || type === "tip") {
+    const label = type === "tax" ? "Tax" : "Tip";
+    const charges = readCharges(strict, label);
+    if (charges.error) return { error: charges.error };
+    return { entry: { date, title: title || label, type, charges: charges.charges } };
+  }
 
   if (type === "pot") {
     const heldBy = Number($("heldBy").value);
@@ -297,6 +335,7 @@ function resetForm() {
   syncType({ keepTitle: true });
   renderMemberGrid(defaultMembers());
   renderPotGrid(new Map());
+  renderChargeGrid(new Map());
   renderHeldBy(String(ledger.settings.budgetPersonId || ledger.people[0].id));
   renderPaymentRows([{ personId: "", amount: "" }]);
   setFormError("");
@@ -308,7 +347,7 @@ function clearAmounts() {
   $("formTitle").textContent = "Add an entry";
   $("saveEntry").textContent = "Save entry";
   $("cancelEdit").hidden = true;
-  document.querySelectorAll("#memberGrid input[data-person], #potGrid input, .pay-row input").forEach((input) => {
+  document.querySelectorAll("#memberGrid input[data-person], #potGrid input, #chargeGrid input, .pay-row input").forEach((input) => {
     input.value = "";
   });
   setFormError("");
@@ -330,6 +369,8 @@ function editEntry(id) {
   if (entry.type === "pot") {
     renderHeldBy(String(entry.heldBy));
     renderPotGrid(new Map((entry.paid || []).map((payment) => [payment.personId, String(payment.amount)])));
+  } else if (entry.type === "tax" || entry.type === "tip") {
+    renderChargeGrid(new Map((entry.charges || []).map((charge) => [charge.personId, String(charge.amount)])));
   } else {
     document.querySelector(`input[name="split"][value="${entry.split}"]`).checked = true;
     renderMemberGrid(
@@ -419,6 +460,7 @@ function renderEntries() {
     const names = [
       ...(entry.members || []),
       ...(entry.paid || []).map((payment) => payment.personId),
+      ...(entry.charges || []).map((charge) => charge.personId),
       entry.heldBy
     ].map((personId) => LunchLedger.personName(ledger.people, personId));
     return [entry.date, entry.title, entry.type, ...names].join(" ").toLowerCase().includes(query);
@@ -436,7 +478,7 @@ function renderEntries() {
       <h3>${dateLabel(date)} <span>${group.length}</span></h3>
       ${group.map((effect) => {
         const entry = effect.entry;
-        const kind = entry.type === "pot" ? "Pot" : entry.type === "settle" ? "Transfer" : "Meal";
+        const kind = entry.type === "pot" ? "Pot" : entry.type === "settle" ? "Transfer" : entry.type === "tax" ? "Tax" : entry.type === "tip" ? "Tip" : "Meal";
         return `
           <article class="entry-card ${editingId === entry.id ? "is-editing" : ""}">
             <div class="entry-top">
@@ -460,6 +502,7 @@ function personIsUsed(personId) {
     Number(entry.heldBy) === personId ||
     (entry.members || []).map(Number).includes(personId) ||
     (entry.shares || []).some((share) => Number(share.personId) === personId) ||
+    (entry.charges || []).some((charge) => Number(charge.personId) === personId) ||
     (entry.paid || []).some((payment) => Number(payment.personId) === personId)
   );
 }
@@ -492,6 +535,7 @@ function refreshPeopleUi() {
   const members = selectedMemberIds();
   const shares = valueMap("#memberGrid input[data-person]");
   const pot = valueMap("#potGrid input[data-person]");
+  const charges = valueMap("#chargeGrid input[data-person]");
   const payments = [...document.querySelectorAll(".pay-row")].map((row) => ({
     personId: row.querySelector("select").value,
     amount: row.querySelector("input").value
@@ -500,6 +544,7 @@ function refreshPeopleUi() {
   renderPeople();
   renderMemberGrid(members, shares);
   renderPotGrid(pot);
+  renderChargeGrid(charges);
   renderHeldBy(heldBy);
   renderPaymentRows(payments);
   renderEntries();

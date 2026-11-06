@@ -2461,6 +2461,24 @@
           "amount": 200
         }
       ]
+    },
+    {
+      "id": "e100",
+      "date": "2026-11-06",
+      "title": "Friday Lunch at Office",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 3,
+          "amount": 1470
+        }
+      ]
     }
   ]
 }

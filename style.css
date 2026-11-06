@@ -378,7 +378,7 @@ input, select, .search {
 
 .type-switch {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
   gap: 8px;
   margin-bottom: 8px;
 }
@@ -403,6 +403,12 @@ input, select, .search {
 }
 .type-switch label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+.amount-grid, .share-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+  margin: 8px 0 12px;
+}
 .chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0 12px; }
 .choice-grid {
   display: grid;
@@ -664,6 +670,50 @@ html[data-theme="dark"] body.book {
 }
 .book .book-net { margin: 14px 2px 0; }
 
+.book .levy {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 18px;
+}
+.book .levy-card {
+  padding: 18px 20px 8px;
+  border-radius: 24px;
+  background: var(--card);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+}
+.book .levy-card h2 { font-size: 1.35rem; }
+.book .levy-card > strong {
+  display: block;
+  margin: 4px 0 8px;
+  font-family: var(--serif);
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+.book .levy-card > p:last-of-type { margin: 0 0 8px; color: var(--muted); }
+.book .is-tax > strong { color: #9a3412; }
+.book .is-tip > strong { color: #6d28d9; }
+html[data-theme="dark"] body.book .is-tax > strong { color: #fdba74; }
+html[data-theme="dark"] body.book .is-tip > strong { color: #d8b4fe; }
+.book .levy-empty { margin: 8px 0 12px; color: var(--muted); }
+.book .levy-people { list-style: none; margin: 8px 0 12px; padding: 0; }
+.book .levy-people li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--line);
+}
+.book .levy-people button {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-weight: 700;
+  text-align: left;
+}
+
 .book .receipt { margin-top: 18px; }
 .book .today-head { text-align: left; }
 .book .day-lines { justify-content: flex-start; margin: 14px 0; }
@@ -752,7 +802,7 @@ html[data-theme="dark"] body.book {
 .book .dialog { background: var(--card); }
 
 @media (max-width: 800px) {
-  .book .hero, .book .board { grid-template-columns: 1fr; }
+  .book .hero, .book .board, .book .levy { grid-template-columns: 1fr; }
   .book .fold > summary span { display: none; }
   .book .person, .book .receipt-row { align-items: flex-start; }
   .book .person-amount, .book .receipt-end strong { font-size: 1.25rem; }

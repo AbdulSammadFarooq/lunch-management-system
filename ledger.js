@@ -7,12 +7,16 @@
     root.LunchLedger = api;
   }
 })(typeof window !== "undefined" ? window : globalThis, function () {
-  // Three kinds of entry:
+  // Five kinds of entry:
   // meal       someone paid a bill and it is split across the people who joined
   // pot        people hand cash to the person holding the lunch money
   // settle     cash moved between people and it was not food
+  // tax        an extra charge taken off one or more wallets
+  // tip        a tip taken off one or more wallets
   //
   // A wallet moves by: amount they paid minus their share.
+  // Tax and tip are shares with no payment, so the wallet goes down.
+  // They are not food and they do not change the monthly pot.
   // The monthly pot falls only by everyone except the budget person's share.
   // That person's own food is counted on both sides, so it does not reduce the pot.
 
@@ -77,8 +81,20 @@
     return paid;
   }
 
+  function chargeMap(entry) {
+    const charges = new Map();
+    for (const charge of entry.charges || []) {
+      const personId = Number(charge.personId);
+      const amount = Number(charge.amount) || 0;
+      if (!personId || amount === 0) continue;
+      charges.set(personId, (charges.get(personId) || 0) + amount);
+    }
+    return charges;
+  }
+
   function shareMap(entry) {
     const shares = new Map();
+    if (entry.type === "tax" || entry.type === "tip") return chargeMap(entry);
     if (entry.type === "pot") {
       shares.set(Number(entry.heldBy), totalOf(entry));
       return shares;
@@ -101,22 +117,22 @@
   }
 
   function entryEffect(entry) {
-    const paid = paidMap(entry);
+    const paid = entry.type === "tax" || entry.type === "tip" ? new Map() : paidMap(entry);
     const shares = shareMap(entry);
     const changes = new Map();
     const personIds = new Set([...paid.keys(), ...shares.keys()]);
+    let total = 0;
 
     for (const personId of personIds) {
-      changes.set(personId, (paid.get(personId) || 0) - (shares.get(personId) || 0));
+      const paidAmount = paid.get(personId) || 0;
+      const shareAmount = shares.get(personId) || 0;
+      changes.set(personId, paidAmount - shareAmount);
+      total += entry.type === "tax" || entry.type === "tip" ? shareAmount : paidAmount;
     }
 
-    return {
-      entry,
-      total: totalOf(entry),
-      paid,
-      shares,
-      changes
-    };
+    if (entry.type !== "tax" && entry.type !== "tip") total = totalOf(entry);
+
+    return { entry, total, paid, shares, changes };
   }
 
   function describeEntry(entry, people, currency) {
@@ -138,6 +154,10 @@
 
     if (entry.type === "pot") {
       summary = `${formatMoney(effect.total, currency)} goes into the pot held by ${name(entry.heldBy)}. People who put money in go ahead by that amount. ${name(entry.heldBy)} goes down by the total, because they are holding the cash.`;
+    } else if (entry.type === "tax" || entry.type === "tip") {
+      const word = entry.type === "tax" ? "Tax" : "A tip";
+      const who = rows.map((row) => `${row.name} ${formatMoney(row.share, currency)}`).join(", ");
+      summary = `${word} of ${formatMoney(effect.total, currency)} comes off the wallet${rows.length === 1 ? "" : "s"}: ${who}. This is not food and the pot does not change.`;
     } else if (entry.split === "custom") {
       const shareSum = [...effect.shares.values()].reduce((sum, amount) => sum + amount, 0);
       summary = `${formatMoney(effect.total, currency)} was paid. Each person is charged the share you entered.`;
@@ -187,7 +207,11 @@
           label: monthLabel(key),
           collected: 0,
           ownShare: 0,
-          consumed: 0
+          consumed: 0,
+          tax: 0,
+          tip: 0,
+          taxByPerson: new Map(),
+          tipByPerson: new Map()
         });
       }
       return months.get(key);
@@ -199,6 +223,16 @@
 
       if (effect.entry.type === "pot") {
         bucket.collected += effect.total;
+        continue;
+      }
+
+      if (effect.entry.type === "tax" || effect.entry.type === "tip") {
+        const field = effect.entry.type;
+        const byPerson = field === "tax" ? bucket.taxByPerson : bucket.tipByPerson;
+        bucket[field] += effect.total;
+        for (const [personId, amount] of effect.shares) {
+          byPerson.set(personId, (byPerson.get(personId) || 0) + amount);
+        }
         continue;
       }
 
@@ -263,7 +297,9 @@
       }
     }
 
-    const spending = effects.filter((effect) => effect.entry.type !== "pot");
+    const spending = effects.filter((effect) =>
+      effect.entry.type !== "pot" && effect.entry.type !== "tax" && effect.entry.type !== "tip"
+    );
     const dates = [...new Set(spending.map((effect) => effect.entry.date))].sort();
     const averageIsCurrentOnly =
       keysForAverage.length === 1 && keysForAverage[0] === currentKey;
@@ -407,8 +443,37 @@
         errors.push(`The entry on ${date} needs a name.`);
         return;
       }
-      if (!["meal", "pot", "settle"].includes(type)) {
+      if (!["meal", "pot", "settle", "tax", "tip"].includes(type)) {
         errors.push(`${title} has an unknown type.`);
+        return;
+      }
+
+      if (type === "tax" || type === "tip") {
+        const charges = [];
+        const seen = new Set();
+        for (const charge of entry.charges || []) {
+          const personId = Number(charge.personId);
+          const amount = Number(charge.amount);
+          if (!knownIds.has(personId)) {
+            errors.push(`${title} names a person who is not in the book.`);
+            return;
+          }
+          if (!Number.isFinite(amount) || amount <= 0) {
+            errors.push(`${title} needs an amount above zero for each person.`);
+            return;
+          }
+          if (seen.has(personId)) {
+            charges.find((item) => item.personId === personId).amount += amount;
+          } else {
+            seen.add(personId);
+            charges.push({ personId, amount });
+          }
+        }
+        if (!charges.length) {
+          errors.push(`${title} needs at least one person.`);
+          return;
+        }
+        entries.push({ id, date, title, type, charges, order: index });
         return;
       }
 

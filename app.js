@@ -69,7 +69,11 @@ function personNote(personId) {
   const food = view.foodByMonth.get(view.current.key)?.get(personId) || 0;
   const typical = view.averageFood.get(personId) || 0;
   const bits = [];
+  const tax = view.current.taxByPerson?.get(personId) || 0;
+  const tip = view.current.tipByPerson?.get(personId) || 0;
   if (food > 0.009) bits.push(`Ate ${money(food)} this month`);
+  if (tax > 0.009) bits.push(`tax ${money(tax)}`);
+  if (tip > 0.009) bits.push(`tip ${money(tip)}`);
   if (!view.averageIsCurrentOnly && typical > 0.009) bits.push(`usually ${money(typical)}`);
   return bits.join(" · ");
 }
@@ -207,12 +211,16 @@ function renderLatest() {
   const isToday = date === LunchLedger.todayISO();
   let spent = 0;
   let collected = 0;
+  let tax = 0;
+  let tip = 0;
   const paid = new Map();
   const shares = new Map();
   const changes = new Map();
 
   for (const effect of effects) {
     if (effect.entry.type === "pot") collected += effect.total;
+    else if (effect.entry.type === "tax") tax += effect.total;
+    else if (effect.entry.type === "tip") tip += effect.total;
     else spent += effect.total;
     for (const [personId, amount] of effect.paid) paid.set(personId, (paid.get(personId) || 0) + amount);
     for (const [personId, amount] of effect.shares) shares.set(personId, (shares.get(personId) || 0) + amount);
@@ -220,7 +228,7 @@ function renderLatest() {
   }
 
   const lines = effects.map((effect) => {
-    const kind = effect.entry.type === "pot" ? "Pot" : effect.entry.type === "settle" ? "Transfer" : "Meal";
+    const kind = entryKind(effect.entry);
     return `
       <div class="day-line">
         <span class="badge">${kind}</span>
@@ -255,7 +263,9 @@ function renderLatest() {
 
   const totals = [
     spent ? `${money(spent)} spent` : "",
-    collected ? `${money(collected)} put into the pot` : ""
+    collected ? `${money(collected)} put into the pot` : "",
+    tax ? `${money(tax)} tax` : "",
+    tip ? `${money(tip)} tip` : ""
   ].filter(Boolean).join(" · ");
 
   $("latest").innerHTML = `
@@ -280,11 +290,23 @@ function groupedEffects() {
   return [...groups.entries()].sort((a, b) => b[0].localeCompare(a[0]));
 }
 
+function entryKind(entry) {
+  if (entry.type === "pot") return "Pot";
+  if (entry.type === "settle") return "Transfer";
+  if (entry.type === "tax") return "Tax";
+  if (entry.type === "tip") return "Tip";
+  return entry.split === "custom" ? "Custom" : "Equal";
+}
+
 function entryCard(effect) {
   const entry = effect.entry;
-  const kind = entry.type === "pot" ? "Pot" : entry.type === "settle" ? "Transfer" : entry.split === "custom" ? "Custom" : "Equal";
+  const kind = entryKind(entry);
   let detail = "";
-  if (entry.type === "pot") {
+  if (entry.type === "tax" || entry.type === "tip") {
+    detail = (entry.charges || [])
+      .map((charge) => `${personName(charge.personId)} ${money(charge.amount)}`)
+      .join(", ");
+  } else if (entry.type === "pot") {
     detail = `${paidText(effect) || "No payments"} · held by ${personName(entry.heldBy)}`;
   } else {
     const count = (entry.members || []).length;
@@ -342,6 +364,8 @@ function renderMonths() {
         <p><span>Added</span><b>${money(month.collected)}</b></p>
         <p><span>From previous</span><b>${carried}</b></p>
         <p><span>Other people's lunches</span><b>${money(month.groupSpend)}</b></p>
+        <p><span>Tax</span><b>${money(month.tax || 0)}</b></p>
+        <p><span>Tip</span><b>${money(month.tip || 0)}</b></p>
       </article>
     `;
   }).join("");
@@ -376,6 +400,55 @@ function renderMonths() {
     <details class="panel fold">
       <summary><h2>Food by person</h2><span>Meals only. Transfers and pot money are not food.</span></summary>
       <div class="food-list">${foodCards || `<p class="empty">No food recorded.</p>`}</div>
+    </details>
+  `;
+}
+
+function chargeLines(byPerson) {
+  const rows = [...(byPerson || new Map()).entries()]
+    .filter(([, amount]) => amount > 0.009)
+    .sort((a, b) => b[1] - a[1]);
+  if (!rows.length) return `<p class="levy-empty">Nothing charged yet.</p>`;
+  return `<ul class="levy-people">${rows.map(([personId, amount]) => `
+    <li>
+      <button type="button" data-open-person="${personId}">${escapeHtml(personName(personId))}</button>
+      <b>${money(amount)}</b>
+    </li>
+  `).join("")}</ul>`;
+}
+
+function renderLevies() {
+  const current = view.current;
+  const months = [...view.months].reverse().map((month) => `
+    <article class="month-tile">
+      <header>
+        <h3>${escapeHtml(month.label)}</h3>
+      </header>
+      <p><span>Tax</span><b>${money(month.tax || 0)}</b></p>
+      <p><span>Tip</span><b>${money(month.tip || 0)}</b></p>
+    </article>
+  `).join("");
+
+  $("levies").innerHTML = `
+    <div class="levy">
+      <article class="levy-card is-tax">
+        <p class="eyebrow">${escapeHtml(current.label)}</p>
+        <h2>Tax</h2>
+        <strong>${money(current.tax || 0)}</strong>
+        <p>Taken off wallets this month. Not lunch, and not taken from the pot.</p>
+        ${chargeLines(current.taxByPerson)}
+      </article>
+      <article class="levy-card is-tip">
+        <p class="eyebrow">${escapeHtml(current.label)}</p>
+        <h2>Tip</h2>
+        <strong>${money(current.tip || 0)}</strong>
+        <p>Taken off wallets this month. Not lunch, and not taken from the pot.</p>
+        ${chargeLines(current.tipByPerson)}
+      </article>
+    </div>
+    <details class="panel fold">
+      <summary><h2>Tax and tip by month</h2><span>Every month in the book</span></summary>
+      <div class="month-list">${months}</div>
     </details>
   `;
 }
@@ -460,6 +533,7 @@ async function init() {
     $("loading").hidden = true;
     renderWallets();
     renderMonth();
+    renderLevies();
     renderLatest();
     renderActivity();
     renderMonths();

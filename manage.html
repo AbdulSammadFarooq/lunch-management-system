@@ -23,7 +23,7 @@
       <div>
         <p class="eyebrow">This computer only</p>
         <h1>Update the book</h1>
-        <p class="lede">Add a meal, pot money, or a transfer. Saving writes <code>data.json</code>. Commit and push that file when everyone else should see it.</p>
+        <p class="lede">Add a meal, pot money, a transfer, tax, or a tip. Saving writes <code>data.json</code>. Commit and push that file when everyone else should see it.</p>
       </div>
       <div class="header-actions">
         <a class="button ghost" href="index.html">View the book</a>
@@ -50,6 +50,8 @@
             <label><input type="radio" name="type" value="meal" checked> Meal</label>
             <label><input type="radio" name="type" value="pot"> Pot</label>
             <label><input type="radio" name="type" value="settle"> Transfer</label>
+            <label><input type="radio" name="type" value="tax"> Tax</label>
+            <label><input type="radio" name="type" value="tip"> Tip</label>
           </div>
           <p id="typeHelp" class="help">Someone paid for food. The bill is split across the people who joined.</p>
 
@@ -87,6 +89,12 @@
             <h3>Who paid?</h3>
             <div id="paymentRows"></div>
             <button id="addPayer" class="button ghost small" type="button">Add another payer</button>
+          </div>
+
+          <div id="chargeFields" hidden>
+            <h3>Who is charged?</h3>
+            <p class="help">Type an amount only for the people who should pay. Each amount comes off that wallet.</p>
+            <div id="chargeGrid" class="amount-grid"></div>
           </div>
 
           <div id="potFields" hidden>

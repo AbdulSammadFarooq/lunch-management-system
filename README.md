@@ -28,6 +28,8 @@ A person's wallet moves by **what they paid minus their share**.
 
 **Transfer.** Cash moved between people and it was not food. Wallets change the same way as a meal, but it is left out of each person's food total.
 
+**Tax and tip.** Choose Tax or Tip, then type an amount next to each person who should pay it. That amount comes off their wallet. It is not counted as food, and it does not change the pot. The shared page shows this month's tax total and tip total, and keeps both totals for every month.
+
 The pot for a month starts with money collected, plus anything left from last month. It goes down by what everyone except the budget person ate. That person's own food is not taken out of the pot.
 
 **Opening balance** is the wallet before the first entry in this file.
