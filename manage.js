@@ -315,7 +315,7 @@ function updatePreview() {
     ${described.warning ? `<p class="form-error">${escapeHtml(described.warning)}</p>` : ""}
     <div class="table-wrap">
       <table>
-        <thead><tr><th>Person</th><th>Paid</th><th>Share</th><th>This entry</th></tr></thead>
+        <thead><tr><th>Person</th><th class="num">Paid</th><th class="num">Share</th><th class="num">This entry</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
     </div>

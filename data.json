@@ -2492,6 +2492,35 @@
           "amount": 6000
         }
       ]
+    },
+    {
+      "id": "e102",
+      "date": "2026-11-10",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 100
+        }
+      ]
+    },
+    {
+      "id": "e103",
+      "date": "2026-11-10",
+      "title": "Funding",
+      "type": "pot",
+      "heldBy": 1,
+      "paid": [
+        {
+          "personId": 4,
+          "amount": 4500
+        }
+      ]
     }
   ]
 }

@@ -181,7 +181,10 @@ function renderMonth() {
         ` : ""}
       </div>
       <dl class="hero-facts">
-        <div><dt>Added this month</dt><dd>${money(current.collected)}</dd></div>
+        <button class="fact-button" type="button" data-open-pot="${escapeHtml(current.key)}">
+          <span class="fact-label">Added this month</span>
+          <strong>${money(current.collected)}</strong>
+        </button>
         <div><dt>From last month</dt><dd>${carried}</dd></div>
         <div><dt>Other people's lunches</dt><dd>${money(current.groupSpend)}</dd></div>
       </dl>
@@ -453,6 +456,53 @@ function renderLevies() {
   `;
 }
 
+function openPot(monthKey) {
+  const month = view.months.find((item) => item.key === monthKey) || view.current;
+  const rows = [];
+  for (const effect of view.effects) {
+    if (effect.entry.type !== "pot") continue;
+    if (LunchLedger.monthKey(effect.entry.date) !== monthKey) continue;
+    for (const [personId, amount] of effect.paid) {
+      if (!amount) continue;
+      rows.push({
+        date: effect.entry.date,
+        title: effect.entry.title,
+        personId,
+        amount
+      });
+    }
+  }
+  rows.sort((a, b) => b.date.localeCompare(a.date) || personName(a.personId).localeCompare(personName(b.personId)));
+
+  const totals = new Map();
+  for (const row of rows) totals.set(row.personId, (totals.get(row.personId) || 0) + row.amount);
+  const people = [...totals.entries()].sort((a, b) => b[1] - a[1]);
+
+  $("potTitle").textContent = month.label || LunchLedger.monthLabel(monthKey);
+  $("potMath").textContent = rows.length
+    ? `${money(month.collected || 0)} was put into the pot.`
+    : "Nobody has put money into the pot this month.";
+  $("potSummary").innerHTML = people.map(([personId, amount]) => `
+    <div><span>${escapeHtml(personName(personId))}</span><strong>${money(amount)}</strong></div>
+  `).join("");
+  $("potRows").innerHTML = rows.map((row) => `
+    <tr>
+      <td data-label="Date">${dateLabel(row.date)}</td>
+      <td data-label="Entry">${escapeHtml(row.title)}</td>
+      <td data-label="Person">${escapeHtml(personName(row.personId))}</td>
+      <td class="num" data-label="Amount">${money(row.amount)}</td>
+    </tr>
+  `).join("") || `<tr><td colspan="4">No contributions yet.</td></tr>`;
+
+  closePerson();
+  $("potModal").hidden = false;
+  $("closePot").focus();
+}
+
+function closePot() {
+  $("potModal").hidden = true;
+}
+
 function openPerson(personId) {
   const person = view.people.find((item) => item.id === personId);
   if (!person) return;
@@ -491,6 +541,7 @@ function openPerson(personId) {
     </tr>
   `).join("") || `<tr><td colspan="5">No entries yet.</td></tr>`;
 
+  closePot();
   const modal = $("personModal");
   modal.hidden = false;
   $("closePerson").focus();
@@ -504,6 +555,8 @@ function bindPage() {
   document.body.addEventListener("click", (event) => {
     const trigger = event.target.closest("[data-open-person]");
     if (trigger) openPerson(Number(trigger.dataset.openPerson));
+    const pot = event.target.closest("[data-open-pot]");
+    if (pot) openPot(pot.dataset.openPot);
     if (event.target.id === "showOlder") {
       showAllActivity = true;
       renderActivity();
@@ -511,11 +564,17 @@ function bindPage() {
   });
 
   $("closePerson").addEventListener("click", closePerson);
+  $("closePot").addEventListener("click", closePot);
   $("personModal").addEventListener("click", (event) => {
     if (event.target === $("personModal")) closePerson();
   });
+  $("potModal").addEventListener("click", (event) => {
+    if (event.target === $("potModal")) closePot();
+  });
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !$("personModal").hidden) closePerson();
+    if (event.key !== "Escape") return;
+    if (!$("potModal").hidden) closePot();
+    else if (!$("personModal").hidden) closePerson();
   });
 }
 

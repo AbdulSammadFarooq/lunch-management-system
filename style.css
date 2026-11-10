@@ -289,6 +289,7 @@ th {
   color: var(--muted);
 }
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+table .num { width: 1%; }
 .positive { color: var(--ahead); font-weight: 700; }
 .negative { color: var(--owes); font-weight: 700; }
 .table-wrap { overflow-x: auto; }
@@ -514,7 +515,7 @@ input, select, .search {
     color: var(--muted);
     font-weight: 600;
   }
-  .num { text-align: right; }
+  table td.num { width: auto; text-align: right; }
 }
 
 /* Public book. The manage page does not use these. */
@@ -593,10 +594,38 @@ html[data-theme="dark"] body.book {
 .book .hero .bar span { background: #f0c14a; }
 .book .hero .bar.is-over span { background: #ff8d7a; }
 .book .hero-facts { display: grid; gap: 8px; margin: 0; align-content: end; }
-.book .hero-facts div {
+.book .hero-facts div,
+.book .hero-facts .fact-button {
   padding: 12px 14px;
   border-radius: 16px;
   background: rgba(8, 22, 18, 0.28);
+}
+.book .hero-facts .fact-button {
+  display: block;
+  width: 100%;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.book .hero-facts .fact-button:hover,
+.book .hero-facts .fact-button:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+}
+.book .hero-facts .fact-label {
+  display: block;
+  color: rgba(247, 243, 234, 0.7);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+.book .hero-facts .fact-button strong {
+  display: block;
+  margin-top: 2px;
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  font-weight: 560;
+  letter-spacing: -0.03em;
 }
 .book .hero-facts dt { color: rgba(247, 243, 234, 0.7); font-size: 0.82rem; }
 .book .hero-facts dd {
