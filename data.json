@@ -2521,6 +2521,63 @@
           "amount": 4500
         }
       ]
+    },
+    {
+      "id": "e104",
+      "date": "2026-11-11",
+      "title": "Lunch at Pulao Khana",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 3,
+          "amount": 1400
+        }
+      ]
+    },
+    {
+      "id": "e105",
+      "date": "2026-11-12",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 670
+        }
+      ]
+    },
+    {
+      "id": "e106",
+      "date": "2026-11-12",
+      "title": "Breakfast",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 230
+        }
+      ]
     }
   ]
 }
