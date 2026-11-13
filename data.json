@@ -2598,6 +2598,51 @@
           "amount": 240
         }
       ]
+    },
+    {
+      "id": "e108",
+      "date": "2026-11-13",
+      "title": "Lunch at office",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 530
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 50
+        },
+        {
+          "personId": 2,
+          "amount": 480
+        }
+      ]
+    },
+    {
+      "id": "e109",
+      "date": "2026-11-13",
+      "title": "Friday Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 5,
+          "amount": 2332.5
+        }
+      ]
     }
   ]
 }
