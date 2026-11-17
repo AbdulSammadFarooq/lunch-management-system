@@ -2660,6 +2660,78 @@
           "amount": 140
         }
       ]
+    },
+    {
+      "id": "e111",
+      "date": "2026-11-16",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 3,
+          "amount": 760
+        }
+      ]
+    },
+    {
+      "id": "e112",
+      "date": "2026-11-17",
+      "title": "Breakfast",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        3
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 270
+        }
+      ]
+    },
+    {
+      "id": "e113",
+      "date": "2026-11-17",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 450
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 72
+        },
+        {
+          "personId": 2,
+          "amount": 126
+        },
+        {
+          "personId": 4,
+          "amount": 126
+        },
+        {
+          "personId": 5,
+          "amount": 126
+        }
+      ]
     }
   ]
 }
