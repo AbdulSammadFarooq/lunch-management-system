@@ -2757,7 +2757,7 @@
       "date": "2026-11-18",
       "title": "Lunch",
       "type": "meal",
-      "split": "equal",
+      "split": "custom",
       "members": [
         1,
         2,
@@ -2768,6 +2768,43 @@
         {
           "personId": 1,
           "amount": 270
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 50
+        },
+        {
+          "personId": 2,
+          "amount": 85
+        },
+        {
+          "personId": 4,
+          "amount": 50
+        },
+        {
+          "personId": 5,
+          "amount": 85
+        }
+      ]
+    },
+    {
+      "id": "e116",
+      "date": "2026-11-18",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 250
         }
       ]
     }
