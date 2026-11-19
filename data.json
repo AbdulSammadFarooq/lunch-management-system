@@ -2817,7 +2817,6 @@
       "members": [
         1,
         2,
-        3,
         4,
         5
       ],
@@ -2830,23 +2829,19 @@
       "shares": [
         {
           "personId": 1,
-          "amount": 71
+          "amount": 72
         },
         {
           "personId": 2,
-          "amount": 203
-        },
-        {
-          "personId": 3,
-          "amount": 70
+          "amount": 226
         },
         {
           "personId": 4,
-          "amount": 203
+          "amount": 226
         },
         {
           "personId": 5,
-          "amount": 203
+          "amount": 226
         }
       ]
     }
