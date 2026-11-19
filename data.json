@@ -2844,6 +2844,25 @@
           "amount": 226
         }
       ]
+    },
+    {
+      "id": "e118",
+      "date": "2026-11-19",
+      "title": "Snacks",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 150
+        }
+      ]
     }
   ]
 }
