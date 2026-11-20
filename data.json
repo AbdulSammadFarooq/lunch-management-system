@@ -2863,6 +2863,26 @@
           "amount": 150
         }
       ]
+    },
+    {
+      "id": "e119",
+      "date": "2026-11-20",
+      "title": "Friday lunch at Savour Food",
+      "type": "meal",
+      "split": "equal",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 3561
+        }
+      ]
     }
   ]
 }
