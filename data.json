@@ -2902,6 +2902,48 @@
           "amount": 140
         }
       ]
+    },
+    {
+      "id": "e121",
+      "date": "2026-11-23",
+      "title": "Lunch",
+      "type": "meal",
+      "split": "custom",
+      "members": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "paid": [
+        {
+          "personId": 1,
+          "amount": 500
+        }
+      ],
+      "shares": [
+        {
+          "personId": 1,
+          "amount": 70
+        },
+        {
+          "personId": 2,
+          "amount": 120
+        },
+        {
+          "personId": 3,
+          "amount": 120
+        },
+        {
+          "personId": 4,
+          "amount": 70
+        },
+        {
+          "personId": 5,
+          "amount": 120
+        }
+      ]
     }
   ]
 }
