@@ -1,7 +1,7 @@
 {
-  "name": "lunch-ledger",
+  "name": "lunch-book",
   "private": true,
-  "description": "Shared lunch expenses. Run npm start to update the book on this computer.",
+  "description": "Shared office lunch ledger. Run npm start, open http://127.0.0.1:5501/ to add expenses.",
   "scripts": {
     "start": "node server.js"
   }

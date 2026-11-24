@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "settings": {
+    "currency": "Rs.",
+    "currencyCode": "PKR",
+    "budgetHolder": "sammad",
+    "statsFrom": "2026-09"
+  },
+  "people": [
+    { "id": "sammad", "name": "Abdul Sammad", "openingBalance": -702.43, "active": true },
+    { "id": "wajahat", "name": "Wajahat Hussain", "openingBalance": 446.97, "active": true },
+    { "id": "umair", "name": "Umair Zafar", "openingBalance": -1344.98, "active": true },
+    { "id": "rizwan", "name": "Rizwan Khan", "openingBalance": -1421.15, "active": true },
+    { "id": "junaid", "name": "Muhammad Junaid", "openingBalance": 2535.73, "active": true },
+    { "id": "arslan", "name": "Arslan", "openingBalance": 295.69, "active": false },
+    { "id": "adeel", "name": "Adeel Ahmed", "openingBalance": 190.17, "active": true },
+    { "id": "kashif", "name": "Kashif", "openingBalance": 0, "active": true }
+  ],
+  "months": ["2026-08","2026-09","2026-10","2026-11"]
+}

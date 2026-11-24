@@ -1,603 +1,498 @@
+/*
+ * Lunch book — data model and calculations.
+ * Shared by the browser (window.LunchLedger) and Node (require("./ledger")).
+ *
+ * Files on disk
+ *   data/book.json          settings, people, list of months
+ *   data/months/YYYY-MM.json   every entry of one month, grouped by day
+ *
+ * People are referenced by a short key ("sammad"), never by a number.
+ *
+ * Entry types (one line each in the month file)
+ *   meal      { type, title, paidBy:{key:amt}, for:[keys] }            equal split
+ *             { type, title, paidBy:{key:amt}, shares:{key:amt} }      custom split
+ *   pot       { type, title, heldBy:key, from:{key:amt} }              cash handed to the pot holder
+ *   transfer  { type, title, from:key, to:key, amount }                cash between two people, not food
+ *   tax / tip { type, title, charges:{key:amt} }                       taken off wallets, not food
+ *   Any entry may also have  note: "free text".
+ *
+ * Wallet rule: a wallet moves by (what they paid) − (their share).
+ * Pot rule:    the month's pot falls by everyone's share except the budget holder's own.
+ */
 (function (root, factory) {
   const api = factory();
-  if (typeof module === "object" && module.exports) {
-    module.exports = api;
-  }
-  if (root) {
-    root.LunchLedger = api;
-  }
+  if (typeof module === "object" && module.exports) module.exports = api;
+  if (root) root.LunchLedger = api;
 })(typeof window !== "undefined" ? window : globalThis, function () {
-  // Five kinds of entry:
-  // meal       someone paid a bill and it is split across the people who joined
-  // pot        people hand cash to the person holding the lunch money
-  // settle     cash moved between people and it was not food
-  // tax        an extra charge taken off one or more wallets
-  // tip        a tip taken off one or more wallets
-  //
-  // A wallet moves by: amount they paid minus their share.
-  // Tax and tip are shares with no payment, so the wallet goes down.
-  // They are not food and they do not change the monthly pot.
-  // The monthly pot falls only by everyone except the budget person's share.
-  // That person's own food is counted on both sides, so it does not reduce the pot.
+  const TYPES = ["meal", "pot", "transfer", "tax", "tip"];
+  const EPS = 0.009;
 
-  function roundMoney(value) {
-    return Math.round((Number(value) || 0) * 100) / 100;
-  }
+  /* ---------- small helpers ---------- */
+
+  const round2 = (v) => Math.round((Number(v) || 0) * 100) / 100;
+  const sumValues = (obj) => Object.values(obj || {}).reduce((s, v) => s + (Number(v) || 0), 0);
+  const monthKey = (date) => String(date || "").slice(0, 7);
 
   function formatMoney(value, currency = "Rs.", signed = false) {
     const amount = Number(value) || 0;
-    const body = Math.abs(amount).toLocaleString("en-PK", {
-      maximumFractionDigits: 2
-    });
-    if (!signed) {
-      return `${amount < 0 ? "−" : ""}${currency} ${body}`;
-    }
-    if (amount > 0) return `+${currency} ${body}`;
-    if (amount < 0) return `−${currency} ${body}`;
-    return `${currency} ${body}`;
+    const body = Math.abs(amount).toLocaleString("en-PK", { maximumFractionDigits: 2 });
+    if (Math.abs(amount) < 0.005) return `${currency} 0`;
+    if (signed) return `${amount > 0 ? "+" : "−"}${currency} ${body}`;
+    return `${amount < 0 ? "−" : ""}${currency} ${body}`;
   }
 
-  function monthKey(dateValue) {
-    return String(dateValue || "").slice(0, 7);
-  }
-
-  function monthLabel(key) {
-    const [year, month] = key.split("-").map(Number);
-    return new Date(year, month - 1, 1).toLocaleDateString("en-GB", {
-      month: "long",
+  function monthLabel(key, short = false) {
+    const [y, m] = String(key).split("-").map(Number);
+    if (!y || !m) return key;
+    return new Date(y, m - 1, 1).toLocaleDateString("en-GB", {
+      month: short ? "short" : "long",
       year: "numeric"
     });
   }
 
-  function todayISO() {
-    const date = new Date();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${date.getFullYear()}-${month}-${day}`;
+  function todayISO(d = new Date()) {
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   }
 
-  function peopleById(people) {
-    return new Map((people || []).map((person) => [Number(person.id), person]));
+  function slugify(text) {
+    return String(text || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[^a-z0-9\s-]/g, "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
   }
 
-  function personName(people, personId) {
-    return peopleById(people).get(Number(personId))?.name || "Unknown";
+  const GENERIC = new Set(["muhammad", "mohammad", "muhammed", "abdul", "syed", "m", "mr"]);
+
+  function makePersonKey(name, takenKeys) {
+    const taken = new Set(takenKeys || []);
+    const words = slugify(name);
+    const candidates = [];
+    const specific = words.filter((w) => !GENERIC.has(w));
+    if (specific[0]) candidates.push(specific[0]);
+    if (words[0]) candidates.push(words[0]);
+    if (words.length > 1) candidates.push(words.join("-"));
+    for (const c of candidates) if (c && !taken.has(c)) return c;
+    const base = candidates[0] || "person";
+    let n = 2;
+    while (taken.has(`${base}${n}`)) n++;
+    return `${base}${n}`;
   }
 
-  function totalOf(entry) {
-    return (entry.paid || []).reduce(
-      (sum, payment) => sum + (Number(payment.amount) || 0),
-      0
-    );
+  /* ---------- entry → wallet effect ---------- */
+
+  function toMap(obj) {
+    const map = new Map();
+    for (const [k, v] of Object.entries(obj || {})) map.set(k, (map.get(k) || 0) + (Number(v) || 0));
+    return map;
   }
 
-  function paidMap(entry) {
-    const paid = new Map();
-    for (const payment of entry.paid || []) {
-      const personId = Number(payment.personId);
-      const amount = Number(payment.amount) || 0;
-      paid.set(personId, (paid.get(personId) || 0) + amount);
-    }
-    return paid;
-  }
-
-  function chargeMap(entry) {
-    const charges = new Map();
-    for (const charge of entry.charges || []) {
-      const personId = Number(charge.personId);
-      const amount = Number(charge.amount) || 0;
-      if (!personId || amount === 0) continue;
-      charges.set(personId, (charges.get(personId) || 0) + amount);
-    }
-    return charges;
-  }
-
-  function shareMap(entry) {
-    const shares = new Map();
-    if (entry.type === "tax" || entry.type === "tip") return chargeMap(entry);
-    if (entry.type === "pot") {
-      shares.set(Number(entry.heldBy), totalOf(entry));
-      return shares;
-    }
-
-    const members = (entry.members || []).map(Number);
-    if (entry.split === "custom") {
-      for (const share of entry.shares || []) {
-        shares.set(Number(share.personId), Number(share.amount) || 0);
+  function effectOf(entry) {
+    let paid = new Map();
+    let shares = new Map();
+    switch (entry.type) {
+      case "meal": {
+        paid = toMap(entry.paidBy);
+        if (entry.shares) {
+          shares = toMap(entry.shares);
+        } else {
+          const members = entry.for || [];
+          const total = sumValues(entry.paidBy);
+          const each = members.length ? total / members.length : 0;
+          for (const k of members) shares.set(k, each);
+        }
+        break;
       }
-      for (const personId of members) {
-        if (!shares.has(personId)) shares.set(personId, 0);
-      }
-      return shares;
+      case "pot":
+        paid = toMap(entry.from);
+        shares.set(entry.heldBy, sumValues(entry.from));
+        break;
+      case "transfer":
+        paid.set(entry.from, Number(entry.amount) || 0);
+        shares.set(entry.to, (shares.get(entry.to) || 0) + (Number(entry.amount) || 0));
+        break;
+      case "tax":
+      case "tip":
+        shares = toMap(entry.charges);
+        break;
     }
-
-    const each = members.length ? totalOf(entry) / members.length : 0;
-    for (const personId of members) shares.set(personId, each);
-    return shares;
-  }
-
-  function entryEffect(entry) {
-    const paid = entry.type === "tax" || entry.type === "tip" ? new Map() : paidMap(entry);
-    const shares = shareMap(entry);
     const changes = new Map();
-    const personIds = new Set([...paid.keys(), ...shares.keys()]);
-    let total = 0;
-
-    for (const personId of personIds) {
-      const paidAmount = paid.get(personId) || 0;
-      const shareAmount = shares.get(personId) || 0;
-      changes.set(personId, paidAmount - shareAmount);
-      total += entry.type === "tax" || entry.type === "tip" ? shareAmount : paidAmount;
+    for (const k of new Set([...paid.keys(), ...shares.keys()])) {
+      changes.set(k, (paid.get(k) || 0) - (shares.get(k) || 0));
     }
-
-    if (entry.type !== "tax" && entry.type !== "tip") total = totalOf(entry);
-
-    return { entry, total, paid, shares, changes };
+    const paidTotal = [...paid.values()].reduce((a, b) => a + b, 0);
+    const shareTotal = [...shares.values()].reduce((a, b) => a + b, 0);
+    const total = entry.type === "tax" || entry.type === "tip" ? shareTotal : paidTotal;
+    return { entry, paid, shares, changes, total, paidTotal, shareTotal };
   }
 
-  function describeEntry(entry, people, currency) {
-    const effect = entryEffect(entry);
-    const name = (personId) => personName(people, personId);
-    const rows = [...effect.changes.keys()]
-      .map((personId) => ({
-        personId,
-        name: name(personId),
-        paid: effect.paid.get(personId) || 0,
-        share: effect.shares.get(personId) || 0,
-        change: effect.changes.get(personId) || 0
-      }))
-      .filter((row) => row.paid !== 0 || row.share !== 0)
-      .sort((a, b) => a.name.localeCompare(b.name));
-
-    let summary = "";
-    let warning = "";
-
-    if (entry.type === "pot") {
-      summary = `${formatMoney(effect.total, currency)} goes into the pot held by ${name(entry.heldBy)}. People who put money in go ahead by that amount. ${name(entry.heldBy)} goes down by the total, because they are holding the cash.`;
-    } else if (entry.type === "tax" || entry.type === "tip") {
-      const word = entry.type === "tax" ? "Tax" : "A tip";
-      const who = rows.map((row) => `${row.name} ${formatMoney(row.share, currency)}`).join(", ");
-      summary = `${word} of ${formatMoney(effect.total, currency)} comes off the wallet${rows.length === 1 ? "" : "s"}: ${who}. This is not food and the pot does not change.`;
-    } else if (entry.split === "custom") {
-      const shareSum = [...effect.shares.values()].reduce((sum, amount) => sum + amount, 0);
-      summary = `${formatMoney(effect.total, currency)} was paid. Each person is charged the share you entered.`;
-      if (Math.abs(shareSum - effect.total) > 0.009) {
-        warning = `Shares add up to ${formatMoney(shareSum, currency)}, but the payments add up to ${formatMoney(effect.total, currency)}. Wallets follow the shares.`;
+  /** How an entry moves the real cash in the holder's pot. `ef` is effectOf(entry). */
+  function potFlow(ef, holder) {
+    const e = ef.entry;
+    const out = { potChange: 0, fromPot: 0, outside: 0, outsideBy: new Map(), holderSelf: 0 };
+    if (e.type === "pot" && e.heldBy === holder) out.potChange = ef.total;
+    if (e.type === "meal") {
+      const ph = ef.paid.get(holder) || 0;
+      const sh = ef.shares.get(holder) || 0;
+      out.fromPot = Math.max(0, ph - sh);
+      out.potChange = -out.fromPot;
+      out.holderSelf = Math.min(ph, sh);
+      for (const [k, v] of ef.paid) {
+        if (k === holder) continue;
+        out.outside += v;
+        out.outsideBy.set(k, (out.outsideBy.get(k) || 0) + v);
       }
-    } else {
-      const count = (entry.members || []).length;
-      const each = count ? effect.total / count : 0;
-      summary = `${count} ${count === 1 ? "person splits" : "people split"} ${formatMoney(effect.total, currency)}. Each share is ${formatMoney(each, currency)}. Whoever paid goes ahead; everyone else owes their share.`;
     }
-
-    if (entry.type === "settle") {
-      summary += " This is a transfer, so it is not counted as food.";
+    if (e.type === "transfer") {
+      if (e.from === holder) out.potChange -= ef.total;
+      if (e.to === holder) out.potChange += ef.total;
     }
-
-    return { ...effect, rows, summary, warning };
+    return out;
   }
 
-  function compute(ledger) {
+  /** People who took part in an entry (for search, chips, filters). */
+  function participants(entry) {
+    const e = effectOf(entry);
+    return [...new Set([...e.paid.keys(), ...e.shares.keys()])];
+  }
+
+  /* ---------- main calculation ---------- */
+
+  function compute(ledger, now = new Date()) {
     const settings = ledger.settings || {};
     const currency = settings.currency || "Rs.";
-    const budgetPersonId = Number(settings.budgetPersonId);
+    const holder = settings.budgetHolder;
     const people = ledger.people || [];
-    const entries = [...(ledger.entries || [])].sort((a, b) =>
-      String(a.date).localeCompare(String(b.date))
+    const byKey = new Map(people.map((p) => [p.id, p]));
+    const entries = [...(ledger.entries || [])].sort(
+      (a, b) => a.date.localeCompare(b.date) || (a.seq || 0) - (b.seq || 0)
     );
-    const effects = entries.map(entryEffect);
-    const balances = new Map(
-      people.map((person) => [Number(person.id), Number(person.openingBalance) || 0])
-    );
+    const effects = entries.map(effectOf);
 
-    for (const effect of effects) {
-      for (const person of people) {
-        const change = effect.changes.get(Number(person.id)) || 0;
-        balances.set(Number(person.id), (balances.get(Number(person.id)) || 0) + change);
+    const balances = new Map(people.map((p) => [p.id, Number(p.openingBalance) || 0]));
+    const history = new Map(people.map((p) => [p.id, []]));
+    for (const ef of effects) {
+      for (const [k, change] of ef.changes) {
+        if (!balances.has(k)) continue;
+        const next = balances.get(k) + change;
+        balances.set(k, next);
+        history.get(k).push({ effect: ef, change, balance: next });
       }
     }
 
     const months = new Map();
-    const foodByMonth = new Map();
-
-    function ensureMonth(key) {
+    const ensure = (key) => {
       if (!months.has(key)) {
         months.set(key, {
-          key,
-          label: monthLabel(key),
-          collected: 0,
-          ownShare: 0,
-          consumed: 0,
-          tax: 0,
-          tip: 0,
-          taxByPerson: new Map(),
-          tipByPerson: new Map()
+          key, label: monthLabel(key), collected: 0, ownShare: 0, consumed: 0,
+          food: 0, tax: 0, tip: 0, entryCount: 0,
+          foodBy: new Map(), taxBy: new Map(), tipBy: new Map(), collectedBy: new Map(),
+          paidBy: new Map(), days: new Set(),
+          // real cash in the pot held by the budget holder
+          potIn: 0, potOut: 0, mealFromPot: 0, outside: 0, outsideBy: new Map(), holderSelf: 0
         });
       }
       return months.get(key);
-    }
+    };
 
-    for (const effect of effects) {
-      const key = monthKey(effect.entry.date);
-      const bucket = ensureMonth(key);
+    for (const ef of effects) {
+      const m = ensure(monthKey(ef.entry.date));
+      m.entryCount++;
+      const t = ef.entry.type;
 
-      if (effect.entry.type === "pot") {
-        bucket.collected += effect.total;
+      // Pot cash flow: only money that really passes through the holder's hands.
+      //  pot money given to the holder  -> into the pot
+      //  holder pays a bill             -> out of the pot, except the holder's own share (he pays that himself)
+      //  someone else pays a bill       -> NOT from the pot ("outside the pot"), it goes to their wallet
+      //  transfers to / from the holder -> into / out of the pot
+      Object.assign(ef, potFlow(ef, holder));
+      m.holderSelf += ef.holderSelf;
+      m.mealFromPot += ef.fromPot;
+      m.outside += ef.outside;
+      for (const [k, v] of ef.outsideBy) m.outsideBy.set(k, (m.outsideBy.get(k) || 0) + v);
+      if (ef.potChange > 0) m.potIn += ef.potChange;
+      else m.potOut -= ef.potChange;
+
+      if (t === "pot") {
+        m.collected += ef.total;
+        for (const [k, v] of ef.paid) m.collectedBy.set(k, (m.collectedBy.get(k) || 0) + v);
         continue;
       }
-
-      if (effect.entry.type === "tax" || effect.entry.type === "tip") {
-        const field = effect.entry.type;
-        const byPerson = field === "tax" ? bucket.taxByPerson : bucket.tipByPerson;
-        bucket[field] += effect.total;
-        for (const [personId, amount] of effect.shares) {
-          byPerson.set(personId, (byPerson.get(personId) || 0) + amount);
-        }
+      if (t === "tax" || t === "tip") {
+        m[t] += ef.total;
+        const by = t === "tax" ? m.taxBy : m.tipBy;
+        for (const [k, v] of ef.shares) by.set(k, (by.get(k) || 0) + v);
         continue;
       }
-
-      let consumed = 0;
-      for (const amount of effect.shares.values()) consumed += amount;
-      bucket.consumed += consumed;
-      bucket.ownShare += effect.shares.get(budgetPersonId) || 0;
-
-      if (effect.entry.type !== "settle") {
-        if (!foodByMonth.has(key)) foodByMonth.set(key, new Map());
-        const food = foodByMonth.get(key);
-        for (const [personId, amount] of effect.shares) {
-          food.set(personId, (food.get(personId) || 0) + amount);
-        }
+      // meals and transfers both draw on the pot (same rule as the original book)
+      m.consumed += ef.shareTotal;
+      m.ownShare += ef.shares.get(holder) || 0;
+      if (t === "meal") {
+        m.food += ef.shareTotal;
+        m.days.add(ef.entry.date);
+        for (const [k, v] of ef.shares) m.foodBy.set(k, (m.foodBy.get(k) || 0) + v);
+        for (const [k, v] of ef.paid) m.paidBy.set(k, (m.paidBy.get(k) || 0) + v);
       }
     }
 
-    const currentKey = monthKey(todayISO());
-    ensureMonth(currentKey);
+    const currentKey = monthKey(todayISO(now));
+    ensure(currentKey);
 
-    const firstPot = effects.find((effect) => effect.entry.type === "pot");
-    const rolloverStart = firstPot ? monthKey(firstPot.entry.date) : "";
+    const firstPot = effects.find((ef) => ef.entry.type === "pot");
+    const rolloverFrom = firstPot ? monthKey(firstPot.entry.date) : "";
     let carried = 0;
-
+    let potCarry = 0;
     const monthList = [...months.values()].sort((a, b) => a.key.localeCompare(b.key));
-    for (const month of monthList) {
-      month.carriedIn = 0;
-      month.budget = month.collected + month.ownShare;
-      month.groupSpend = month.consumed - month.ownShare;
-      if (rolloverStart && month.key >= rolloverStart) {
-        month.carriedIn = carried;
-        month.budget += carried;
-        carried = month.budget - month.consumed;
+    for (const m of monthList) {
+      m.potTracked = !!rolloverFrom && m.key >= rolloverFrom;
+      m.potCarried = m.potTracked ? potCarry : 0;
+      m.potLeft = m.potCarried + m.potIn - m.potOut;
+      if (m.potTracked) potCarry = m.potLeft;
+      m.totalFood = m.food;
+      m.carriedIn = 0;
+      m.budget = m.collected + m.ownShare;
+      m.groupSpend = m.consumed - m.ownShare;
+      if (rolloverFrom && m.key >= rolloverFrom) {
+        m.carriedIn = carried;
+        m.budget += carried;
+        carried = m.budget - m.consumed;
       }
-      month.left = month.budget - month.consumed;
-      month.isCurrent = month.key === currentKey;
+      m.available = m.collected + m.carriedIn;
+      m.left = m.budget - m.consumed;
+      m.isCurrent = m.key === currentKey;
+      m.dayCount = m.days.size;
     }
 
+    // typical month of food per person (complete months from statsFrom)
     const statsFrom = settings.statsFrom || "";
-    const averageKeys = monthList
-      .map((month) => month.key)
-      .filter((key) => key >= statsFrom && key < currentKey && foodByMonth.has(key));
-    const keysForAverage = averageKeys.length
-      ? averageKeys
-      : foodByMonth.has(currentKey)
-        ? [currentKey]
-        : [];
-    const averageFood = new Map(people.map((person) => [Number(person.id), 0]));
-
-    for (const key of keysForAverage) {
-      const food = foodByMonth.get(key) || new Map();
-      for (const person of people) {
-        const personId = Number(person.id);
-        averageFood.set(personId, averageFood.get(personId) + (food.get(personId) || 0));
-      }
+    let avgKeys = monthList.filter((m) => m.key >= statsFrom && m.key < currentKey && m.food > 0).map((m) => m.key);
+    const current = monthList.find((m) => m.isCurrent);
+    if (!avgKeys.length && current.food > 0) avgKeys = [currentKey];
+    const averageFood = new Map(people.map((p) => [p.id, 0]));
+    for (const key of avgKeys) {
+      const m = months.get(key);
+      for (const p of people) averageFood.set(p.id, averageFood.get(p.id) + (m.foodBy.get(p.id) || 0) / avgKeys.length);
     }
 
-    if (keysForAverage.length) {
-      for (const person of people) {
-        const personId = Number(person.id);
-        averageFood.set(personId, averageFood.get(personId) / keysForAverage.length);
-      }
-    }
-
-    const spending = effects.filter((effect) =>
-      effect.entry.type !== "pot" && effect.entry.type !== "tax" && effect.entry.type !== "tip"
-    );
-    const dates = [...new Set(spending.map((effect) => effect.entry.date))].sort();
-    const averageIsCurrentOnly =
-      keysForAverage.length === 1 && keysForAverage[0] === currentKey;
-    const averageLabel =
-      keysForAverage.length === 1 ? monthLabel(keysForAverage[0]) : "Usual month";
-    const current = monthList.find((month) => month.isCurrent) || monthList[monthList.length - 1];
-    const now = new Date();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const dayOfMonth = now.getDate();
     const daysLeft = Math.max(daysInMonth - dayOfMonth + 1, 0);
-    const groupPace = dayOfMonth > 0 ? current.groupSpend / dayOfMonth : 0;
+    const pace = dayOfMonth > 0 ? current.potOut / dayOfMonth : 0;
+    const potCash = potCarry;
+    const holderWallet = balances.get(holder) || 0;
+
+    const meals = effects.filter((ef) => ef.entry.type === "meal");
+    const mealDates = [...new Set(meals.map((ef) => ef.entry.date))].sort();
 
     return {
-      settings,
-      currency,
-      budgetPersonId,
-      budgetPersonName: personName(people, budgetPersonId),
-      people,
-      balances,
-      effects,
-      months: monthList,
-      foodByMonth,
-      averageFood,
-      averageMonthCount: keysForAverage.length,
-      averageIsCurrentOnly,
-      averageLabel,
+      settings, currency, holder, holderName: byKey.get(holder)?.name || "—",
+      people, byKey, balances, history, effects,
+      months: monthList, monthMap: months, averageFood, averageMonths: avgKeys.length,
+      averageIsCurrentOnly: avgKeys.length === 1 && avgKeys[0] === currentKey,
       current: {
-        ...current,
-        daysInMonth,
-        dayOfMonth,
-        daysLeft,
-        groupPace,
-        dailyRoom: daysLeft > 0 ? Math.max(current.left, 0) / daysLeft : 0,
-        daysOfPot: groupPace > 0 ? current.left / groupPace : null
+        ...current, daysInMonth, dayOfMonth, daysLeft, pace,
+        dailyRoom: daysLeft > 0 ? Math.max(current.potLeft, 0) / daysLeft : 0,
+        daysOfPot: pace > 0 ? current.potLeft / pace : null
       },
+      // cash the holder is keeping for the group right now, and the holder's own personal wallet
+      potCash,
+      holderPersonal: holderWallet + potCash,
       overall: {
-        spent: spending.reduce((sum, effect) => sum + [...effect.shares.values()].reduce((a, b) => a + b, 0), 0),
-        firstDate: dates[0] || "",
-        lastDate: dates[dates.length - 1] || "",
-        days: dates.length
+        food: meals.reduce((s, ef) => s + ef.shareTotal, 0),
+        meals: meals.length,
+        days: mealDates.length,
+        firstDate: mealDates[0] || "",
+        lastDate: mealDates[mealDates.length - 1] || ""
       },
-      net: [...balances.values()].reduce((sum, amount) => sum + amount, 0)
+      net: [...balances.values()].reduce((a, b) => a + b, 0)
     };
   }
 
-  function cleanPaymentList(payments, knownIds) {
-    const merged = [];
-    const indexByPerson = new Map();
-
-    for (const payment of payments || []) {
-      const personId = Number(payment.personId);
-      const amount = Number(payment.amount);
-      if (!knownIds.has(personId)) {
-        return { error: "A payment names a person who is not in the book." };
-      }
-      if (!Number.isFinite(amount) || amount <= 0) {
-        return { error: "Every payment needs an amount above zero." };
-      }
-      if (indexByPerson.has(personId)) {
-        merged[indexByPerson.get(personId)].amount += amount;
-      } else {
-        indexByPerson.set(personId, merged.length);
-        merged.push({ personId, amount });
-      }
+  /** Fewest cash hand-overs that would bring every active wallet to zero. */
+  function settlePlan(balances, people) {
+    const active = new Set(people.filter((p) => p.active !== false).map((p) => p.id));
+    const debtors = [];
+    const creditors = [];
+    for (const [k, v] of balances) {
+      if (!active.has(k)) continue;
+      const amt = round2(v);
+      if (amt < -0.5) debtors.push({ k, amt: -amt });
+      else if (amt > 0.5) creditors.push({ k, amt });
     }
-
-    if (!merged.length) {
-      return { error: "Add at least one payment." };
+    debtors.sort((a, b) => b.amt - a.amt);
+    creditors.sort((a, b) => b.amt - a.amt);
+    const plan = [];
+    let i = 0;
+    let j = 0;
+    while (i < debtors.length && j < creditors.length) {
+      const pay = Math.min(debtors[i].amt, creditors[j].amt);
+      plan.push({ from: debtors[i].k, to: creditors[j].k, amount: round2(pay) });
+      debtors[i].amt -= pay;
+      creditors[j].amt -= pay;
+      if (debtors[i].amt < 0.5) i++;
+      if (creditors[j].amt < 0.5) j++;
     }
-
-    return { payments: merged };
+    return plan;
   }
 
-  function validate(input) {
-    const errors = [];
-    if (!input || typeof input !== "object" || Array.isArray(input)) {
-      return { ok: false, errors: ["The book must be an object."] };
-    }
+  /* ---------- files <-> in-memory ledger ---------- */
 
-    const sourcePeople = Array.isArray(input.people) ? input.people : [];
-    if (!sourcePeople.length) errors.push("Add at least one person.");
+  const ENTRY_KEY_ORDER = ["type", "title", "paidBy", "for", "shares", "heldBy", "from", "to", "amount", "charges", "note"];
 
-    const people = [];
-    const knownIds = new Set();
+  function cleanEntryForDisk(entry) {
+    const out = {};
+    for (const key of ENTRY_KEY_ORDER) if (entry[key] !== undefined && entry[key] !== "") out[key] = entry[key];
+    return out;
+  }
 
-    for (const person of sourcePeople) {
-      const id = Number(person.id);
-      const name = String(person.name || "").trim();
-      const openingBalance = Number(person.openingBalance);
-      if (!Number.isInteger(id) || id <= 0) {
-        errors.push("Each person needs a positive id.");
-        continue;
-      }
-      if (knownIds.has(id)) {
-        errors.push(`Person id ${id} is used more than once.`);
-        continue;
-      }
-      if (!name) {
-        errors.push("Each person needs a name.");
-        continue;
-      }
-      if (!Number.isFinite(openingBalance)) {
-        errors.push(`${name} needs a numeric opening balance.`);
-        continue;
-      }
-      knownIds.add(id);
-      people.push({
-        id,
-        name,
-        openingBalance,
-        active: person.active !== false
-      });
-    }
-
-    people.sort((a, b) => a.id - b.id);
-
-    const sourceEntries = Array.isArray(input.entries) ? input.entries : [];
+  /** Build the in-memory ledger from book.json + month files. */
+  function assemble(book, monthDocs) {
     const entries = [];
-    const seenEntryIds = new Set();
-
-    sourceEntries.forEach((entry, index) => {
-      const id = String(entry.id || "").trim();
-      const date = String(entry.date || "").trim();
-      const title = String(entry.title || "").trim();
-      const type = entry.type;
-
-      if (!id) {
-        errors.push(`Entry ${index + 1} needs an id.`);
-        return;
-      }
-      if (seenEntryIds.has(id)) {
-        errors.push(`Entry id ${id} is used more than once.`);
-        return;
-      }
-      seenEntryIds.add(id);
-      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-        errors.push(`${title || id} needs a date like 2026-10-30.`);
-        return;
-      }
-      if (!title) {
-        errors.push(`The entry on ${date} needs a name.`);
-        return;
-      }
-      if (!["meal", "pot", "settle", "tax", "tip"].includes(type)) {
-        errors.push(`${title} has an unknown type.`);
-        return;
-      }
-
-      if (type === "tax" || type === "tip") {
-        const charges = [];
-        const seen = new Set();
-        for (const charge of entry.charges || []) {
-          const personId = Number(charge.personId);
-          const amount = Number(charge.amount);
-          if (!knownIds.has(personId)) {
-            errors.push(`${title} names a person who is not in the book.`);
-            return;
-          }
-          if (!Number.isFinite(amount) || amount <= 0) {
-            errors.push(`${title} needs an amount above zero for each person.`);
-            return;
-          }
-          if (seen.has(personId)) {
-            charges.find((item) => item.personId === personId).amount += amount;
-          } else {
-            seen.add(personId);
-            charges.push({ personId, amount });
-          }
+    let seq = 0;
+    const docs = [...monthDocs].sort((a, b) => String(a.month).localeCompare(String(b.month)));
+    for (const doc of docs) {
+      for (const date of Object.keys(doc.days || {}).sort()) {
+        for (const raw of doc.days[date] || []) {
+          entries.push({ ...raw, date, seq: seq++, uid: `u${seq}` });
         }
-        if (!charges.length) {
-          errors.push(`${title} needs at least one person.`);
-          return;
-        }
-        entries.push({ id, date, title, type, charges, order: index });
-        return;
       }
-
-      const paidResult = cleanPaymentList(entry.paid, knownIds);
-      if (paidResult.error) {
-        errors.push(`${title}: ${paidResult.error}`);
-        return;
-      }
-
-      if (type === "pot") {
-        const heldBy = Number(entry.heldBy);
-        if (!knownIds.has(heldBy)) {
-          errors.push(`${title} needs a person who is holding the pot.`);
-          return;
-        }
-        entries.push({
-          id,
-          date,
-          title,
-          type,
-          heldBy,
-          paid: paidResult.payments,
-          order: index
-        });
-        return;
-      }
-
-      const split = entry.split === "custom" ? "custom" : entry.split === "equal" ? "equal" : "";
-      if (!split) {
-        errors.push(`${title} must be an equal split or a custom split.`);
-        return;
-      }
-
-      const members = [];
-      const seenMembers = new Set();
-      for (const memberId of entry.members || []) {
-        const personId = Number(memberId);
-        if (!knownIds.has(personId) || seenMembers.has(personId)) continue;
-        seenMembers.add(personId);
-        members.push(personId);
-      }
-      if (!members.length) {
-        errors.push(`${title} needs at least one person.`);
-        return;
-      }
-
-      const cleaned = {
-        id,
-        date,
-        title,
-        type,
-        split,
-        members,
-        paid: paidResult.payments,
-        order: index
-      };
-
-      if (split === "custom") {
-        const amounts = new Map(
-          (entry.shares || []).map((share) => [Number(share.personId), Number(share.amount)])
-        );
-        const shares = [];
-        for (const personId of members) {
-          const amount = amounts.get(personId);
-          if (!Number.isFinite(amount) || amount < 0) {
-            errors.push(`${title} is missing a share for one of the people.`);
-            return;
-          }
-          shares.push({ personId, amount });
-        }
-        cleaned.shares = shares;
-      }
-
-      entries.push(cleaned);
-    });
-
-    if (errors.length) return { ok: false, errors };
-
-    entries.sort((a, b) => a.date.localeCompare(b.date) || a.order - b.order);
-    for (const entry of entries) delete entry.order;
-
-    const settingsInput = input.settings || {};
-    let budgetPersonId = Number(settingsInput.budgetPersonId);
-    if (!knownIds.has(budgetPersonId)) budgetPersonId = people[0].id;
-
-    const ledger = {
-      settings: {
-        currency: String(settingsInput.currency || "Rs."),
-        currencyCode: String(settingsInput.currencyCode || "PKR"),
-        budgetPersonId,
-        statsFrom: String(settingsInput.statsFrom || "2026-09")
-      },
-      people,
+    }
+    return {
+      settings: { ...(book.settings || {}) },
+      people: (book.people || []).map((p) => ({ ...p })),
       entries
     };
-
-    return { ok: true, errors: [], ledger };
   }
 
-  function nextPersonId(people) {
-    return (people || []).reduce((max, person) => Math.max(max, Number(person.id) || 0), 0) + 1;
+  /** Split an in-memory ledger into the files that live on disk. */
+  function disassemble(ledger) {
+    const sorted = [...ledger.entries].sort((a, b) => a.date.localeCompare(b.date) || (a.seq || 0) - (b.seq || 0));
+    const months = {};
+    for (const e of sorted) {
+      const key = monthKey(e.date);
+      months[key] = months[key] || { month: key, days: {} };
+      (months[key].days[e.date] = months[key].days[e.date] || []).push(cleanEntryForDisk(e));
+    }
+    const book = {
+      version: 2,
+      settings: ledger.settings,
+      people: ledger.people.map((p) => ({ id: p.id, name: p.name, openingBalance: p.openingBalance, active: p.active !== false })),
+      months: Object.keys(months).sort()
+    };
+    return { book, months };
   }
 
-  function nextEntryId(entries) {
-    const max = (entries || []).reduce((current, entry) => {
-      const match = String(entry.id || "").match(/^e(\d+)$/);
-      return match ? Math.max(current, Number(match[1])) : current;
-    }, 0);
-    return `e${max + 1}`;
+  /** Pretty JSON where each entry / person sits on its own line (easy to read and diff). */
+  function inline(value) {
+    if (Array.isArray(value)) return `[${value.map(inline).join(", ")}]`;
+    if (value && typeof value === "object") {
+      const parts = Object.entries(value).map(([k, v]) => `${JSON.stringify(k)}: ${inline(v)}`);
+      return parts.length ? `{ ${parts.join(", ")} }` : "{}";
+    }
+    return JSON.stringify(value);
+  }
+
+  function stringifyMonth(doc) {
+    const days = Object.keys(doc.days).sort().map((date) => {
+      const lines = doc.days[date].map((e) => `      ${inline(e)}`).join(",\n");
+      return `    "${date}": [\n${lines}\n    ]`;
+    });
+    return `{\n  "month": "${doc.month}",\n  "days": {\n${days.join(",\n")}\n  }\n}\n`;
+  }
+
+  function stringifyBook(book) {
+    const people = book.people.map((p) => `    ${inline(p)}`).join(",\n");
+    return `{\n  "version": ${book.version},\n  "settings": ${JSON.stringify(book.settings, null, 2).replace(/\n/g, "\n  ")},\n  "people": [\n${people}\n  ],\n  "months": ${JSON.stringify(book.months)}\n}\n`;
+  }
+
+  /* ---------- validation ---------- */
+
+  function validate(ledger) {
+    const errors = [];
+    const people = [];
+    const keys = new Set();
+    for (const p of ledger.people || []) {
+      const id = String(p.id || "").trim();
+      const name = String(p.name || "").trim();
+      const ob = Number(p.openingBalance);
+      if (!/^[a-z0-9-]+$/.test(id)) { errors.push(`Person "${name || id}" needs a key of lowercase letters/numbers.`); continue; }
+      if (keys.has(id)) { errors.push(`Person key "${id}" is used twice.`); continue; }
+      if (!name) { errors.push(`Person "${id}" needs a name.`); continue; }
+      if (!Number.isFinite(ob)) { errors.push(`${name} needs a numeric opening balance.`); continue; }
+      keys.add(id);
+      people.push({ id, name, openingBalance: ob, active: p.active !== false });
+    }
+    if (!people.length) errors.push("Add at least one person.");
+
+    const known = (k) => keys.has(k);
+    const amountMap = (obj, label, allowZero) => {
+      if (!obj || typeof obj !== "object" || Array.isArray(obj)) return `${label} is missing.`;
+      const ks = Object.keys(obj);
+      if (!ks.length) return `${label} needs at least one person.`;
+      for (const k of ks) {
+        if (!known(k)) return `${label} names "${k}", who is not in the book.`;
+        const v = Number(obj[k]);
+        if (!Number.isFinite(v) || v < 0 || (!allowZero && v === 0)) return `${label} needs amounts above zero.`;
+      }
+      return "";
+    };
+
+    const entries = [];
+    (ledger.entries || []).forEach((e, i) => {
+      const where = `${e.title || "Entry"} on ${e.date || "?"}`;
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(String(e.date))) return errors.push(`Entry ${i + 1} needs a date like 2026-11-24.`);
+      if (!String(e.title || "").trim()) return errors.push(`The entry on ${e.date} needs a title.`);
+      if (!TYPES.includes(e.type)) return errors.push(`${where} has an unknown type "${e.type}".`);
+      let err = "";
+      if (e.type === "meal") {
+        err = amountMap(e.paidBy, "Paid by", false);
+        if (!err && e.shares) err = amountMap(e.shares, "Shares", true);
+        else if (!err && (!Array.isArray(e.for) || !e.for.length)) err = "Pick who ate.";
+        else if (!err && e.for.some((k) => !known(k))) err = "Someone in the list is not in the book.";
+        if (!err && e.shares && e.for) err = "Use either an equal split (for) or custom shares, not both.";
+      } else if (e.type === "pot") {
+        err = known(e.heldBy) ? amountMap(e.from, "Money in", false) : "Pick who holds the pot.";
+      } else if (e.type === "transfer") {
+        if (!known(e.from) || !known(e.to)) err = "Pick who gave and who received.";
+        else if (e.from === e.to) err = "Giver and receiver must be different people.";
+        else if (!(Number(e.amount) > 0)) err = "Amount must be above zero.";
+      } else {
+        err = amountMap(e.charges, "Charges", false);
+      }
+      if (err) return errors.push(`${where}: ${err}`);
+      const clean = { ...cleanEntryForDisk(e), date: e.date, seq: e.seq ?? i, uid: e.uid || `n${i}` };
+      clean.title = String(clean.title).trim();
+      if (clean.note) clean.note = String(clean.note).trim();
+      if (e.type === "meal" && e.for) clean.for = [...new Set(e.for)];
+      if (e.type === "transfer") clean.amount = Number(e.amount);
+      entries.push(clean);
+    });
+
+    const s = ledger.settings || {};
+    const settings = {
+      currency: String(s.currency || "Rs."),
+      currencyCode: String(s.currencyCode || "PKR"),
+      budgetHolder: keys.has(s.budgetHolder) ? s.budgetHolder : people[0]?.id,
+      statsFrom: String(s.statsFrom || "")
+    };
+    if (errors.length) return { ok: false, errors };
+    return { ok: true, errors: [], ledger: { settings, people, entries } };
+  }
+
+  /** Warnings that don't block saving (e.g. custom shares not adding up). */
+  function warningsFor(entry) {
+    if (entry.type === "meal" && entry.shares) {
+      const diff = sumValues(entry.shares) - sumValues(entry.paidBy);
+      if (Math.abs(diff) > 0.5) return [`Shares add up to ${round2(sumValues(entry.shares))} but ${round2(sumValues(entry.paidBy))} was paid (difference ${round2(diff)}).`];
+    }
+    return [];
   }
 
   return {
-    roundMoney,
-    formatMoney,
-    monthKey,
-    monthLabel,
-    todayISO,
-    personName,
-    totalOf,
-    entryEffect,
-    describeEntry,
-    compute,
-    validate,
-    nextPersonId,
-    nextEntryId
+    TYPES, EPS, round2, sumValues, monthKey, monthLabel, todayISO, formatMoney,
+    makePersonKey, effectOf, potFlow, participants, compute, settlePlan,
+    assemble, disassemble, stringifyMonth, stringifyBook, validate, warningsFor
   };
 });

@@ -1,0 +1,86 @@
+{
+  "month": "2026-10",
+  "days": {
+    "2026-10-01": [
+      { "type": "pot", "title": "Funding", "heldBy": "sammad", "from": { "umair": 5000, "wajahat": 5000, "rizwan": 3000, "junaid": 4000 } },
+      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 540 }, "shares": { "sammad": 122.5, "wajahat": 122.5, "umair": 50, "rizwan": 122.5, "junaid": 122.5 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 250 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-02": [
+      { "type": "meal", "title": "Breakfast", "paidBy": { "sammad": 100 }, "for": ["umair"] },
+      { "type": "meal", "title": "Lunch at Savour Food", "paidBy": { "sammad": 3600 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] },
+      { "type": "transfer", "title": "Exchange", "from": "kashif", "to": "sammad", "amount": 400 }
+    ],
+    "2026-10-05": [
+      { "type": "meal", "title": "Lunch (Kbab)", "paidBy": { "sammad": 1610 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-06": [
+      { "type": "meal", "title": "Lunch at Pulao Khana", "paidBy": { "sammad": 1190 }, "for": ["sammad", "wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-07": [
+      { "type": "transfer", "title": "Exchange", "from": "sammad", "to": "umair", "amount": 200 }
+    ],
+    "2026-10-08": [
+      { "type": "meal", "title": "Lunch Rasheed Sweets", "paidBy": { "sammad": 1970 }, "for": ["sammad", "wajahat", "rizwan", "junaid"] }
+    ],
+    "2026-10-09": [
+      { "type": "meal", "title": "Friday Lunch (Pulao Khana)", "paidBy": { "sammad": 1800 }, "for": ["sammad", "wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-12": [
+      { "type": "meal", "title": "Lunch at office", "paidBy": { "sammad": 570 }, "shares": { "sammad": 102.5, "wajahat": 102.5, "umair": 160, "rizwan": 102.5, "junaid": 102.5 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 200 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-13": [
+      { "type": "meal", "title": "Lunch at Quetta Chinar", "paidBy": { "sammad": 930 }, "for": ["sammad", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-14": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 470 }, "shares": { "wajahat": 136.66, "umair": 60, "rizwan": 136.66, "junaid": 136.66 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 230 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-15": [
+      { "type": "meal", "title": "Lunch at Pulao Khana", "paidBy": { "sammad": 1460 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 210 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-16": [
+      { "type": "meal", "title": "Lunch at Pulao Khana", "paidBy": { "sammad": 1620 }, "shares": { "sammad": 620, "wajahat": 570, "umair": 430 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 160 }, "shares": { "wajahat": 80, "umair": 40, "rizwan": 40 } }
+    ],
+    "2026-10-19": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 280 }, "for": ["rizwan", "junaid"] },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 200 }, "for": ["sammad", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-20": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 835 }, "shares": { "sammad": 60, "wajahat": 258.75, "umair": 258.75, "junaid": 258.75 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "junaid": 200 }, "for": ["sammad", "wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-21": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 125 }, "for": ["wajahat", "umair", "junaid"] },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 200 }, "for": ["sammad", "wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-22": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 660 }, "shares": { "sammad": 60, "wajahat": 150, "umair": 150, "rizwan": 150, "junaid": 150 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 160 }, "for": ["wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-23": [
+      { "type": "meal", "title": "Lunch at Eat and Spicy", "paidBy": { "sammad": 2850 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-26": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "junaid": 680 }, "for": ["rizwan", "junaid"] }
+    ],
+    "2026-10-27": [
+      { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 860 }, "shares": { "sammad": 102.5, "wajahat": 327.5, "rizwan": 102.5, "junaid": 327.5 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 210 }, "for": ["sammad", "wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-28": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 400 }, "for": ["sammad", "wajahat", "umair", "junaid"] },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 120 }, "for": ["wajahat", "umair", "junaid"] }
+    ],
+    "2026-10-29": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 310 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 400 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-10-30": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "junaid": 3561 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
+    ]
+  }
+}

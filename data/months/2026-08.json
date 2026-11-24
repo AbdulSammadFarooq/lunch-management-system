@@ -1,0 +1,14 @@
+{
+  "month": "2026-08",
+  "days": {
+    "2026-08-28": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 3528 }, "shares": { "sammad": 882.37, "wajahat": 881.875, "umair": 881.875, "junaid": 881.875 } },
+      { "type": "meal", "title": "French Fries (PWD)", "paidBy": { "umair": 700 }, "for": ["sammad", "umair", "junaid"] }
+    ],
+    "2026-08-31": [
+      { "type": "meal", "title": "Lunch", "paidBy": { "rizwan": 430 }, "shares": { "arslan": 50, "sammad": 95, "umair": 95, "junaid": 95, "rizwan": 95 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "junaid": 200 }, "shares": { "sammad": 50, "wajahat": 50, "umair": 50, "arslan": 50, "junaid": 0 } },
+      { "type": "transfer", "title": "Exchange", "from": "sammad", "to": "arslan", "amount": 195.69 }
+    ]
+  }
+}

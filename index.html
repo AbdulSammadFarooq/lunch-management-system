@@ -2,93 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta id="themeColor" name="theme-color" content="#f3eee4">
-  <title>Lunch book</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta id="themeColor" name="theme-color" content="#0e1014">
+  <title>Lunch Book</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ff7a45' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 11h18a9 9 0 0 1-18 0z'/%3E%3Cpath d='M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5'/%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,560;9..144,650&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
   <script>
     try {
-      if (localStorage.getItem("theme") === "dark") {
-        document.documentElement.setAttribute("data-theme", "dark");
-      }
-    } catch (error) {}
+      const t = localStorage.getItem("theme");
+      if (t) document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
   </script>
 </head>
-<body class="book">
-  <div class="app">
-    <header class="topbar">
-      <div>
-        <p class="eyebrow">Lunch book</p>
-        <h1>Who owes what</h1>
-        <p class="lede">Ahead means the group owes them. Owes means they still need to pay in.</p>
-      </div>
-      <div class="header-actions">
-        <a id="manageLink" class="button" href="manage.html" hidden>Update the book</a>
-        <button id="themeToggle" class="button ghost" type="button">Dark</button>
-      </div>
-    </header>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-logo" viewBox="0 0 24 24"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7c0-1.5 1-2 1-3.5M12 7c0-1.5 1-2 1-3.5M16 7c0-1.5 1-2 1-3.5"/></symbol>
+      <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+      <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></symbol>
+      <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="4"/><path d="M2 21c0-4 3-7 7-7s7 3 7 7"/><path d="M16 4a4 4 0 0 1 0 8M22 21c0-3-2-5.5-4.5-6.5"/></symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4.5" width="18" height="16.5" rx="3"/><path d="M8 2.5v4M16 2.5v4M3 10h18"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="i-meal" viewBox="0 0 24 24"><path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2M18 22V2c-2.5 1.5-4 5-4 9h4"/></symbol>
+      <symbol id="i-pot" viewBox="0 0 24 24"><path d="M4 7.5V6a2 2 0 0 1 2-2h11v3.5"/><rect x="3" y="7.5" width="18" height="13" rx="2.5"/><circle cx="16.5" cy="14" r="1.4"/></symbol>
+      <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M4 8h15l-4-4M20 16H5l4 4"/></symbol>
+      <symbol id="i-tax" viewBox="0 0 24 24"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"/><path d="M9 8h6M9 12h6"/></symbol>
+      <symbol id="i-tip" viewBox="0 0 24 24"><path d="M12 21s-8-4.8-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6.2-8 11-8 11z"/></symbol>
+      <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+      <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+      <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></symbol>
+      <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
+      <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></symbol>
+      <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 15h10l1-15"/></symbol>
+      <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+      <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 21h16"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></symbol>
+      <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+    </defs>
+  </svg>
 
-    <main>
-      <p id="loading" class="loading">Loading the book…</p>
-      <section id="month"></section>
-      <section id="levies"></section>
-      <section id="wallets"></section>
-      <section id="latest"></section>
-      <section id="activity" hidden></section>
-      <section id="months"></section>
-      <footer class="foot">This page only shows the book. Tap a name to see how their number was worked out.</footer>
-    </main>
-  </div>
+  <div class="bg" aria-hidden="true"><span></span><span></span><span></span></div>
 
-  <div id="potModal" class="modal" hidden>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="potTitle">
-      <button id="closePot" class="icon-button" type="button" aria-label="Close">×</button>
-      <p class="eyebrow">Who put money in</p>
-      <h2 id="potTitle">This month</h2>
-      <p id="potMath" class="lede"></p>
-      <div id="potSummary" class="summary-row"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Entry</th>
-              <th>Person</th>
-              <th class="num">Amount</th>
-            </tr>
-          </thead>
-          <tbody id="potRows"></tbody>
-        </table>
-      </div>
+  <header class="topbar">
+    <a class="brand" href="#overview">
+      <span class="brand-mark"><svg class="ic"><use href="#i-logo"/></svg></span>
+      <span class="brand-text"><strong>Lunch Book</strong><small id="brandSub">Office lunch ledger</small></span>
+    </a>
+    <nav class="tabs" id="tabs" aria-label="Sections">
+      <a href="#overview" data-tab="overview"><svg class="ic"><use href="#i-home"/></svg><span>Overview</span></a>
+      <a href="#activity" data-tab="activity"><svg class="ic"><use href="#i-list"/></svg><span>Activity</span></a>
+      <a href="#people" data-tab="people"><svg class="ic"><use href="#i-users"/></svg><span>People</span></a>
+      <a href="#months" data-tab="months"><svg class="ic"><use href="#i-calendar"/></svg><span>Months</span></a>
+      <i class="tab-ink" id="tabInk"></i>
+    </nav>
+    <div class="top-actions">
+      <span id="modePill" class="pill mode" hidden></span>
+      <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle theme"><svg class="ic"><use href="#i-moon"/></svg></button>
+      <button id="addBtn" class="btn primary add-top" type="button" hidden><svg class="ic"><use href="#i-plus"/></svg><span>Add expense</span></button>
     </div>
+  </header>
+
+  <main id="main" class="main">
+    <div id="loading" class="loading">
+      <div class="skeleton hero-skel"></div>
+      <div class="skeleton-row"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    </div>
+    <section id="view-overview" class="view" hidden></section>
+    <section id="view-activity" class="view" hidden></section>
+    <section id="view-people" class="view" hidden></section>
+    <section id="view-months" class="view" hidden></section>
+  </main>
+
+  <button id="fab" class="fab" type="button" aria-label="Add expense" hidden><svg class="ic"><use href="#i-plus"/></svg></button>
+
+  <!-- Add / edit entry -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <form id="entryForm" class="sheet-panel" novalidate autocomplete="off">
+      <header class="sheet-head">
+        <div>
+          <p class="eyebrow" id="sheetEyebrow">New entry</p>
+          <h2 id="sheetTitle">Add expense</h2>
+        </div>
+        <button class="icon-btn" type="button" data-close aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button>
+      </header>
+      <div class="sheet-body" id="sheetBody"></div>
+      <footer class="sheet-foot">
+        <p id="formError" class="form-error" role="alert" hidden></p>
+        <div class="foot-row">
+          <span class="kbd-hint">Ctrl + Enter to save</span>
+          <button id="saveAnother" class="btn ghost" type="button">Save &amp; add another</button>
+          <button id="saveBtn" class="btn primary" type="submit"><svg class="ic"><use href="#i-check"/></svg><span>Save</span></button>
+        </div>
+      </footer>
+    </form>
   </div>
 
-  <div id="personModal" class="modal" hidden>
-    <div class="dialog" role="dialog" aria-modal="true" aria-labelledby="personTitle">
-      <button id="closePerson" class="icon-button" type="button" aria-label="Close">×</button>
-      <p class="eyebrow">Wallet</p>
-      <h2 id="personTitle">Person</h2>
-      <p id="personMath" class="lede"></p>
-      <div id="personSummary" class="summary-row"></div>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Entry</th>
-              <th class="num">Paid</th>
-              <th class="num">Share</th>
-              <th class="num">Change</th>
-            </tr>
-          </thead>
-          <tbody id="personRows"></tbody>
-        </table>
-      </div>
-    </div>
+  <!-- Side drawer for person / month details -->
+  <div id="drawer" class="drawer" hidden>
+    <div class="sheet-backdrop" data-close-drawer></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true">
+      <button class="icon-btn drawer-close" type="button" data-close-drawer aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button>
+      <div id="drawerBody"></div>
+    </aside>
   </div>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
 
   <script src="ledger.js"></script>
   <script src="app.js"></script>
