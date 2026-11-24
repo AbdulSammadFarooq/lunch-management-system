@@ -63,7 +63,8 @@
       { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 290 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] }
     ],
     "2026-11-24": [
-      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 310 }, "shares": { "sammad": 95, "umair": 60, "rizwan": 60, "junaid": 95 } }
+      { "type": "meal", "title": "Lunch", "paidBy": { "sammad": 310 }, "shares": { "sammad": 95, "umair": 60, "rizwan": 60, "junaid": 95 } },
+      { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 110 }, "for": ["sammad", "umair", "rizwan"] }
     ]
   }
 }
