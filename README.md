@@ -35,6 +35,24 @@ Shortcuts:
 - **Delete** has an **Undo** button in the pop-up.
 - **Record** on a *Settle up* row pre-fills the transfer.
 
+## Install it on a phone (Android & iPhone)
+
+Lunch Book is a **Progressive Web App**: it installs from the shared GitHub Pages link, with no app store. It then opens full-screen from a home-screen icon and works offline.
+
+- **Android** (Chrome, Edge, Samsung Internet): a pop-up appears after a few seconds → tap **Install**.
+- **iPhone / iPad** (Safari): the pop-up shows three steps: **Share** → **Add to Home Screen** → **Add**. Apple doesn't allow a one-tap install button.
+- Opened from **WhatsApp** or another in-app browser: the pop-up says to open the link in Safari or Chrome first.
+- **Not now** hides the pop-up for 3 days. The 📲 phone icon in the top bar opens it again at any time. It never shows once the app is installed.
+
+How it stays fast and up to date (`sw.js`):
+- App files load instantly from the phone's cache. Each launch checks for newer files in the background. If you've pushed a change, users get a **"Lunch Book was updated · Refresh"** prompt.
+- Numbers (`data/`) always come from the network first, so they're fresh. With no signal, the last saved numbers are shown.
+- Saving (`api/`) is never cached.
+
+The installed app is **view-only**, like the shared page. Keep adding entries on your computer with `npm start`.
+
+Files: `manifest.webmanifest` (name, colours, icons), `sw.js` (offline cache), `pwa.js` (install pop-up), `icons/` (home-screen icons).
+
 ## The five kinds of entry
 
 | Type | When to use it | Effect |

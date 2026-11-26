@@ -206,7 +206,8 @@ button { cursor: pointer; }
 .view { animation: viewIn 0.5s var(--ease); }
 @keyframes viewIn { from { opacity: 0; transform: translateY(12px); } }
 .grid { display: grid; gap: 18px; }
-.grid.two { grid-template-columns: 1.35fr 1fr; }
+.grid.two { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); }
+.grid > *, .stack > * { min-width: 0; }
 .grid.three { grid-template-columns: repeat(3, 1fr); }
 .grid.four { grid-template-columns: repeat(4, 1fr); }
 .stack { display: flex; flex-direction: column; gap: 18px; }
@@ -411,7 +412,7 @@ button { cursor: pointer; }
 .entry:hover { border-color: var(--line-2); box-shadow: var(--shadow); }
 .entry.flash { animation: flash 1.6s var(--ease); }
 @keyframes flash { 0%, 30% { box-shadow: 0 0 0 3px var(--accent); } }
-.entry-main { display: grid; grid-template-columns: auto 1fr auto auto; align-items: center; gap: 14px; padding: 12px 14px; cursor: pointer; }
+.entry-main { display: grid; grid-template-columns: auto minmax(0, 1fr) auto auto; align-items: center; gap: 14px; padding: 12px 14px; cursor: pointer; }
 .type-icon { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; }
 .type-icon .ic { width: 19px; height: 19px; }
 .entry-title strong { display: block; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -577,6 +578,43 @@ tr.current td:first-child::after { content: "now"; margin-left: 8px; font-size: 
 @keyframes toastIn { from { opacity: 0; transform: translateY(20px) scale(0.9); } }
 @keyframes toastOut { to { opacity: 0; transform: translateY(10px) scale(0.95); } }
 
+/* ============ install app sheet ============ */
+.install {
+  position: fixed; z-index: 70; left: 50%; bottom: max(20px, env(safe-area-inset-bottom));
+  width: min(440px, calc(100vw - 24px)); transform: translateX(-50%);
+  background: var(--card-solid); border: 1px solid var(--line-2); border-radius: 24px;
+  padding: 18px 18px 16px; box-shadow: var(--shadow-lg);
+  animation: installIn 0.55s var(--spring) both;
+}
+.install::before { /* soft glow behind the sheet */
+  content: ""; position: absolute; inset: -1px; border-radius: inherit; z-index: -1;
+  background: var(--grad); filter: blur(22px); opacity: 0.25;
+}
+.install.closing { animation: installOut 0.26s ease both; }
+@keyframes installIn { from { opacity: 0; transform: translate(-50%, 40px) scale(0.96); } }
+@keyframes installOut { to { opacity: 0; transform: translate(-50%, 30px) scale(0.97); } }
+.install-close { position: absolute; top: 12px; right: 12px; }
+.install-head { display: flex; gap: 14px; align-items: center; padding-right: 36px; }
+.install-head img { width: 56px; height: 56px; border-radius: 15px; box-shadow: 0 10px 24px -10px var(--accent); animation: iconPop 0.7s var(--spring) 0.15s both; }
+@keyframes iconPop { from { transform: scale(0.4) rotate(-12deg); opacity: 0; } }
+.install-head h3 { font-size: 18px; }
+.install-head p { color: var(--muted); font-size: 13.5px; margin-top: 2px; }
+.install-perks { display: flex; flex-wrap: wrap; gap: 6px; margin: 14px 0 4px; }
+.install-perks span { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; padding: 5px 9px; border-radius: 99px; background: var(--card-2); color: var(--muted); }
+.install-perks .ic { width: 14px; height: 14px; color: var(--accent); }
+.install-steps { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.install-steps li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--card-2); font-size: 14px; animation: popIn 0.4s var(--ease) both; animation-delay: calc(var(--i) * 90ms + 0.2s); }
+.install-steps .n { width: 24px; height: 24px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--grad); color: #fff; font-weight: 700; font-size: 12.5px; }
+.install-steps .ic { width: 18px; height: 18px; vertical-align: -4px; color: var(--info); margin: 0 2px; }
+.install-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 14px; }
+.install-actions .btn { flex: 1; }
+.install-arrow { position: absolute; left: 50%; bottom: -34px; transform: translateX(-50%) rotate(90deg); color: var(--accent); animation: pointDown 1.2s ease-in-out infinite; }
+.install-arrow .ic { width: 28px; height: 28px; stroke-width: 3; }
+@keyframes pointDown { 50% { transform: translateX(-50%) translateY(8px) rotate(90deg); } }
+
+/* installed app: respect the notch / status bar */
+.standalone .topbar { padding-top: max(12px, env(safe-area-inset-top)); }
+
 /* ============ FAB & loading ============ */
 .fab {
   position: fixed; right: 20px; bottom: 22px; z-index: 40; width: 60px; height: 60px; border-radius: 20px; border: 0;
@@ -596,7 +634,7 @@ tr.current td:first-child::after { content: "now"; margin-left: 8px; font-size: 
 
 /* ============ responsive ============ */
 @media (max-width: 980px) {
-  .grid.two { grid-template-columns: 1fr; }
+  .grid.two { grid-template-columns: minmax(0, 1fr); }
   .grid.four { grid-template-columns: repeat(2, 1fr); }
   .hero-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .sources-grid { grid-template-columns: 1fr; }
@@ -616,6 +654,8 @@ tr.current td:first-child::after { content: "now"; margin-left: 8px; font-size: 
   .add-top { display: none !important; }
   .fab { display: grid; bottom: calc(max(12px, env(safe-area-inset-bottom)) + 78px); right: 18px; width: 56px; height: 56px; }
   .toasts { bottom: 100px; }
+  .install { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 84px); }
+  .install.point-down { bottom: calc(max(12px, env(safe-area-inset-bottom)) + 44px); }
   .main { padding: 18px 16px 140px; }
   .hero { grid-template-columns: 1fr; justify-items: center; text-align: center; padding: 22px 18px; }
   .hero-copy .sub { margin: 0 auto; }
@@ -625,7 +665,9 @@ tr.current td:first-child::after { content: "now"; margin-left: 8px; font-size: 
   .grid.three, .skeleton-row { grid-template-columns: 1fr; }
   .wallet { grid-template-columns: auto 1fr auto; }
   .wallet .diverge { grid-column: 1 / -1; grid-row: 2; }
-  .entry-main { grid-template-columns: auto 1fr auto; }
+  .entry-main { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .settle { flex-wrap: wrap; }
+  .settle b { margin-left: auto; }
   .entry-actions { grid-column: 1 / -1; opacity: 1; justify-content: flex-end; }
   .sheet-panel { left: 0; right: 0; top: auto; bottom: 0; transform: none; width: 100%; max-height: 92vh; border-radius: 24px 24px 0 0; animation: sheetUp 0.45s var(--ease) both; }
   @keyframes sheetUp { from { transform: translateY(100%); } }
