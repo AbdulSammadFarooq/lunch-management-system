@@ -71,7 +71,8 @@
     ],
     "2026-11-26": [
       { "type": "meal", "title": "Lunch at Office", "paidBy": { "sammad": 450 }, "shares": { "sammad": 60, "wajahat": 110, "umair": 60, "rizwan": 110, "junaid": 110 } },
-      { "type": "tip", "title": "Tip", "charges": { "sammad": 2, "wajahat": 2, "umair": 2, "rizwan": 2, "junaid": 2 }, "note": "Tip for Ijaz" }
+      { "type": "tip", "title": "Tip", "charges": { "sammad": 2, "wajahat": 2, "umair": 2, "rizwan": 2, "junaid": 2 }, "note": "Tip for Ijaz" },
+      { "type": "meal", "title": "Tea", "paidBy": { "sammad": 500 }, "for": ["sammad", "umair", "rizwan", "junaid"] }
     ]
   }
 }
