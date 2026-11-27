@@ -74,6 +74,10 @@
       { "type": "tip", "title": "Tip", "charges": { "sammad": 2, "wajahat": 2, "umair": 2, "rizwan": 2, "junaid": 2 }, "note": "Tip for Ijaz" },
       { "type": "meal", "title": "Tea", "paidBy": { "sammad": 500 }, "for": ["sammad", "umair", "rizwan", "junaid"] },
       { "type": "meal", "title": "Snacks", "paidBy": { "sammad": 210 }, "for": ["wajahat", "umair", "rizwan", "junaid"] }
+    ],
+    "2026-11-27": [
+      { "type": "meal", "title": "Lunch at savour food", "paidBy": { "sammad": 3477 }, "for": ["sammad", "wajahat", "umair", "rizwan", "junaid"] },
+      { "type": "transfer", "title": "Exchange", "from": "sammad", "to": "umair", "amount": 1000, "note": "Fuel for car" }
     ]
   }
 }
